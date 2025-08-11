@@ -1,0 +1,56 @@
+{
+  "name": "itxshakil/laravel-fast2sms",
+  "description": "A Laravel package for sending SMS using Fast2sms API with a fluent interface.",
+  "keywords": [
+    "laravel",
+    "fast2sms",
+    "sms",
+    "package",
+    "fluent-api"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Shakil Alam",
+      "email": "itxshakil@gmail.com",
+      "homepage": "https://github.com/itxshakil",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.3",
+    "illuminate/support": "^12.0",
+    "illuminate/http": "^12.0"
+  },
+    "require-dev": {
+        "orchestra/testbench": "^10.4",
+        "phpunit/phpunit": "^12.3",
+        "laravel/pint": "^1.24"
+    },
+  "autoload": {
+    "psr-4": {
+      "Shakil\\Fast2sms\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Shakil\\Fast2sms\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Shakil\\Fast2sms\\Fast2smsServiceProvider"
+      ],
+      "aliases": {
+        "Fast2sms": "Shakil\\Fast2sms\\Facades\\Fast2sms"
+      }
+    }
+  },
+  "scripts": {
+      "test": "phpunit",
+      "lint": "pint"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
