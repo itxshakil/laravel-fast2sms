@@ -1,6 +1,10 @@
-### Fast2sms Laravel Package
+# Laravel Fast2sms 📲
 
-A robust and simple-to-use Laravel package for sending SMS messages via the **Fast2sms API**. This package offers a powerful, fluent interface that simplifies sending different types of SMS, including **Quick**, **DLT**, and **OTP** messages.
+[![Latest Version](https://img.shields.io/packagist/v/itxshakil/laravel-fast2sms.svg?style=flat-square)](https://packagist.org/packages/itxshakil/laravel-fast2sms)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+A **Laravel package** for sending SMS using the [Fast2sms API](https://www.fast2sms.com/) with a **fluent, expressive interface**.  
+Supports **Quick SMS**, **DLT templates**, **OTP**, scheduling, and balance checks.
 
 -----
 
@@ -23,6 +27,7 @@ Install the package via Composer:
 ```bash
 composer require itxshakil/laravel-fast2sms
 ```
+The package supports **Laravel auto-discovery**. No manual provider registration is required.
 
 #### Configuration
 
@@ -50,17 +55,14 @@ FAST2SMS_DEFAULT_ROUTE="dlt"
 
 You can use the **`Fast2sms` facade** for convenience. The package supports three primary sending methods, each with a dedicated helper function.
 
-```php
-use Shakil\Fast2sms\Facades\Fast2sms;
-use Shakil\Fast2sms\Enums\SmsLanguage;
-use Shakil\Fast2sms\Enums\SmsRoute;
-```
-
 #### Quick SMS
 
 Quickly send a simple message. This route uses a random sender ID and is not DLT compliant.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Enums\SmsLanguage;
+
 Fast2sms::quick('9999999999', 'Hello, this is a Quick SMS!');
 
 // Send with a Unicode message
@@ -72,6 +74,8 @@ Fast2sms::quick('9999999999', 'नमस्ते! यह एक क्विक
 Send a DLT-approved message with a template and variables.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
 Fast2sms::dlt(
     numbers: '9999999999',
     templateId: 'YOUR_TEMPLATE_ID',
@@ -85,6 +89,8 @@ Fast2sms::dlt(
 Send a one-time password.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
 Fast2sms::otp('9999999999', '123456');
 ```
 
@@ -93,6 +99,9 @@ Fast2sms::otp('9999999999', '123456');
 For more control, you can build your message step-by-step.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Enums\SmsRoute;
+
 Fast2sms::to('9999999999')
     ->route(SmsRoute::DLT)
     ->senderId('YOUR_SENDER_ID')
@@ -106,6 +115,8 @@ Fast2sms::to('9999999999')
 Retrieve your current wallet balance and available SMS count. The response object provides properties for easy access to the data.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
 $response = Fast2sms::checkBalance();
 
 if ($response->success()) {
@@ -119,6 +130,7 @@ if ($response->success()) {
 Get details about your DLT sender IDs or templates. The response object includes helper methods to parse the data.
 
 ```php
+use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Responses\DltManagerResponse;
 
 // Get DLT sender IDs
@@ -154,6 +166,21 @@ foreach ($sendersResponse->getSenders() as $sender) {
 | `->dltManager(string $type)` | Retrieves DLT manager details for `sender` or `template` types. |
 
 -----
+
+### ⚠️ Exceptions
+All errors throw `Fast2smsException`.
+
+Make sure to catch them when handling SMS sending:
+
+```php
+use Fast2sms\LaravelFast2sms\Exceptions\Fast2smsException;
+
+try {
+    Fast2sms::quick('9999999999', 'Hello World');
+} catch (Fast2smsException $e) {
+    logger()->error("SMS failed: " . $e->getMessage());
+}
+```
 
 ### 🤝 Contributing
 
