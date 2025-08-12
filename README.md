@@ -182,6 +182,56 @@ try {
 }
 ```
 
+### Monitoring Your SMS Balance
+
+Using the `sms:monitor` Artisan command, you can instruct Laravel to dispatch a `Shakil\Fast2sms\Events\LowBalanceDetected` event if your Fast2sms wallet balance falls below a specified threshold.
+
+To get started, you should schedule the `sms:monitor` command to run at your desired interval. The command accepts an optional `--threshold` value representing the minimum balance (in ₹) that should be maintained before dispatching an event:
+
+```bash
+php artisan sms:monitor --threshold=500
+````
+
+If no threshold is specified, the value from your configuration file will be used:
+
+```php
+// config/fast2sms.php
+'balance_threshold' => 1000,
+```
+
+Scheduling this command alone is not enough to trigger a notification alerting you that your balance is low. When the command detects a balance that is less than or equal to your threshold, a `LowBalanceDetected` event will be dispatched. You should listen for this event within your application's `AppServiceProvider` in order to send a notification to yourself or your team:
+
+```php
+use App\Notifications\LowSmsBalanceNotification;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
+use Shakil\Fast2sms\Events\LowBalanceDetected;
+
+/**
+ * Bootstrap any application services.
+ */
+public function boot(): void
+{
+    Event::listen(function (LowBalanceDetected $event) {
+        Notification::route('mail', 'dev@example.com')
+            ->notify(new LowSmsBalanceNotification(
+                $event->balance,
+                $event->threshold
+            ));
+    });
+}
+```
+
+For example, you might schedule the balance monitor to run every hour in your application's `App\Console\Kernel` class:
+
+```php
+protected function schedule(Schedule $schedule)
+{
+    $schedule->command('sms:monitor')->hourly();
+}
+```
+
+
 ### 🤝 Contributing
 
 Contributions are always welcome\! Feel free to open an issue or submit a pull request if you find a bug or have a suggestion.
