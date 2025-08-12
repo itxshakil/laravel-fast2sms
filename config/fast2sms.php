@@ -59,5 +59,15 @@ return [
     |
     */
     'timeout' => 30,
+
+    /**
+     * ---------------------------------------------------------------------------
+     * Fast2sms Balance Threshold
+     * ---------------------------------------------------------------------------
+     *
+     * This is the minimum balance threshold for triggering low balance events.
+     */
+
+    'balance_threshold' => env('FAST2SMS_BALANCE_THRESHOLD', 1000),
 ];
 

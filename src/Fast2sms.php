@@ -9,6 +9,7 @@ use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
+use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 use Shakil\Fast2sms\Traits\HandlesFaking;
 use Shakil\Fast2sms\Traits\ManagesSmsParameters;
 
@@ -123,14 +124,28 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Retrieve the wallet balance from Fast2sms.
      *
+     * @param float|null $threshold Optional threshold to check for low balance
      * @return Fast2smsResponse
      *
      * @throws Fast2smsException If the API call fails.
      */
-    public function checkBalance(): Fast2smsResponse
+    public function checkBalance(?float $threshold = null): Fast2smsResponse
     {
-        return $this->executeApiCall([], '/wallet');
+        /**
+         * @var WalletBalanceResponse $response
+         */
+        $response = $this->executeApiCall([], '/wallet');
+
+        if ($threshold !== null) {
+            $balance = $response->balance;
+            if ($balance <= $threshold) {
+                event(new Events\LowBalanceDetected($balance, $threshold));
+            }
+        }
+
+        return $response;
     }
+
 
     /**
      * Retrieve DLT manager details from Fast2sms.
