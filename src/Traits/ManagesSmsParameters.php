@@ -224,6 +224,106 @@ trait ManagesSmsParameters
     }
 
     /**
+     * Get the current numbers.
+     *
+     * @return array
+     */
+    public function getNumbers(): array
+    {
+        return $this->numbers;
+    }
+
+    /**
+     * Get the current message.
+     *
+     * @return string
+     */
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * Get the current route.
+     *
+     * @return SmsRoute
+     */
+    public function getRoute(): SmsRoute
+    {
+        return $this->route;
+    }
+
+    /**
+     * Get the current language.
+     *
+     * @return SmsLanguage
+     */
+    public function getLanguage(): SmsLanguage
+    {
+        return $this->language;
+    }
+
+    /**
+     * Get the current sender ID.
+     *
+     * @return string|null
+     */
+    public function getSenderId(): ?string
+    {
+        return $this->senderId;
+    }
+
+    /**
+     * Get the current entity ID.
+     *
+     * @return string|null
+     */
+    public function getEntityId(): ?string
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * Get the current template ID.
+     *
+     * @return string|null
+     */
+    public function getTemplateId(): ?string
+    {
+        return $this->templateId;
+    }
+
+    /**
+     * Get the current variables values.
+     *
+     * @return array|string|null
+     */
+    public function getVariablesValues(): array|string|null
+    {
+        return $this->variablesValues;
+    }
+
+    /**
+     * Get the current flash status.
+     *
+     * @return bool
+     */
+    public function isFlash(): bool
+    {
+        return $this->flash;
+    }
+
+    /**
+     * Get the current schedule time.
+     *
+     * @return string|null
+     */
+    public function getScheduleTime(): ?string
+    {
+        return $this->scheduleTime;
+    }
+
+    /**
      * Reset the state of the Fast2sms instance after sending.
      * This ensures that subsequent calls start with a clean slate.
      *

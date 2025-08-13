@@ -12,6 +12,7 @@ use Shakil\Fast2sms\Responses\Fast2smsResponse;
 use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 use Shakil\Fast2sms\Traits\HandlesFaking;
 use Shakil\Fast2sms\Traits\ManagesSmsParameters;
+use Shakil\Fast2sms\Traits\QueuesSms;
 
 /**
  * Main service class for interacting with the Fast2sms API.
@@ -24,6 +25,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
 {
     use HandlesFaking;
     use ManagesSmsParameters;
+    use QueuesSms;
 
     /**
      * Create a new Fast2sms instance.

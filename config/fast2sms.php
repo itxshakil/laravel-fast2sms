@@ -69,5 +69,19 @@ return [
      */
 
     'balance_threshold' => env('FAST2SMS_BALANCE_THRESHOLD', 1000),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure the default queue settings for SMS jobs
+    |
+    */
+    'queue' => [
+        'connection' => env('FAST2SMS_QUEUE_CONNECTION', 'default'),
+        'name' => env('FAST2SMS_QUEUE_NAME', 'fast2sms'),
+    ],
+
 ];
 

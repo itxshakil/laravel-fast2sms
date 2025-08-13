@@ -4,74 +4,125 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A **Laravel package** for sending SMS using the [Fast2sms API](https://www.fast2sms.com/) with a **fluent, expressive interface**.  
-Supports **Quick SMS**, **DLT templates**, **OTP**, scheduling, and balance checks.
+Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and balance checks.
 
------
+---
 
-### ✨ Features
+## Table of Contents
 
-* **Fluent Interface:** Build and send SMS messages with a concise, chainable API.
-* **Multiple Routes:** Full support for **Quick SMS**, **DLT SMS**, and **OTP SMS**.
-* **Easy Configuration:** Use a simple configuration file and environment variables to set up your API key and default settings.
-* **DLT Compliant:** Dedicated methods for sending DLT (Distributed Ledger Technology) messages with support for templates and variables.
-* **Service & Facade:** Use the `Fast2sms` service directly or through a convenient facade.
-* **API Helpers:** Methods to check your Fast2sms wallet balance and retrieve DLT sender/template details.
-* **Artisan Command:** Quickly publish the configuration file with a single command.
+- [Requirements](#requirements)
+- [Features](#features)
+- [Quick Start Guide](#quick-start-guide)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Basic Usage](#basic-usage)
+- [API Methods](#api-methods)
+- [Error Handling](#exceptions)
+- [Advanced Features](#advanced-features)
+- [Contributing](#contributing)
+- [License](#license)
 
------
+---
 
-### ⚙️ Installation
+## Requirements
+
+- **PHP 8.3 or higher**
+- **Laravel 12 or higher** (the package relies on `illuminate/support` v12+)
+
+---
+
+## ✨ Features
+
+- **Fluent Interface:** Chainable API for building and sending SMS.
+- **Multiple Routes:** Supports **Quick SMS**, **DLT SMS**, and **OTP SMS**.
+- **Queue Support:** Built-in job queueing for asynchronous processing.
+- **Easy Configuration:** Simple config file and environment variable setup.
+- **DLT Compliant:** Send DLT messages with templates and variables.
+- **Service & Facade:** Use the `Fast2sms` service directly or via facade.
+- **API Helpers:** Check wallet balance and DLT details.
+- **Artisan Commands:** Publish configuration and monitor balance.
+
+---
+
+## 🚀 Quick Start Guide
+
+1. **Install via Composer:**
+    ```bash
+    composer require itxshakil/laravel-fast2sms
+    ```
+
+2. **Publish Configuration:**
+    ```bash
+    php artisan vendor:publish --tag=fast2sms-config
+    ```
+   This creates `fast2sms.php` in your `config` directory.
+
+3. **Update Environment Variables:**
+   Add to your `.env`:
+    ```ini
+    FAST2SMS_API_KEY="YOUR_API_KEY"
+    FAST2SMS_DEFAULT_SENDER_ID="FSTSMS"
+    FAST2SMS_DEFAULT_ROUTE="dlt"
+    ```
+
+4. **Send Your First DLT SMS:**
+    ```php
+    use Shakil\Fast2sms\Facades\Fast2sms;
+
+    Fast2sms::dlt(
+        numbers: '9999999999',
+        templateId: 'YOUR_TEMPLATE_ID',
+        variablesValues: ['John Doe'],
+        senderId: 'YOUR_SENDER_ID'
+    );
+    ```
+
+---
+
+## ⚙️ Installation
 
 Install the package via Composer:
 
 ```bash
 composer require itxshakil/laravel-fast2sms
 ```
-The package supports **Laravel auto-discovery**. No manual provider registration is required.
+Supports **Laravel auto-discovery**. No manual provider registration required.
 
-#### Configuration
+---
 
-Publish the configuration file using the Artisan command:
+## 🛠️ Configuration
 
+**Publish the configuration file:**
 ```bash
 php artisan vendor:publish --tag=fast2sms-config
 ```
+Creates `fast2sms.php` in your `config` directory.
 
-This will create a `fast2sms.php` file in your `config` directory.
-
-#### Environment Variables
-
-Update your `.env` file with your Fast2sms API key and other defaults:
-
+**Environment Variables:**
+Update your `.env` file:
 ```ini
 FAST2SMS_API_KEY="YOUR_API_KEY"
 FAST2SMS_DEFAULT_SENDER_ID="FSTSMS"
 FAST2SMS_DEFAULT_ROUTE="dlt"
 ```
 
------
+---
 
-### 📝 Usage
+## 📝 Basic Usage
 
-You can use the **`Fast2sms` facade** for convenience. The package supports three primary sending methods, each with a dedicated helper function.
+Use the **`Fast2sms` facade** for convenience. Three primary sending methods, each with a dedicated helper.
 
-#### Quick SMS
-
-Quickly send a simple message. This route uses a random sender ID and is not DLT compliant.
+### Quick SMS
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 
 Fast2sms::quick('9999999999', 'Hello, this is a Quick SMS!');
-
-// Send with a Unicode message
 Fast2sms::quick('9999999999', 'नमस्ते! यह एक क्विक एसएमएस है।', SmsLanguage::UNICODE);
 ```
 
-#### DLT SMS
-
-Send a DLT-approved message with a template and variables.
+### DLT SMS
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -84,9 +135,7 @@ Fast2sms::dlt(
 );
 ```
 
-#### OTP SMS
-
-Send a one-time password.
+### OTP SMS
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -94,9 +143,7 @@ use Shakil\Fast2sms\Facades\Fast2sms;
 Fast2sms::otp('9999999999', '123456');
 ```
 
-#### Fluent Interface
-
-For more control, you can build your message step-by-step.
+### Fluent Interface
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -110,9 +157,7 @@ Fast2sms::to('9999999999')
     ->send();
 ```
 
-#### Check Wallet Balance
-
-Retrieve your current wallet balance and available SMS count. The response object provides properties for easy access to the data.
+### Check Wallet Balance
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -125,9 +170,7 @@ if ($response->success()) {
 }
 ```
 
-#### Check DLT Manager Details
-
-Get details about your DLT sender IDs or templates. The response object includes helper methods to parse the data.
+### Check DLT Manager Details
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -142,35 +185,35 @@ foreach ($sendersResponse->getSenders() as $sender) {
 }
 ```
 
------
+---
 
-### 📚 API Methods
+## 📚 API Methods
 
 | Method | Description |
 |---|---|
-| `->to(string\|array $numbers)` | Sets the recipient mobile number(s). |
-| `->message(string $message)` | Sets the message content. For DLT, this is the template ID. |
-| `->senderId(string $senderId)` | Sets the DLT-approved sender ID. |
-| `->route(SmsRoute $route)` | Sets the SMS route (`DLT`, `QUICK`, `OTP`, etc.). |
-| `->entityId(string $entityId)` | Sets the DLT Principal Entity ID. |
-| `->templateId(string $templateId)` | Sets the DLT Content Template ID. |
-| `->variables(array\|string $values)` | Sets the pipe-separated variable values for a DLT template. |
-| `->flash(bool $flash)` | Toggles sending a flash message. |
-| `->language(SmsLanguage $language)` | Sets the message language (`ENGLISH`, `UNICODE`). |
-| `->schedule(string\|DateTimeInterface $time)` | Schedules the SMS to be sent at a specific time. |
-| `->send()` | Sends the SMS using the configured parameters. |
-| `->quick(...)` | A quick helper method to send a simple SMS. |
-| `->dlt(...)` | A quick helper method for DLT messages. |
-| `->otp(...)` | A quick helper method for OTP messages. |
-| `->checkBalance()` | Retrieves the Fast2sms wallet balance. |
-| `->dltManager(string $type)` | Retrieves DLT manager details for `sender` or `template` types. |
+| `->to(string|array $numbers)` | Sets recipient mobile number(s). |
+| `->message(string $message)` | Sets message content (DLT: template ID). |
+| `->senderId(string $senderId)` | Sets DLT-approved sender ID. |
+| `->route(SmsRoute $route)` | Sets SMS route (`DLT`, `QUICK`, `OTP`, etc.). |
+| `->entityId(string $entityId)` | Sets DLT Principal Entity ID. |
+| `->templateId(string $templateId)` | Sets DLT Content Template ID. |
+| `->variables(array|string $values)` | Sets pipe-separated variable values for DLT template. |
+| `->flash(bool $flash)` | Toggles flash message. |
+| `->language(SmsLanguage $language)` | Sets message language (`ENGLISH`, `UNICODE`). |
+| `->schedule(string|DateTimeInterface $time)` | Schedules SMS at a specific time. |
+| `->send()` | Sends SMS with configured parameters. |
+| `->quick(...)` | Quick helper to send simple SMS. |
+| `->dlt(...)` | Helper for DLT messages. |
+| `->otp(...)` | Helper for OTP messages. |
+| `->checkBalance()` | Retrieves wallet balance. |
+| `->dltManager(string $type)` | Retrieves DLT manager details for `sender` or `template`. |
 
------
+---
 
-### ⚠️ Exceptions
-All errors throw `Fast2smsException`.
+## ⚠️ Exceptions
 
-Make sure to catch them when handling SMS sending:
+All errors throw `Fast2smsException`.  
+Catch them when handling SMS sending:
 
 ```php
 use Fast2sms\LaravelFast2sms\Exceptions\Fast2smsException;
@@ -182,15 +225,80 @@ try {
 }
 ```
 
-### Monitoring Your SMS Balance
+---
 
-Using the `sms:monitor` Artisan command, you can instruct Laravel to dispatch a `Shakil\Fast2sms\Events\LowBalanceDetected` event if your Fast2sms wallet balance falls below a specified threshold.
+## 🧩 Advanced Features
 
-To get started, you should schedule the `sms:monitor` command to run at your desired interval. The command accepts an optional `--threshold` value representing the minimum balance (in ₹) that should be maintained before dispatching an event:
+### 🚀 Queue Integration
 
+Supports Laravel's queue system for asynchronous SMS sending.
+
+**Queue Configuration:**
+```php
+// config/queue.php 
+'connections' => [ 
+    'redis' => [ 
+        'driver' => 'redis', 
+        // ... other redis configuration 
+    ], 
+],
+```
+
+**Queueing SMS Messages:**
+```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
+// Queue a Quick SMS
+Fast2sms::quickQueue('9999999999', 'Hello from queue!');
+
+// Queue a DLT SMS
+Fast2sms::dltQueue(
+    numbers: '9999999999',
+    templateId: 'YOUR_TEMPLATE_ID',
+    variablesValues: ['John Doe'],
+    senderId: 'YOUR_SENDER_ID'
+);
+
+// Queue an OTP SMS
+Fast2sms::otpQueue('9999999999', '123456');
+```
+
+**Advanced Queue Options:**
+```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Enums\SmsRoute;
+
+Fast2sms::to('9999999999')
+    ->message('Test message')
+    ->route(SmsRoute::QUICK)
+    ->onConnection('redis')   // Specify queue connection
+    ->onQueue('sms')          // Specify queue name
+    ->delay(now()->addMinutes(10)) // Add delay
+    ->queue();                // Queue the SMS
+```
+
+**Queue Methods:**
+
+| Method | Description |
+|---|---|
+| `->queue()` | Queue SMS using default settings |
+| `->onConnection(string $name)` | Set queue connection |
+| `->onQueue(string $queue)` | Set queue name |
+| `->delay($delay)` | Set delay before processing |
+| `->quickQueue()` | Queue Quick SMS |
+| `->dltQueue()` | Queue DLT SMS |
+| `->otpQueue()` | Queue OTP SMS |
+
+---
+
+### 📊 Monitoring SMS Balance
+
+Use the `sms:monitor` Artisan command to dispatch a `Shakil\Fast2sms\Events\LowBalanceDetected` event if your wallet balance falls below a threshold.
+
+**Schedule the command:**
 ```bash
 php artisan sms:monitor --threshold=500
-````
+```
 
 If no threshold is specified, the value from your configuration file will be used:
 
@@ -199,17 +307,13 @@ If no threshold is specified, the value from your configuration file will be use
 'balance_threshold' => 1000,
 ```
 
-Scheduling this command alone is not enough to trigger a notification alerting you that your balance is low. When the command detects a balance that is less than or equal to your threshold, a `LowBalanceDetected` event will be dispatched. You should listen for this event within your application's `AppServiceProvider` in order to send a notification to yourself or your team:
-
+**Listen for the event in `AppServiceProvider`:**
 ```php
 use App\Notifications\LowSmsBalanceNotification;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades/Event;
 use Illuminate\Support\Facades\Notification;
 use Shakil\Fast2sms\Events\LowBalanceDetected;
 
-/**
- * Bootstrap any application services.
- */
 public function boot(): void
 {
     Event::listen(function (LowBalanceDetected $event) {
@@ -222,8 +326,7 @@ public function boot(): void
 }
 ```
 
-For example, you might schedule the balance monitor to run every hour in your application's `App\Console\Kernel` class:
-
+**Example schedule in `App\Console\Kernel`:**
 ```php
 protected function schedule(Schedule $schedule)
 {
@@ -231,13 +334,15 @@ protected function schedule(Schedule $schedule)
 }
 ```
 
+---
 
-### 🤝 Contributing
+## 🤝 Contributing
 
-Contributions are always welcome\! Feel free to open an issue or submit a pull request if you find a bug or have a suggestion.
+Contributions are always welcome!  
+Open an issue or submit a pull request for bugs or suggestions.
 
------
+---
 
-### 📄 License
+## 📄 License
 
 This package is open-source software licensed under the **[MIT license](https://opensource.org/licenses/MIT)**.
