@@ -291,9 +291,72 @@ Fast2sms::to('9999999999')
 
 ---
 
-### 📊 Monitoring SMS Balance
+### 📱 Notifications Channel
 
-Use the `sms:monitor` Artisan command to dispatch a `Shakil\Fast2sms\Events\LowBalanceDetected` event if your wallet balance falls below a threshold.
+Use Fast2sms as a notification channel in your Laravel applications:
+
+**Create a Notification:**
+```php
+use Illuminate\Notifications\Notification;
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Enums\SmsRoute;
+class LowSmsBalanceNotification extends Notification
+{
+    public function __construct(
+        protected float $balance,
+        protected float $threshold
+    ) {}
+
+    public function via($notifiable)
+    {
+        return ['fast2sms'];
+    }
+
+    public function toFast2sms($notifiable)
+    {
+        return Fast2sms::to($notifiable->phone)
+            ->message("Low SMS balance: {$this->balance}. Threshold: {$this->threshold}.")
+            ->route(SmsRoute::QUICK)
+            ->send();
+    }
+}
+```
+**Use route in SMS Notification:**
+```php
+use Illuminate\Notifications\RoutesNotifications;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
+class User extends Model
+{
+    use Notifiable, RoutesNotifications;
+
+    protected $fillable = ['name', 'email', 'phone'];
+
+    public function routeNotificationForFast2sms()
+    {
+        return $this->phone; // Return the phone number for Fast2sms
+    }
+}
+```
+
+**Send the notification:**
+```php
+use App\Notifications\LowSmsBalanceNotification;
+use Illuminate\Support\Facades\Notification;
+Notification::route('fast2sms', '9999999999')
+    ->notify(new LowSmsBalanceNotification(500, 1000));
+```
+
+**Model Setup:**
+Ensure your model has a `phone` attribute:
+```php
+use Illuminate\Database\Eloquent\Model;
+class User extends Model
+{
+    protected $fillable = ['name', 'email', 'phone'];
+}
+```
+---
 
 **Schedule the command:**
 ```bash
