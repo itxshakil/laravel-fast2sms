@@ -14,28 +14,24 @@ class WalletBalanceResponse extends Fast2smsResponse
 {
     /**
      * The current wallet balance.
-     *
-     * @var float|null
      */
     public readonly ?float $balance;
 
     /**
      * The number of SMS messages available.
-     *
-     * @var int|null
      */
     public readonly ?int $smsCount;
 
     /**
      * Creates a new WalletBalanceResponse instance.
      *
-     * @param array $data The raw response data from the API.
+     * @param  array  $data  The raw response data from the API.
      */
     public function __construct(array $data)
     {
         parent::__construct($data);
 
-        $this->balance = isset($data['wallet']) ? (float)$data['wallet'] : null;
-        $this->smsCount = isset($data['sms_count']) ? (int)$data['sms_count'] : null;
+        $this->balance = isset($data['wallet']) ? (float) $data['wallet'] : null;
+        $this->smsCount = isset($data['sms_count']) ? (int) $data['sms_count'] : null;
     }
 }

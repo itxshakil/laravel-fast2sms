@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Unit;
 
-use Shakil\Fast2sms\Responses\Fast2smsResponse;
-use Shakil\Fast2sms\Responses\SmsResponse;
-use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Shakil\Fast2sms\Responses\Fast2smsResponse;
+use Shakil\Fast2sms\Responses\SmsResponse;
+use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 
 class Fast2smsResponseTest extends TestCase
 {
@@ -48,7 +48,7 @@ class Fast2smsResponseTest extends TestCase
         $data = [
             'return' => true,
             'request_id' => 'abc-123',
-            'message' => ['Message sent to 9999999999']
+            'message' => ['Message sent to 9999999999'],
         ];
         $response = new SmsResponse($data);
 

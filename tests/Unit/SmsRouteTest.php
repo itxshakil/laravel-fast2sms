@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use ValueError;
 
 /**

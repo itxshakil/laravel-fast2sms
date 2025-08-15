@@ -6,8 +6,6 @@ namespace Shakil\Fast2sms\Enums;
 
 /**
  * Enum representing the available SMS languages for Fast2sms.
- *
- * @package Shakil\Fast2sms\Enums
  */
 enum SmsLanguage: string
 {
@@ -21,4 +19,3 @@ enum SmsLanguage: string
      */
     case UNICODE = 'unicode';
 }
-

@@ -51,6 +51,7 @@ class MonitorSmsBalance extends Command
 
         } catch (Fast2smsException $e) {
             $this->error("Failed to check SMS balance: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }
@@ -62,15 +63,10 @@ class MonitorSmsBalance extends Command
      */
     private function getThreshold(): float
     {
-        return (float)($this->option('threshold')
+        return (float) ($this->option('threshold')
             ?? config('fast2sms.balance_threshold', 1000));
     }
 
-    /**
-     * @param float|null $balance
-     * @param float $threshold
-     * @return void
-     */
     public function handleBalance(?float $balance, float $threshold): void
     {
         $this->info("Current SMS balance: ₹$balance");

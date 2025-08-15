@@ -6,8 +6,6 @@ namespace Shakil\Fast2sms\Enums;
 
 /**
  * Enum representing the available SMS routes for Fast2sms.
- *
- * @package Shakil\Fast2sms\Enums
  */
 enum SmsRoute: string
 {
@@ -35,4 +33,3 @@ enum SmsRoute: string
      */
     case DLT_MANUAL = 'dlt_manual';
 }
-

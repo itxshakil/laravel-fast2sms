@@ -67,7 +67,6 @@ return [
      *
      * This is the minimum balance threshold for triggering a low balance events.
      */
-
     'balance_threshold' => env('FAST2SMS_BALANCE_THRESHOLD', 1000),
 
     /*
@@ -84,4 +83,3 @@ return [
     ],
 
 ];
-

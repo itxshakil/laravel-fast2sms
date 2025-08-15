@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Assert;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
+
 use function is_array;
 
 /**
@@ -18,23 +19,17 @@ trait HandlesFaking
 {
     /**
      * Indicates if the Fast2sms service is faking SMS sends.
-     *
-     * @var bool
      */
     protected static bool $faking = false;
 
     /**
      * The collection of "sent" messages when faking.
-     *
-     * @var Collection
      */
     protected static Collection $sentMessages;
 
     /**
      * Enable faking for Fast2sms.
      * This will prevent actual HTTP calls and store messages in memory.
-     *
-     * @return void
      */
     public static function fake(): void
     {
@@ -42,7 +37,7 @@ trait HandlesFaking
         self::$sentMessages = collect();
 
         Http::fake([
-            config('fast2sms.base_url') . '*' => function ($request) {
+            config('fast2sms.base_url').'*' => function ($request) {
                 // Convert multipart request into array
                 $payload = [];
                 foreach ($request->data() as $part) {
@@ -53,23 +48,20 @@ trait HandlesFaking
 
                 return Http::response([
                     'return' => true,
-                    'message' => 'SMS sent successfully (faked).'
+                    'message' => 'SMS sent successfully (faked).',
                 ]);
             },
         ]);
     }
 
-
     /**
      * Assert that an SMS was sent.
      *
-     * @param array|Closure|null $callback
-     * @return void
      * @throws Fast2smsException
      */
     public static function assertSent(array|Closure|null $callback = null): void
     {
-        if (!self::$faking) {
+        if (! self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
@@ -79,6 +71,7 @@ trait HandlesFaking
                 self::$sentMessages->count(),
                 'No SMS was sent.'
             );
+
             return;
         }
 
@@ -86,10 +79,11 @@ trait HandlesFaking
             self::$sentMessages->contains(function ($message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
-                        if (!isset($message[$key]) || $message[$key] !== $value) {
+                        if (! isset($message[$key]) || $message[$key] !== $value) {
                             return false;
                         }
                     }
+
                     return true;
                 }
 
@@ -102,13 +96,11 @@ trait HandlesFaking
     /**
      * Assert that an SMS was not sent.
      *
-     * @param array|Closure|null $callback
-     * @return void
      * @throws Fast2smsException
      */
     public static function assertNotSent(array|Closure|null $callback = null): void
     {
-        if (!self::$faking) {
+        if (! self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
@@ -118,6 +110,7 @@ trait HandlesFaking
                 self::$sentMessages->count(),
                 'SMS was sent when it should not have been.'
             );
+
             return;
         }
 
@@ -125,10 +118,11 @@ trait HandlesFaking
             self::$sentMessages->contains(function ($message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
-                        if (!isset($message[$key]) || $message[$key] !== $value) {
+                        if (! isset($message[$key]) || $message[$key] !== $value) {
                             return false;
                         }
                     }
+
                     return true;
                 }
 
@@ -141,31 +135,26 @@ trait HandlesFaking
     /**
      * Assert that a specific number of SMS messages were sent.
      *
-     * @param int $count
-     * @return void
      * @throws Fast2smsException
      */
     public static function assertSentTimes(int $count): void
     {
-        if (!self::$faking) {
+        if (! self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
         Assert::assertEquals(
             $count,
             self::$sentMessages->count(),
-            "Expected $count SMS messages to be sent, but " . self::$sentMessages->count() . ' were sent.'
+            "Expected $count SMS messages to be sent, but ".self::$sentMessages->count().' were sent.'
         );
     }
 
     /**
      * Get all "sent" messages when faking.
-     *
-     * @return Collection
      */
     public static function sentMessages(): Collection
     {
         return self::$sentMessages;
     }
 }
-

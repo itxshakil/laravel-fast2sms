@@ -32,13 +32,11 @@ class SendSmsJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param SmsParameters $parameters Data transfer object containing all SMS parameters
+     * @param  SmsParameters  $parameters  Data transfer object containing all SMS parameters
      */
     public function __construct(
         public readonly SmsParameters $parameters
-    )
-    {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -46,10 +44,10 @@ class SendSmsJob implements ShouldQueue
      * Configures the Fast2sms instance with the stored parameters and sends the SMS.
      * All optional parameters are only set if they have values to maintain clean configuration.
      *
-     * @param Fast2sms $fast2sms The Fast2sms service instance
+     * @param  Fast2sms  $fast2sms  The Fast2sms service instance
+     *
      * @throws Fast2smsException If SMS sending fails or validation fails
      */
-
     public function handle(Fast2sms $fast2sms): void
     {
         $fast2sms

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Responses;
 
 use InvalidArgumentException;
+
 use function count;
 use function is_array;
 use function is_bool;
@@ -33,7 +34,7 @@ class Fast2smsResponse
     /**
      * The raw data from the Fast2sms API response.
      *
-     * @param array $data The raw response data from the API.
+     * @param  array  $data  The raw response data from the API.
      *
      * @throws InvalidArgumentException if the response data is invalid or malformed.
      */
@@ -43,19 +44,19 @@ class Fast2smsResponse
             throw new InvalidArgumentException('Response data cannot be empty.');
         }
 
-        if (!is_array($this->data)) {
+        if (! is_array($this->data)) {
             throw new InvalidArgumentException('Response data must be an array.');
         }
 
-        if (!isset($this->data['return']) && !isset($this->data['success'])) {
+        if (! isset($this->data['return']) && ! isset($this->data['success'])) {
             throw new InvalidArgumentException('Response data must contain "return" or "success" key.');
         }
 
-        if (!is_bool($this->data['return'] ?? $this->data['success'])) {
+        if (! is_bool($this->data['return'] ?? $this->data['success'])) {
             throw new InvalidArgumentException('"return" or "success" key must be a boolean.');
         }
 
-        if (isset($this->data['status_code']) && !is_int($this->data['status_code'])) {
+        if (isset($this->data['status_code']) && ! is_int($this->data['status_code'])) {
             throw new InvalidArgumentException('"status_code" key must be an integer.');
         }
 

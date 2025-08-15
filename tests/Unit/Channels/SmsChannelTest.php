@@ -35,9 +35,9 @@ class SmsChannelTest extends TestCase
     #[Test]
     public function it_can_send_string_message(): void
     {
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiable();
-        $notification = new TestStringNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestStringNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -56,9 +56,9 @@ class SmsChannelTest extends TestCase
     #[Test]
     public function it_can_send_dlt_message(): void
     {
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiable();
-        $notification = new TestDltNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestDltNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -79,9 +79,9 @@ class SmsChannelTest extends TestCase
     #[Test]
     public function it_can_send_quick_message_with_language(): void
     {
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiable();
-        $notification = new TestLanguageNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestLanguageNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -99,9 +99,9 @@ class SmsChannelTest extends TestCase
     #[Test]
     public function it_does_not_send_when_phone_number_is_missing(): void
     {
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiableWithoutPhone();
-        $notification = new TestStringNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiableWithoutPhone;
+        $notification = new TestStringNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -118,9 +118,9 @@ class SmsChannelTest extends TestCase
     {
         config(['fast2sms.default_route' => SmsRoute::QUICK->value]);
 
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiable();
-        $notification = new TestDefaultRouteNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestDefaultRouteNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -139,9 +139,9 @@ class SmsChannelTest extends TestCase
     {
         config(['fast2sms.default_sender_id' => 'DEFAULT']);
 
-        $channel = new SmsChannel();
-        $notifiable = new TestNotifiable();
-        $notification = new TestDefaultSenderNotification();
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestDefaultSenderNotification;
 
         $channel->send($notifiable, $notification);
 
@@ -191,7 +191,7 @@ class TestDltNotification extends Notification
 {
     public function toSms(mixed $notifiable): SmsMessage
     {
-        return (new SmsMessage())
+        return (new SmsMessage)
             ->route(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');
@@ -205,7 +205,7 @@ class TestLanguageNotification extends Notification
 {
     public function toSms(mixed $notifiable): SmsMessage
     {
-        return (new SmsMessage())
+        return (new SmsMessage)
             ->content('Test unicode message')
             ->route(SmsRoute::QUICK)
             ->language(SmsLanguage::UNICODE);
@@ -219,7 +219,7 @@ class TestDefaultRouteNotification extends Notification
 {
     public function toSms(mixed $notifiable): SmsMessage
     {
-        return (new SmsMessage())
+        return (new SmsMessage)
             ->content('Test message');
     }
 }
@@ -231,7 +231,7 @@ class TestDefaultSenderNotification extends Notification
 {
     public function toSms(mixed $notifiable): SmsMessage
     {
-        return (new SmsMessage())
+        return (new SmsMessage)
             ->content('Test message')
             ->route(SmsRoute::DLT)
             ->template('template123', ['var1']);

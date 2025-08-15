@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 
 class FakingTest extends TestCase
 {

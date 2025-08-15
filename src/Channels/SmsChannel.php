@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notification;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
+
 use function get_class;
 use function is_string;
 use function sprintf;
@@ -19,8 +20,6 @@ use function sprintf;
  * This channel allows sending SMS notifications through Fast2SMS service.
  * It supports both simple string messages and complex message objects with
  * additional parameters like templates, sender IDs, and language settings.
- *
- * @package Shakil\Fast2sms\Channels
  */
 class SmsChannel
 {
@@ -35,19 +34,18 @@ class SmsChannel
      * - Language settings
      * - Route specification
      *
-     * @param mixed $notifiable The entity receiving the notification
-     * @param Notification $notification The notification instance
+     * @param  mixed  $notifiable  The entity receiving the notification
+     * @param  Notification  $notification  The notification instance
      *
-     * @return void
      * @throws Fast2smsException When there's an error sending the SMS
      */
     public function send(mixed $notifiable, Notification $notification): void
     {
-        if (!$to = $notifiable->routeNotificationFor('sms', $notification)) {
+        if (! $to = $notifiable->routeNotificationFor('sms', $notification)) {
             return;
         }
 
-        if (!method_exists($notification, 'toSms')) {
+        if (! method_exists($notification, 'toSms')) {
             throw new BadMethodCallException(
                 sprintf('Method [toSms] missing from notification [%s].', get_class($notification))
             );

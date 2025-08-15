@@ -30,6 +30,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
 
     /**
      * Create a new Fast2sms instance.
+     *
      * @throws Fast2smsException
      */
     public function __construct()
@@ -46,7 +47,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Send an SMS using the currently configured parameters.
      *
-     * @return Fast2smsResponse
      *
      * @throws Fast2smsException If required parameters are missing or invalid.
      */
@@ -58,7 +58,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Execute an SMS send request to Fast2sms.
      *
-     * @return Fast2smsResponse
      *
      * @throws Fast2smsException If validation fails or API call fails.
      */
@@ -92,8 +91,8 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Assert that a value is not empty.
      *
-     * @param mixed $value The value to check.
-     * @param string $message The error message if the value is empty.
+     * @param  mixed  $value  The value to check.
+     * @param  string  $message  The error message if the value is empty.
      *
      * @throws Fast2smsException If the value is empty.
      */
@@ -172,11 +171,9 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Quickly send an SMS with minimal configuration.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $message The SMS message content.
-     * @param SmsLanguage|null $language Optional message language.
-     *
-     * @return Fast2smsResponse
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $message  The SMS message content.
+     * @param  SmsLanguage|null  $language  Optional message language.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -190,13 +187,11 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Send an SMS via DLT route.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $templateId The registered DLT template ID.
-     * @param array|string $variablesValues Template variable values.
-     * @param string|null $senderId Optional sender ID.
-     * @param string|null $entityId Optional entity ID (required for DLT_MANUAL route).
-     *
-     * @return Fast2smsResponse
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $templateId  The registered DLT template ID.
+     * @param  array|string  $variablesValues  Template variable values.
+     * @param  string|null  $senderId  Optional sender ID.
+     * @param  string|null  $entityId  Optional entity ID (required for DLT_MANUAL route).
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -210,24 +205,22 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Send an OTP SMS.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $otpValue The OTP code to send.
-     *
-     * @return Fast2smsResponse
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $otpValue  The OTP code to send.
      *
      * @throws Fast2smsException If validation fails.
      */
     public function otp(string|array $numbers, string $otpValue): Fast2smsResponse
     {
         $this->setOtp($numbers, $otpValue);
+
         return $this->send();
     }
 
     /**
      * Retrieve the wallet balance from Fast2sms.
      *
-     * @param float|null $threshold Optional threshold to check for low balance
-     * @return Fast2smsResponse
+     * @param  float|null  $threshold  Optional threshold to check for low balance
      *
      * @throws Fast2smsException If the API call fails.
      */
@@ -251,9 +244,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Retrieve DLT manager details from Fast2sms.
      *
-     * @param DltManagerType $type The type of DLT manager data ('sender' or 'template').
-     *
-     * @return Fast2smsResponse
+     * @param  DltManagerType  $type  The type of DLT manager data ('sender' or 'template').
      *
      * @throws Fast2smsException If validation fails or API call fails.
      */
@@ -267,7 +258,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Validate the DLT manager type value.
      *
-     * @param DltManagerType $type Must be "sender" or "template".
+     * @param  DltManagerType  $type  Must be "sender" or "template".
      *
      * @throws Fast2smsException If the value is invalid.
      */
@@ -280,8 +271,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
      * Hook method called after every API call.
      *
      * Used to reset SMS parameters for the next request.
-     *
-     * @return void
      */
     protected function afterApiCall(): void
     {

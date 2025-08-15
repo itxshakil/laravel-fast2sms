@@ -43,13 +43,14 @@
     }
   },
   "scripts": {
-    "test": "phpunit",
-    "test-coverage": "vendor/bin/pest --coverage"
+      "test": "phpunit",
+      "pint": "pint"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require-dev": {
     "orchestra/testbench": "^10.4",
-    "phpunit/phpunit": "^12.3"
+    "phpunit/phpunit": "^12.3",
+    "laravel/pint": "^1.24"
   }
 }

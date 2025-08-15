@@ -22,7 +22,6 @@ use Shakil\Fast2sms\Jobs\SendSmsJob;
  * - Support for Quick SMS, DLT SMS, and OTP SMS queueing
  * - Automatic queue configuration reset after job dispatch
  *
- * @package Shakil\Fast2sms\Traits
  *
  * @property-read ?string $queueConnection Connection name for the queue
  * @property-read ?string $queueName Queue name
@@ -31,17 +30,17 @@ use Shakil\Fast2sms\Jobs\SendSmsJob;
 trait QueuesSms
 {
     protected ?string $queueConnection = null;
+
     protected ?string $queueName = null;
+
     protected ?int $queueDelay = null;
 
     /**
      * Queue a quick SMS with minimal configuration.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $message The SMS message content.
-     * @param SmsLanguage|null $language Optional message language.
-     *
-     * @return void
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $message  The SMS message content.
+     * @param  SmsLanguage|null  $language  Optional message language.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -55,10 +54,8 @@ trait QueuesSms
     /**
      * Queue the SMS for sending.
      *
-     * @return void
      * @throws Fast2smsException
      */
-
     public function queue(): void
     {
         $this->validateForRoute();
@@ -87,43 +84,41 @@ trait QueuesSms
     /**
      * Set the queue connection to be used.
      *
-     * @param string $connection
      * @return QueuesSms|Fast2sms
      */
     public function onConnection(string $connection): self
     {
         $this->queueConnection = $connection;
+
         return $this;
     }
 
     /**
      * Set the queue name to be used.
      *
-     * @param string $queue
      * @return QueuesSms|Fast2sms
      */
     public function onQueue(string $queue): self
     {
         $this->queueName = $queue;
+
         return $this;
     }
 
     /**
      * Set the delay for the queued job.
      *
-     * @param int $seconds
      * @return QueuesSms|Fast2sms
      */
     public function delay(int $seconds): self
     {
         $this->queueDelay = $seconds;
+
         return $this;
     }
 
     /**
      * Reset queue configuration.
-     *
-     * @return void
      */
     private function resetQueueConfig(): void
     {
@@ -135,24 +130,21 @@ trait QueuesSms
     /**
      * Queue an SMS via DLT route.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $templateId The registered DLT template ID.
-     * @param array|string $variablesValues Template variable values.
-     * @param string|null $senderId Optional sender ID.
-     * @param string|null $entityId Optional entity ID (required for DLT_MANUAL route).
-     *
-     * @return void
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $templateId  The registered DLT template ID.
+     * @param  array|string  $variablesValues  Template variable values.
+     * @param  string|null  $senderId  Optional sender ID.
+     * @param  string|null  $entityId  Optional entity ID (required for DLT_MANUAL route).
      *
      * @throws Fast2smsException If validation fails.
      */
     public function dltQueue(
         string|array $numbers,
-        string       $templateId,
+        string $templateId,
         array|string $variablesValues,
-        ?string      $senderId = null,
-        ?string      $entityId = null
-    ): void
-    {
+        ?string $senderId = null,
+        ?string $entityId = null
+    ): void {
         $this->setDlt($numbers, $templateId, $variablesValues, $senderId, $entityId);
 
         $this->queue();
@@ -161,10 +153,8 @@ trait QueuesSms
     /**
      * Queue an OTP SMS.
      *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $otpValue The OTP code to send.
-     *
-     * @return void
+     * @param  string|array  $numbers  One or more recipient numbers.
+     * @param  string  $otpValue  The OTP code to send.
      *
      * @throws Fast2smsException If validation fails.
      */

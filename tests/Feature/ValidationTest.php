@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 use TypeError;
 
 class ValidationTest extends TestCase
 {
     private string $testNumber = '9999999999';
+
     private string $testSenderId = 'FASTSM';
+
     private string $testTemplateId = '1234567890123456';
 
     protected function setUp(): void

@@ -45,17 +45,16 @@ abstract class BaseFast2smsService
     /**
      * Executes the API call to Fast2sms and returns the mapped response.
      *
-     * @param array $payload The request payload.
-     * @param string $path The API endpoint path (default: /bulkV2).
+     * @param  array  $payload  The request payload.
+     * @param  string  $path  The API endpoint path (default: /bulkV2).
      *
-     * @return Fast2smsResponse
      * @throws Fast2smsException
      */
     protected function executeApiCall(array $payload = [], string $path = '/bulkV2'): Fast2smsResponse
     {
         $response = null;
         $multipart = collect($payload)
-            ->map(fn($v, $k) => ['name' => $k, 'contents' => $v])
+            ->map(fn ($v, $k) => ['name' => $k, 'contents' => $v])
             ->values()
             ->toArray();
 
@@ -72,7 +71,7 @@ abstract class BaseFast2smsService
             Event::dispatch(new SmsFailed($payload, $exception, $response->json()));
             throw $exception;
         } catch (Throwable $e) {
-            if (!isset($exception)) {
+            if (! isset($exception)) {
                 $exception = new Fast2smsException(
                     "Fast2sms API call failed: {$e->getMessage()}",
                     $e->getCode(),
@@ -97,11 +96,6 @@ abstract class BaseFast2smsService
             ->asMultipart();
     }
 
-    /**
-     * @param array $payload
-     * @param PromiseInterface|Response $response
-     * @return Fast2smsResponse
-     */
     public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
     {
         // TODO: Handle response based on the payload and response structure.
@@ -120,6 +114,7 @@ abstract class BaseFast2smsService
         if (isset($data['request_id'])) {
             $smsResponse = new SmsResponse($data);
             Event::dispatch(new SmsSent($payload, $smsResponse));
+
             return $smsResponse;
         }
 
@@ -135,8 +130,6 @@ abstract class BaseFast2smsService
      *
      * Child classes can override this to reset state or perform
      * post-request cleanup.
-     *
-     * @return void
      */
     protected function afterApiCall(): void
     {

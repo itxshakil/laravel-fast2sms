@@ -4,21 +4,20 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Responses\SmsResponse;
-use Illuminate\Support\Facades\Http;
 use Shakil\Fast2sms\Tests\TestCase;
-use PHPUnit\Framework\Attributes\Test;
 
-/**
- *
- */
 class SmsSendingTest extends TestCase
 {
     private string $testNumber = '9999999999';
+
     private string $testSenderId = 'FASTSM';
+
     private string $testTemplateId = '1234567890123456';
 
     protected function setUp(): void
@@ -29,16 +28,14 @@ class SmsSendingTest extends TestCase
 
     /**
      * Helper to mock a successful SMS send response.
-     *
-     * @param array $extraData
      */
     private function mockSuccessfulSmsResponse(array $extraData = []): void
     {
         Http::fake([
-            config('fast2sms.base_url') . '*' => Http::response(array_merge([
+            config('fast2sms.base_url').'*' => Http::response(array_merge([
                 'return' => true,
                 'message' => 'SMS sent successfully.',
-                'request_id' => 'xyz-123'
+                'request_id' => 'xyz-123',
             ], $extraData)),
         ]);
     }
@@ -171,7 +168,7 @@ class SmsSendingTest extends TestCase
     public function it_can_check_the_wallet_balance(): void
     {
         Http::fake([
-            config('fast2sms.base_url') . '/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000]),
+            config('fast2sms.base_url').'/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000]),
         ]);
 
         $response = Fast2sms::checkBalance();
@@ -185,7 +182,7 @@ class SmsSendingTest extends TestCase
     public function it_can_retrieve_dlt_manager_senders(): void
     {
         Http::fake([
-            config('fast2sms.base_url') . '/dlt_manager*' => Http::response([
+            config('fast2sms.base_url').'/dlt_manager*' => Http::response([
                 'success' => true,
                 'data' => [
                     ['sender_id' => 'SENDER1', 'entity_id' => '1', 'entity_name' => 'Name 1'],
@@ -206,7 +203,7 @@ class SmsSendingTest extends TestCase
     public function it_can_retrieve_dlt_manager_templates(): void
     {
         Http::fake([
-            config('fast2sms.base_url') . '/dlt_manager*' => Http::response([
+            config('fast2sms.base_url').'/dlt_manager*' => Http::response([
                 'success' => true,
                 'data' => [
                     ['templates' => [['template_id' => 'TPL1'], ['template_id' => 'TPL2']]],

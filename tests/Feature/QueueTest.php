@@ -7,10 +7,10 @@ namespace Shakil\Fast2sms\Tests\Feature;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\Attributes\Test;
+use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Fast2sms;
 use Shakil\Fast2sms\Jobs\SendSmsJob;
-use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Tests\TestCase;
 
 class QueueTest extends TestCase
@@ -20,7 +20,6 @@ class QueueTest extends TestCase
     /**
      * Setup the test environment.
      *
-     * @return void
      * @throws BindingResolutionException
      */
     protected function setUp(): void

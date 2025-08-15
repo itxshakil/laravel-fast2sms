@@ -14,7 +14,6 @@ use Shakil\Fast2sms\Enums\SmsRoute;
  * various Fast2SMS specific features like DLT templates, sender IDs,
  * and language settings.
  *
- * @package Shakil\Fast2sms\Notifications\Messages
  *
  * @property-read string|null $content The message content
  * @property-read string|null $templateId The DLT template ID
@@ -27,44 +26,34 @@ class SmsMessage
 {
     /**
      * The message content.
-     *
-     * @var string|null
      */
     protected ?string $content = null;
+
     /**
      * The DLT template ID.
-     *
-     * @var string|null
      */
     protected ?string $templateId = null;
+
     /**
      * The template variables.
-     *
-     * @var array|null
      */
     protected ?array $variables = null;
+
     /**
      * The sender ID.
-     *
-     * @var string|null
      */
     protected ?string $senderId = null;
+
     /**
      * The SMS route.
-     *
-     * @var SmsRoute|null
      */
     protected ?SmsRoute $route = null;
+
     /**
      * The message language.
-     *
-     * @var SmsLanguage|null
      */
     protected ?SmsLanguage $language = null;
 
-    /**
-     * @param string $content
-     */
     public function __construct(string $content = '')
     {
         if ($content) {
@@ -75,69 +64,74 @@ class SmsMessage
     /**
      * Set the message content.
      *
-     * @param string $content The message text
+     * @param  string  $content  The message text
      * @return $this
      */
     public function content(string $content): self
     {
         $this->content = $content;
+
         return $this;
     }
 
     /**
      * Set the DLT template and its variables.
      *
-     * @param string $templateId The DLT template ID
-     * @param array $variables Variables to be replaced in the template
+     * @param  string  $templateId  The DLT template ID
+     * @param  array  $variables  Variables to be replaced in the template
      * @return $this
      */
     public function template(string $templateId, array $variables = []): self
     {
         $this->templateId = $templateId;
         $this->variables = $variables;
+
         return $this;
     }
 
     /**
      * Set the sender ID.
      *
-     * @param string $senderId The sender ID
+     * @param  string  $senderId  The sender ID
      * @return $this
      */
     public function from(string $senderId): self
     {
         $this->senderId = $senderId;
+
         return $this;
     }
 
     /**
      * Set the SMS route.
      *
-     * @param SmsRoute $route The route to use (QUICK/DLT/OTP)
+     * @param  SmsRoute  $route  The route to use (QUICK/DLT/OTP)
      * @return $this
      */
     public function route(SmsRoute $route): self
     {
         $this->route = $route;
+
         return $this;
     }
 
     /**
      * Set the message language.
      *
-     * @param SmsLanguage $language The language to use
+     * @param  SmsLanguage  $language  The language to use
      * @return $this
      */
     public function language(SmsLanguage $language): self
     {
         $this->language = $language;
+
         return $this;
     }
 
     /**
      * Get a property value.
      *
-     * @param string $name Property name
+     * @param  string  $name  Property name
      * @return mixed The property value
      */
     public function __get(string $name): mixed

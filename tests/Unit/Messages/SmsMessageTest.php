@@ -25,7 +25,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_set_content()
     {
-        $message = new SmsMessage();
+        $message = new SmsMessage;
         $message->content('Test message');
 
         $this->assertEquals('Test message', $message->content);
@@ -42,7 +42,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_set_template()
     {
-        $message = new SmsMessage();
+        $message = new SmsMessage;
         $message->template('template123', ['var1', 'var2']);
 
         $this->assertEquals('template123', $message->templateId);
@@ -52,7 +52,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_set_sender_id()
     {
-        $message = new SmsMessage();
+        $message = new SmsMessage;
         $message->from('TESTID');
 
         $this->assertEquals('TESTID', $message->senderId);
@@ -61,7 +61,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_set_route()
     {
-        $message = new SmsMessage();
+        $message = new SmsMessage;
         $message->route(SmsRoute::QUICK);
 
         $this->assertEquals(SmsRoute::QUICK, $message->route);
@@ -70,7 +70,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_set_language()
     {
-        $message = new SmsMessage();
+        $message = new SmsMessage;
         $message->language(SmsLanguage::UNICODE);
 
         $this->assertEquals(SmsLanguage::UNICODE, $message->language);
@@ -79,7 +79,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_chain_methods()
     {
-        $message = (new SmsMessage())
+        $message = (new SmsMessage)
             ->content('Test message')
             ->from('TESTID')
             ->route(SmsRoute::QUICK)
@@ -94,7 +94,7 @@ class SmsMessageTest extends TestCase
     #[Test]
     public function it_can_create_dlt_message()
     {
-        $message = (new SmsMessage())
+        $message = (new SmsMessage)
             ->route(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');

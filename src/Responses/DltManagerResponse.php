@@ -21,7 +21,7 @@ class DltManagerResponse extends Fast2smsResponse
      */
     public function getSenders(): array
     {
-        return array_map(fn($item) => [
+        return array_map(fn ($item) => [
             'sender_id' => $item['sender_id'] ?? null,
             'entity_id' => $item['entity_id'] ?? null,
             'entity_name' => $item['entity_name'] ?? null,
@@ -56,6 +56,7 @@ class DltManagerResponse extends Fast2smsResponse
                 $templates = array_merge($templates, $item['templates']);
             }
         }
+
         return $templates;
     }
 }
