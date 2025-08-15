@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Contracts;
 
+use DateTimeInterface;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
@@ -86,11 +87,11 @@ interface Fast2smsInterface
     /**
      * Schedule the SMS to be sent at a future time.
      *
-     * @param \DateTimeInterface|string $time The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
+     * @param DateTimeInterface|string $time The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
      * @return $this
      * @throws Fast2smsException If the time format is invalid.
      */
-    public function schedule(string|\DateTimeInterface $time): self;
+    public function schedule(string|DateTimeInterface $time): self;
 
     /**
      * Set the language of the SMS message.

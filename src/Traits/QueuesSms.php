@@ -5,17 +5,84 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Traits;
 
 use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
+use Shakil\Fast2sms\Enums\SmsLanguage;
+use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Fast2sms;
 use Shakil\Fast2sms\Jobs\SendSmsJob;
-use Shakil\Fast2sms\Enums\SmsLanguage;
-use Shakil\Fast2sms\Enums\SmsRoute;
-use Shakil\Fast2sms\Exceptions\Fast2smsException;
 
+/**
+ * Trait QueuesSms
+ *
+ * Provides queueing functionality for SMS messages in the Fast2sms package.
+ * This trait handles the configuration and execution of queued SMS jobs,
+ * allowing for delayed sending and custom queue configurations.
+ *
+ * Features:
+ * - Queue configuration (connection, name, delay)
+ * - Support for Quick SMS, DLT SMS, and OTP SMS queueing
+ * - Automatic queue configuration reset after job dispatch
+ *
+ * @package Shakil\Fast2sms\Traits
+ *
+ * @property-read ?string $queueConnection Connection name for the queue
+ * @property-read ?string $queueName Queue name
+ * @property-read ?int $queueDelay Delay in seconds before processing the job
+ */
 trait QueuesSms
 {
     protected ?string $queueConnection = null;
     protected ?string $queueName = null;
     protected ?int $queueDelay = null;
+
+    /**
+     * Queue a quick SMS with minimal configuration.
+     *
+     * @param string|array $numbers One or more recipient numbers.
+     * @param string $message The SMS message content.
+     * @param SmsLanguage|null $language Optional message language.
+     *
+     * @return void
+     *
+     * @throws Fast2smsException If validation fails.
+     */
+    public function quickQueue(string|array $numbers, string $message, ?SmsLanguage $language = null): void
+    {
+        $this->setQuick($numbers, $message, $language);
+
+        $this->queue();
+    }
+
+    /**
+     * Queue the SMS for sending.
+     *
+     * @return void
+     * @throws Fast2smsException
+     */
+
+    public function queue(): void
+    {
+        $this->validateForRoute();
+
+        $parameters = SmsParameters::fromFast2sms($this);
+
+        $job = new SendSmsJob($parameters);
+
+        if ($this->queueConnection) {
+            $job->onConnection($this->queueConnection);
+        }
+
+        if ($this->queueName) {
+            $job->onQueue($this->queueName);
+        }
+
+        if ($this->queueDelay) {
+            $job->delay($this->queueDelay);
+        }
+
+        dispatch($job);
+
+        $this->resetQueueConfig();
+    }
 
     /**
      * Set the queue connection to be used.
@@ -54,55 +121,15 @@ trait QueuesSms
     }
 
     /**
-     * Queue the SMS for sending.
+     * Reset queue configuration.
      *
      * @return void
-     * @throws Fast2smsException
      */
-
-    public function queue(): void
+    private function resetQueueConfig(): void
     {
-        $this->validateForRoute();
-
-        $parameters = SmsParameters::fromFast2sms($this);
-
-        $job = new SendSmsJob($parameters);
-
-        if ($this->queueConnection) {
-            $job->onConnection($this->queueConnection);
-        }
-
-        if ($this->queueName) {
-            $job->onQueue($this->queueName);
-        }
-
-        if ($this->queueDelay) {
-            $job->delay($this->queueDelay);
-        }
-
-        dispatch($job);
-
-        $this->resetQueueConfig();
-    }
-
-    /**
-     * Queue a quick SMS with minimal configuration.
-     *
-     * @param string|array $numbers One or more recipient numbers.
-     * @param string $message The SMS message content.
-     * @param SmsLanguage|null $language Optional message language.
-     *
-     * @return void
-     *
-     * @throws Fast2smsException If validation fails.
-     */
-    public function quickQueue(string|array $numbers, string $message, ?SmsLanguage $language = null): void
-    {
-        $this->to($numbers)->message($message)->route(SmsRoute::QUICK);
-        if ($language) {
-            $this->language($language);
-        }
-        $this->queue();
+        $this->queueConnection = null;
+        $this->queueName = null;
+        $this->queueDelay = null;
     }
 
     /**
@@ -120,23 +147,13 @@ trait QueuesSms
      */
     public function dltQueue(
         string|array $numbers,
-        string $templateId,
+        string       $templateId,
         array|string $variablesValues,
-        ?string $senderId = null,
-        ?string $entityId = null
-    ): void {
-        $this->to($numbers)
-            ->message($templateId)
-            ->templateId($templateId)
-            ->variables($variablesValues)
-            ->route(SmsRoute::DLT);
-
-        if ($senderId) {
-            $this->senderId($senderId);
-        }
-        if ($entityId) {
-            $this->entityId($entityId);
-        }
+        ?string      $senderId = null,
+        ?string      $entityId = null
+    ): void
+    {
+        $this->setDlt($numbers, $templateId, $variablesValues, $senderId, $entityId);
 
         $this->queue();
     }
@@ -153,19 +170,7 @@ trait QueuesSms
      */
     public function otpQueue(string|array $numbers, string $otpValue): void
     {
-        $this->to($numbers)->message($otpValue)->route(SmsRoute::OTP);
+        $this->setOtp($numbers, $otpValue);
         $this->queue();
-    }
-
-    /**
-     * Reset queue configuration.
-     *
-     * @return void
-     */
-    private function resetQueueConfig(): void
-    {
-        $this->queueConnection = null;
-        $this->queueName = null;
-        $this->queueDelay = null;
     }
 }

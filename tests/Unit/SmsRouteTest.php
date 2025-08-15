@@ -7,6 +7,7 @@ namespace Shakil\Fast2sms\Tests\Unit;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use ValueError;
 
 /**
  * Unit tests for the SmsRoute Enum.
@@ -32,7 +33,7 @@ class SmsRouteTest extends TestCase
     #[Test]
     public function invalid_sms_route_string_throws_error(): void
     {
-        $this->expectException(\ValueError::class); // Enum::from() throws ValueError for invalid cases
+        $this->expectException(ValueError::class); // Enum::from() throws ValueError for invalid cases
         SmsRoute::from('invalid_route');
     }
 }

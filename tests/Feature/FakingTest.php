@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Shakil\Fast2sms\Tests\Feature;
 
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
@@ -11,12 +13,12 @@ class FakingTest extends TestCase
 {
     private string $testNumber = '9999999999';
 
-    // --- Faking and Basic Assertions ---
-
+    /**
+     * @throws Fast2smsException
+     */
     #[Test]
     public function it_can_fake_an_sms_send(): void
     {
-        $this->withoutExceptionHandling();
         Fast2sms::fake();
 
         Fast2sms::quick($this->testNumber, 'This is a faked message.');

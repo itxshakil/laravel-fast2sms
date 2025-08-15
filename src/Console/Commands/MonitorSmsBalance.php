@@ -6,8 +6,8 @@ namespace Shakil\Fast2sms\Console\Commands;
 
 use Illuminate\Console\Command;
 use Shakil\Fast2sms\Events\LowBalanceDetected;
-use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
+use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 
 /**
@@ -40,19 +40,12 @@ class MonitorSmsBalance extends Command
      */
     public function handle(): int
     {
+        $threshold = $this->getThreshold();
         try {
-            $threshold = $this->getThreshold();
-
             /** @var WalletBalanceResponse $response */
             $response = Fast2sms::checkBalance();
-            $balance = $response->balance;
 
-            $this->info("Current SMS balance: ₹$balance");
-
-            if ($balance <= $threshold) {
-                event(new LowBalanceDetected($balance, $threshold));
-                $this->warn("Balance (₹{$balance}) is below threshold (₹{$threshold})");
-            }
+            $this->handleBalance($response->balance, $threshold);
 
             return self::SUCCESS;
 
@@ -69,7 +62,22 @@ class MonitorSmsBalance extends Command
      */
     private function getThreshold(): float
     {
-        return (float) ($this->option('threshold')
+        return (float)($this->option('threshold')
             ?? config('fast2sms.balance_threshold', 1000));
+    }
+
+    /**
+     * @param float|null $balance
+     * @param float $threshold
+     * @return void
+     */
+    public function handleBalance(?float $balance, float $threshold): void
+    {
+        $this->info("Current SMS balance: ₹$balance");
+
+        if ($balance <= $threshold) {
+            event(new LowBalanceDetected($balance, $threshold));
+            $this->warn("Balance (₹$balance) is below threshold (₹$threshold)");
+        }
     }
 }

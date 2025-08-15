@@ -37,7 +37,8 @@ class Fast2smsResponse
      *
      * @throws InvalidArgumentException if the response data is invalid or malformed.
      */
-    public function __construct(protected array $data) {
+    public function __construct(protected array $data)
+    {
         if (empty($this->data)) {
             throw new InvalidArgumentException('Response data cannot be empty.');
         }
@@ -60,60 +61,6 @@ class Fast2smsResponse
 
         $this->success = $this->data['return'] ?? $this->data['success'];
         $this->message = $this->message();
-    }
-
-    /**
-     * Determines if the API call was successful.
-     *
-     * @return bool True if the API call was successful, otherwise false.
-     */
-    public function isSuccess(): bool
-    {
-        return $this->success === true;
-    }
-
-    /**
-     * Gets the error code from the response.
-     *
-     * @return int|null The error code if available, otherwise null.
-     */
-    public function getErrorCode(): ?int
-    {
-        return $this->data['status_code'] ?? null;
-    }
-
-    /**
-     * Gets the error message from the response.
-     *
-     * @return string|null The error message if available, otherwise null.
-     */
-    public function getErrorMessage(): ?string
-    {
-        return is_string($this->data['message'] ?? null)
-            ? $this->data['message']
-            : null;
-    }
-
-    /**
-     * Gets the raw response data.
-     *
-     * @return array The complete, raw response data from the API.
-     */
-    public function getRawData(): array
-    {
-        return $this->data;
-    }
-
-    /**
-     * Gets the raw response data as an array.
-     *
-     * This is an alias for getRawData().
-     *
-     * @return array The complete, raw response data from the API.
-     */
-    public function toArray(): array
-    {
-        return $this->data;
     }
 
     /**
@@ -140,5 +87,59 @@ class Fast2smsResponse
         }
 
         return 'No message provided';
+    }
+
+    /**
+     * Gets the error message from the response.
+     *
+     * @return string|null The error message if available, otherwise null.
+     */
+    public function getErrorMessage(): ?string
+    {
+        return is_string($this->data['message'] ?? null)
+            ? $this->data['message']
+            : null;
+    }
+
+    /**
+     * Determines if the API call was successful.
+     *
+     * @return bool True if the API call was successful, otherwise false.
+     */
+    public function isSuccess(): bool
+    {
+        return $this->success === true;
+    }
+
+    /**
+     * Gets the error code from the response.
+     *
+     * @return int|null The error code if available, otherwise null.
+     */
+    public function getErrorCode(): ?int
+    {
+        return $this->data['status_code'] ?? null;
+    }
+
+    /**
+     * Gets the raw response data.
+     *
+     * @return array The complete, raw response data from the API.
+     */
+    public function getRawData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * Gets the raw response data as an array.
+     *
+     * This is an alias for getRawData().
+     *
+     * @return array The complete, raw response data from the API.
+     */
+    public function toArray(): array
+    {
+        return $this->data;
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Shakil\Fast2sms\Tests\Feature;
 
-use Shakil\Fast2sms\Enums\SmsLanguage;
+use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Responses\SmsResponse;
@@ -18,7 +20,6 @@ class SmsSendingTest extends TestCase
     private string $testNumber = '9999999999';
     private string $testSenderId = 'FASTSM';
     private string $testTemplateId = '1234567890123456';
-    private string $testEntityId = '9876543210987654';
 
     protected function setUp(): void
     {
@@ -38,7 +39,7 @@ class SmsSendingTest extends TestCase
                 'return' => true,
                 'message' => 'SMS sent successfully.',
                 'request_id' => 'xyz-123'
-            ], $extraData), 200),
+            ], $extraData)),
         ]);
     }
 
@@ -170,7 +171,7 @@ class SmsSendingTest extends TestCase
     public function it_can_check_the_wallet_balance(): void
     {
         Http::fake([
-            config('fast2sms.base_url') . '/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000], 200),
+            config('fast2sms.base_url') . '/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000]),
         ]);
 
         $response = Fast2sms::checkBalance();
@@ -190,10 +191,10 @@ class SmsSendingTest extends TestCase
                     ['sender_id' => 'SENDER1', 'entity_id' => '1', 'entity_name' => 'Name 1'],
                     ['sender_id' => 'SENDER2', 'entity_id' => '2', 'entity_name' => 'Name 2'],
                 ],
-            ], 200),
+            ]),
         ]);
 
-        $response = Fast2sms::dltManager('sender');
+        $response = Fast2sms::dltManager(DltManagerType::SENDER);
         $senders = $response->getSenders();
 
         $this->assertTrue($response->isSuccess());
@@ -210,10 +211,10 @@ class SmsSendingTest extends TestCase
                 'data' => [
                     ['templates' => [['template_id' => 'TPL1'], ['template_id' => 'TPL2']]],
                 ],
-            ], 200),
+            ]),
         ]);
 
-        $response = Fast2sms::dltManager('template');
+        $response = Fast2sms::dltManager(DltManagerType::TEMPLATE);
         $templates = $response->getTemplates();
 
         $this->assertTrue($response->isSuccess());

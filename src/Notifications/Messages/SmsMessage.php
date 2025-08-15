@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Notifications\Messages;
@@ -25,54 +26,51 @@ use Shakil\Fast2sms\Enums\SmsRoute;
 class SmsMessage
 {
     /**
-     * @param string $content
-     */
-    public function __construct(string $content = ''){
-        if ($content) {
-            $this->content($content);
-        }
-    }
-    /**
      * The message content.
      *
      * @var string|null
      */
     protected ?string $content = null;
-
     /**
      * The DLT template ID.
      *
      * @var string|null
      */
     protected ?string $templateId = null;
-
     /**
      * The template variables.
      *
      * @var array|null
      */
     protected ?array $variables = null;
-
     /**
      * The sender ID.
      *
      * @var string|null
      */
     protected ?string $senderId = null;
-
     /**
      * The SMS route.
      *
      * @var SmsRoute|null
      */
     protected ?SmsRoute $route = null;
-
     /**
      * The message language.
      *
      * @var SmsLanguage|null
      */
     protected ?SmsLanguage $language = null;
+
+    /**
+     * @param string $content
+     */
+    public function __construct(string $content = '')
+    {
+        if ($content) {
+            $this->content($content);
+        }
+    }
 
     /**
      * Set the message content.

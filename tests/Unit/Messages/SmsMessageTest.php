@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
-namespace Tests\Unit\Notifications\Messages;
+namespace Shakil\Fast2sms\Tests\Unit\Messages;
 
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Fast2sms;
@@ -20,7 +22,8 @@ class SmsMessageTest extends TestCase
         Fast2sms::fake();
     }
 
-    public function test_it_can_set_content()
+    #[Test]
+    public function it_can_set_content()
     {
         $message = new SmsMessage();
         $message->content('Test message');
@@ -28,24 +31,26 @@ class SmsMessageTest extends TestCase
         $this->assertEquals('Test message', $message->content);
     }
 
-    public function test_it_can_be_created_with_content()
+    #[Test]
+    public function it_can_be_created_with_content()
     {
         $message = new SmsMessage('Test message');
 
         $this->assertEquals('Test message', $message->content);
     }
 
-    public function test_it_can_set_template()
+    #[Test]
+    public function it_can_set_template()
     {
         $message = new SmsMessage();
         $message->template('template123', ['var1', 'var2']);
 
         $this->assertEquals('template123', $message->templateId);
         $this->assertEquals(['var1', 'var2'], $message->variables);
-//        $this->assertEquals(SmsRoute::QUICK, $message->route);
     }
 
-    public function test_it_can_set_sender_id()
+    #[Test]
+    public function it_can_set_sender_id()
     {
         $message = new SmsMessage();
         $message->from('TESTID');
@@ -53,7 +58,8 @@ class SmsMessageTest extends TestCase
         $this->assertEquals('TESTID', $message->senderId);
     }
 
-    public function test_it_can_set_route()
+    #[Test]
+    public function it_can_set_route()
     {
         $message = new SmsMessage();
         $message->route(SmsRoute::QUICK);
@@ -61,7 +67,8 @@ class SmsMessageTest extends TestCase
         $this->assertEquals(SmsRoute::QUICK, $message->route);
     }
 
-    public function test_it_can_set_language()
+    #[Test]
+    public function it_can_set_language()
     {
         $message = new SmsMessage();
         $message->language(SmsLanguage::UNICODE);
@@ -69,7 +76,8 @@ class SmsMessageTest extends TestCase
         $this->assertEquals(SmsLanguage::UNICODE, $message->language);
     }
 
-    public function test_it_can_chain_methods()
+    #[Test]
+    public function it_can_chain_methods()
     {
         $message = (new SmsMessage())
             ->content('Test message')
@@ -83,15 +91,17 @@ class SmsMessageTest extends TestCase
         $this->assertEquals(SmsLanguage::UNICODE, $message->language);
     }
 
-    public function test_it_can_create_dlt_message()
+    #[Test]
+    public function it_can_create_dlt_message()
     {
         $message = (new SmsMessage())
+            ->route(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');
 
         $this->assertEquals('template123', $message->templateId);
         $this->assertEquals(['var1', 'var2'], $message->variables);
         $this->assertEquals('TESTID', $message->senderId);
-//        $this->assertEquals(SmsRoute::DLT, $message->route);
+        $this->assertEquals(SmsRoute::DLT, $message->route);
     }
 }

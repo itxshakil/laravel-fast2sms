@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Shakil\Fast2sms\Tests\Feature;
 
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
-use Illuminate\Support\Facades\Http;
 use Shakil\Fast2sms\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Test;
+use TypeError;
 
 class ValidationTest extends TestCase
 {
@@ -108,13 +110,11 @@ class ValidationTest extends TestCase
         Fast2sms::to($this->testNumber)->route(SmsRoute::OTP)->send();
     }
 
-    // --- DLT Manager Validation ---
-
     #[Test]
     public function it_throws_an_exception_for_invalid_dlt_manager_type(): void
     {
-        $this->expectException(Fast2smsException::class);
-        $this->expectExceptionMessage('Invalid DLT Manager type. Must be "sender" or "template".');
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('Shakil\Fast2sms\Fast2sms::dltManager(): Argument #1 ($type) must be of type Shakil\Fast2sms\Enums\DltManagerType, string given');
 
         Fast2sms::dltManager('invalid-type');
     }

@@ -13,8 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class Fast2smsResponseTest extends TestCase
 {
-    // --- Fast2smsResponse Base Class Tests ---
-
     #[Test]
     public function it_can_create_a_successful_response_object(): void
     {
@@ -44,8 +42,6 @@ class Fast2smsResponseTest extends TestCase
         new Fast2smsResponse([]);
     }
 
-    // --- SmsResponse Tests ---
-
     #[Test]
     public function sms_response_can_get_request_id_and_messages(): void
     {
@@ -59,8 +55,6 @@ class Fast2smsResponseTest extends TestCase
         $this->assertEquals('abc-123', $response->getRequestId());
         $this->assertEquals(['Message sent to 9999999999'], $response->getMessages());
     }
-
-    // --- WalletBalanceResponse Tests ---
 
     #[Test]
     public function wallet_balance_response_can_get_balance_and_sms_count(): void

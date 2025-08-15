@@ -174,11 +174,12 @@ if ($response->success()) {
 
 ```php
 use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Responses\DltManagerResponse;
 
 // Get DLT sender IDs
 /** @var DltManagerResponse $sendersResponse */
-$sendersResponse = Fast2sms::dltManager('sender');
+$sendersResponse = Fast2sms::dltManager(DltManagerType::SENDER);
 
 foreach ($sendersResponse->getSenders() as $sender) {
     echo "Sender ID: {$sender['sender_id']} | Entity ID: {$sender['entity_id']}\n";

@@ -24,8 +24,10 @@ class SmsFailed
      * @param array|null $response The API response, if any was received before the error.
      */
     public function __construct(
-        public array $payload,
+        public array     $payload,
         public Throwable $exception,
-        public ?array $response = null
-    ) {}
+        public ?array    $response = null
+    )
+    {
+    }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Shakil\Fast2sms\Tests\Feature;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -59,7 +61,7 @@ class QueueTest extends TestCase
         Queue::assertPushed(SendSmsJob::class, function ($job) {
             return $job->parameters->numbers === ['1234567890']
                 && $job->parameters->templateId === 'template123'
-                && $job->parameters->variablesValues === "var1|var2"
+                && $job->parameters->variablesValues === 'var1|var2'
                 && $job->parameters->senderId === 'SENDER1'
                 && $job->parameters->route === SmsRoute::DLT;
         });

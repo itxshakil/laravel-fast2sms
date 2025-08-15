@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Traits;
 
 use Closure;
-use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Assert;
+use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use function is_array;
 
 /**
@@ -52,9 +52,9 @@ trait HandlesFaking
                 self::$sentMessages->push($payload);
 
                 return Http::response([
-                    'return'  => true,
+                    'return' => true,
                     'message' => 'SMS sent successfully (faked).'
-                ], 200);
+                ]);
             },
         ]);
     }
@@ -69,7 +69,7 @@ trait HandlesFaking
      */
     public static function assertSent(array|Closure|null $callback = null): void
     {
-        if (! self::$faking) {
+        if (!self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
@@ -108,7 +108,7 @@ trait HandlesFaking
      */
     public static function assertNotSent(array|Closure|null $callback = null): void
     {
-        if (! self::$faking) {
+        if (!self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
@@ -147,14 +147,14 @@ trait HandlesFaking
      */
     public static function assertSentTimes(int $count): void
     {
-        if (! self::$faking) {
+        if (!self::$faking) {
             throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
         }
 
         Assert::assertEquals(
             $count,
             self::$sentMessages->count(),
-            "Expected {$count} SMS messages to be sent, but " . self::$sentMessages->count() . " were sent."
+            "Expected $count SMS messages to be sent, but " . self::$sentMessages->count() . ' were sent.'
         );
     }
 

@@ -13,6 +13,15 @@ use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Fast2sms;
 
+/**
+ * Job for handling asynchronous SMS sending through Fast2sms.
+ *
+ * This job class is responsible for processing queued SMS requests using the Fast2sms service.
+ * It takes an SmsParameters object containing all necessary SMS configuration and sends
+ * the message using the injected Fast2sms service instance.
+ *
+ * @implements ShouldQueue
+ */
 class SendSmsJob implements ShouldQueue
 {
     use Dispatchable;
@@ -20,13 +29,27 @@ class SendSmsJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    /**
+     * Create a new job instance.
+     *
+     * @param SmsParameters $parameters Data transfer object containing all SMS parameters
+     */
     public function __construct(
         public readonly SmsParameters $parameters
-    ) {}
+    )
+    {
+    }
 
     /**
-     * @throws Fast2smsException
+     * Execute the job.
+     *
+     * Configures the Fast2sms instance with the stored parameters and sends the SMS.
+     * All optional parameters are only set if they have values to maintain clean configuration.
+     *
+     * @param Fast2sms $fast2sms The Fast2sms service instance
+     * @throws Fast2smsException If SMS sending fails or validation fails
      */
+
     public function handle(Fast2sms $fast2sms): void
     {
         $fast2sms

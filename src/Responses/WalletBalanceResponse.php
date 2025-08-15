@@ -35,7 +35,7 @@ class WalletBalanceResponse extends Fast2smsResponse
     {
         parent::__construct($data);
 
-        $this->balance = isset($data['wallet']) ? (float) $data['wallet'] : null;
-        $this->smsCount = isset($data['sms_count']) ? (int) $data['sms_count'] : null;
+        $this->balance = isset($data['wallet']) ? (float)$data['wallet'] : null;
+        $this->smsCount = isset($data['sms_count']) ? (int)$data['sms_count'] : null;
     }
 }

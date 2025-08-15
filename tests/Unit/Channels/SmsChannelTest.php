@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Channels;
+namespace Shakil\Fast2sms\Tests\Unit\Channels;
 
 use Illuminate\Notifications\Notification;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Channels\SmsChannel;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
@@ -31,7 +32,8 @@ class SmsChannelTest extends TestCase
      *
      * @throws Fast2smsException
      */
-    public function test_it_can_send_string_message(): void
+    #[Test]
+    public function it_can_send_string_message(): void
     {
         $channel = new SmsChannel();
         $notifiable = new TestNotifiable();
@@ -51,7 +53,8 @@ class SmsChannelTest extends TestCase
      *
      * @throws Fast2smsException
      */
-    public function test_it_can_send_dlt_message(): void
+    #[Test]
+    public function it_can_send_dlt_message(): void
     {
         $channel = new SmsChannel();
         $notifiable = new TestNotifiable();
@@ -73,7 +76,8 @@ class SmsChannelTest extends TestCase
      *
      * @throws Fast2smsException
      */
-    public function test_it_can_send_quick_message_with_language(): void
+    #[Test]
+    public function it_can_send_quick_message_with_language(): void
     {
         $channel = new SmsChannel();
         $notifiable = new TestNotifiable();
@@ -92,7 +96,8 @@ class SmsChannelTest extends TestCase
     /**
      * Test that message is not sent when phone number is missing.
      */
-    public function test_it_does_not_send_when_phone_number_is_missing(): void
+    #[Test]
+    public function it_does_not_send_when_phone_number_is_missing(): void
     {
         $channel = new SmsChannel();
         $notifiable = new TestNotifiableWithoutPhone();
@@ -108,7 +113,8 @@ class SmsChannelTest extends TestCase
      *
      * @throws Fast2smsException
      */
-    public function test_it_sends_with_default_route_when_not_specified(): void
+    #[Test]
+    public function it_sends_with_default_route_when_not_specified(): void
     {
         config(['fast2sms.default_route' => SmsRoute::QUICK->value]);
 
@@ -128,7 +134,8 @@ class SmsChannelTest extends TestCase
      *
      * @throws Fast2smsException
      */
-    public function test_it_sends_with_default_sender_id_when_not_specified(): void
+    #[Test]
+    public function it_sends_with_default_sender_id_when_not_specified(): void
     {
         config(['fast2sms.default_sender_id' => 'DEFAULT']);
 
@@ -184,7 +191,8 @@ class TestDltNotification extends Notification
 {
     public function toSms(mixed $notifiable): SmsMessage
     {
-        return (new SmsMessage)
+        return (new SmsMessage())
+            ->route(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');
     }

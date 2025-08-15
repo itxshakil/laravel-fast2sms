@@ -1,12 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Channels;
 
+use BadMethodCallException;
 use Illuminate\Notifications\Notification;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
+use function get_class;
+use function is_string;
+use function sprintf;
 
 /**
  * SMS Channel for Laravel notifications using Fast2SMS.
@@ -33,18 +38,24 @@ class SmsChannel
      * @param mixed $notifiable The entity receiving the notification
      * @param Notification $notification The notification instance
      *
-     * @throws Fast2smsException When there's an error sending the SMS
      * @return void
+     * @throws Fast2smsException When there's an error sending the SMS
      */
     public function send(mixed $notifiable, Notification $notification): void
     {
-        if (! $to = $notifiable->routeNotificationFor('sms', $notification)) {
+        if (!$to = $notifiable->routeNotificationFor('sms', $notification)) {
             return;
+        }
+
+        if (!method_exists($notification, 'toSms')) {
+            throw new BadMethodCallException(
+                sprintf('Method [toSms] missing from notification [%s].', get_class($notification))
+            );
         }
 
         $message = $notification->toSms($notifiable);
 
-        if (\is_string($message)) {
+        if (is_string($message)) {
             Fast2sms::quick($to, $message);
         } else {
             Fast2sms::to($to)
@@ -52,7 +63,7 @@ class SmsChannel
                 ->senderId($message->senderId ?? config('fast2sms.default_sender_id'));
 
             if ($message->templateId !== null) {
-                Fast2sms::route(SmsRoute::DLT)->templateId($message->templateId)
+                Fast2sms::templateId($message->templateId)
                     ->variables($message->variables ?? []);
             } else {
                 Fast2sms::message($message->content);

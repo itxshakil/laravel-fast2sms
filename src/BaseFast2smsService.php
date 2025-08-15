@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
-use Shakil\Fast2sms\Responses\Fast2smsResponse;
-use Shakil\Fast2sms\Responses\WalletBalanceResponse;
-use Shakil\Fast2sms\Responses\SmsResponse;
 use Shakil\Fast2sms\Responses\DltManagerResponse;
+use Shakil\Fast2sms\Responses\Fast2smsResponse;
+use Shakil\Fast2sms\Responses\SmsResponse;
+use Shakil\Fast2sms\Responses\WalletBalanceResponse;
 use Throwable;
 
 /**
@@ -33,22 +35,11 @@ abstract class BaseFast2smsService
     {
         $apiKey = config('fast2sms.api_key');
 
-        if($apiKey === null || $apiKey === '') {
+        if ($apiKey === null || $apiKey === '') {
             throw new Fast2smsException('Fast2sms API Key is not configured. Please set FAST2SMS_API_KEY in your .env file.');
         }
 
         $this->apiKey = $apiKey;
-    }
-
-    /**
-     * Make an HTTP client for Fast2sms.
-     */
-    protected function http(): PendingRequest
-    {
-        return Http::retry(3, 100)->baseUrl(config('fast2sms.base_url'))
-            ->timeout(config('fast2sms.timeout'))
-            ->withHeaders(['Authorization' => $this->apiKey])
-            ->asMultipart();
     }
 
     /**
@@ -63,18 +54,16 @@ abstract class BaseFast2smsService
     protected function executeApiCall(array $payload = [], string $path = '/bulkV2'): Fast2smsResponse
     {
         $response = null;
+        $multipart = collect($payload)
+            ->map(fn($v, $k) => ['name' => $k, 'contents' => $v])
+            ->values()
+            ->toArray();
 
         try {
-            $multipart = collect($payload)
-                ->map(fn($v, $k) => ['name' => $k, 'contents' => $v])
-                ->values()
-                ->toArray();
-
             $response = $this->http()->post($path, $multipart);
 
             if ($response->successful()) {
-                $data = $response->json();
-                return $this->mapApiResponse($payload, $data);
+                return $this->handleSuccessResponse($payload, $response);
             }
 
             $error = $response->json('message', 'Unknown Fast2sms API error.');
@@ -82,7 +71,6 @@ abstract class BaseFast2smsService
 
             Event::dispatch(new SmsFailed($payload, $exception, $response->json()));
             throw $exception;
-
         } catch (Throwable $e) {
             if (!isset($exception)) {
                 $exception = new Fast2smsException(
@@ -99,6 +87,28 @@ abstract class BaseFast2smsService
     }
 
     /**
+     * Make an HTTP client for Fast2sms.
+     */
+    protected function http(): PendingRequest
+    {
+        return Http::retry(3, 100)->baseUrl(config('fast2sms.base_url'))
+            ->timeout(config('fast2sms.timeout'))
+            ->withHeaders(['Authorization' => $this->apiKey])
+            ->asMultipart();
+    }
+
+    /**
+     * @param array $payload
+     * @param PromiseInterface|Response $response
+     * @return Fast2smsResponse
+     */
+    public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
+    {
+        // TODO: Handle response based on the payload and response structure.
+        return $this->mapApiResponse($payload, $response->json());
+    }
+
+    /**
      * Maps API response data to the correct response object.
      */
     private function mapApiResponse(array $payload, array $data): Fast2smsResponse
@@ -108,7 +118,7 @@ abstract class BaseFast2smsService
         }
 
         if (isset($data['request_id'])) {
-            $smsResponse =  new SmsResponse($data);
+            $smsResponse = new SmsResponse($data);
             Event::dispatch(new SmsSent($payload, $smsResponse));
             return $smsResponse;
         }

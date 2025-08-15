@@ -13,18 +13,6 @@ namespace Shakil\Fast2sms\Responses;
 class DltManagerResponse extends Fast2smsResponse
 {
     /**
-     * Gets the 'data' array from the response.
-     *
-     * This method is useful for accessing the core DLT information within the response.
-     *
-     * @return array The 'data' array from the response, or an empty array if not present.
-     */
-    public function getData(): array
-    {
-        return $this->data['data'] ?? [];
-    }
-
-    /**
      * Gets a formatted array of sender information.
      *
      * Each sender's data is normalized to include 'sender_id', 'entity_id', and 'entity_name'.
@@ -38,6 +26,18 @@ class DltManagerResponse extends Fast2smsResponse
             'entity_id' => $item['entity_id'] ?? null,
             'entity_name' => $item['entity_name'] ?? null,
         ], $this->getData());
+    }
+
+    /**
+     * Gets the 'data' array from the response.
+     *
+     * This method is useful for accessing the core DLT information within the response.
+     *
+     * @return array The 'data' array from the response, or an empty array if not present.
+     */
+    public function getData(): array
+    {
+        return $this->data['data'] ?? [];
     }
 
     /**

@@ -9,6 +9,7 @@ use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Fast2sms;
+use function is_array;
 
 /**
  * Trait to manage SMS parameters for Fast2sms.
@@ -199,15 +200,13 @@ trait ManagesSmsParameters
     {
         if ($time instanceof DateTimeInterface) {
             $this->scheduleTime = $time->format('Y-m-d-H-i');
-        } elseif (is_string($time)) {
-            // Validate string format YYYY-MM-DD-HH-MM
-            if (!preg_match('/^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}$/', $time)) {
-                throw new Fast2smsException("Invalid schedule time format. Expected YYYY-MM-DD-HH-MM.");
-            }
-            $this->scheduleTime = $time;
-        } else {
-            throw new Fast2smsException("Invalid schedule time provided. Must be a DateTimeInterface or YYYY-MM-DD-HH-MM string.");
         }
+        // Validate string format YYYY-MM-DD-HH-MM
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}$/', $time)) {
+            throw new Fast2smsException('Invalid schedule time format. Expected YYYY-MM-DD-HH-MM.');
+        }
+
+        $this->scheduleTime = $time;
         return $this;
     }
 
@@ -321,6 +320,54 @@ trait ManagesSmsParameters
     public function getScheduleTime(): ?string
     {
         return $this->scheduleTime;
+    }
+
+    /**
+     * @param array|string $numbers
+     * @param string $message
+     * @param SmsLanguage|null $language
+     * @return void
+     */
+    public function setQuick(array|string $numbers, string $message, ?SmsLanguage $language): void
+    {
+        $this->to($numbers)->message($message)->route(SmsRoute::QUICK);
+        if ($language) {
+            $this->language($language);
+        }
+    }
+
+    /**
+     * @param array|string $numbers
+     * @param string $templateId
+     * @param array|string $variablesValues
+     * @param string|null $senderId
+     * @param string|null $entityId
+     * @return void
+     */
+    public function setDlt(array|string $numbers, string $templateId, array|string $variablesValues, ?string $senderId, ?string $entityId): void
+    {
+        $this->to($numbers)
+            ->message($templateId)
+            ->templateId($templateId)
+            ->variables($variablesValues)
+            ->route(SmsRoute::DLT);
+
+        if ($senderId) {
+            $this->senderId($senderId);
+        }
+        if ($entityId) {
+            $this->entityId($entityId);
+        }
+    }
+
+    /**
+     * @param array|string $numbers
+     * @param string $otpValue
+     * @return void
+     */
+    public function setOtp(array|string $numbers, string $otpValue): void
+    {
+        $this->to($numbers)->message($otpValue)->route(SmsRoute::OTP);
     }
 
     /**
