@@ -44,7 +44,7 @@
   },
   "scripts": {
       "test": "phpunit",
-      "pint": "pint"
+      "lint": "pint"
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
