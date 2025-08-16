@@ -19,6 +19,7 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
 - [API Methods](#api-methods)
 - [Error Handling](#exceptions)
 - [Advanced Features](#advanced-features)
+- [Documentation](#documentation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -397,6 +398,25 @@ protected function schedule(Schedule $schedule)
     $schedule->command('sms:monitor')->hourly();
 }
 ```
+
+---
+
+
+## 📚 Documentation
+
+Learn how to use Laravel Fast2sms effectively:
+
+### Getting Started
+- [Installation and Requirements](docs/installation.md)
+- [Configuration](docs/configuration.md)
+- [Basic Usage](docs/basic-usage.md)
+
+### Features
+- [API Reference](docs/api-reference.md)
+- [Advanced Usage](docs/advanced-usage.md)
+- [Queue Integration](docs/queues.md)
+- [Notifications](docs/notifications.md)
+- [Events & Listeners](docs/events.md)
 
 ---
 
