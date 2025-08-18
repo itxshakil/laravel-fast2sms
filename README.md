@@ -218,7 +218,7 @@ All errors throw `Fast2smsException`.
 Catch them when handling SMS sending:
 
 ```php
-use Fast2sms\LaravelFast2sms\Exceptions\Fast2smsException;
+use Shakil\Fast2sms\Exceptions\Fast2smsException;
 
 try {
     Fast2sms::quick('9999999999', 'Hello World');
