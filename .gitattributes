@@ -1,0 +1,64 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Treat common binary assets as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tgz binary
+*.bz2 binary
+
+# GitHub Linguist: refine language stats
+/docs linguist-documentation
+/.github linguist-documentation
+/tests linguist-vendored
+/vendor linguist-vendored
+
+# Exclude dev/CI/docs/tests/etc. from archives (Composer dist uses this)
+/.github               export-ignore
+/.idea                 export-ignore
+/.vscode               export-ignore
+/.circleci             export-ignore
+/appveyor.yml          export-ignore
+/.scrutinizer.yml      export-ignore
+/.styleci.yml          export-ignore
+/.coveralls.yml        export-ignore
+
+/docs                  export-ignore
+/tests                 export-ignore
+/vendor                export-ignore
+
+/.editorconfig         export-ignore
+/.gitattributes        export-ignore
+/.gitignore            export-ignore
+/.DS_Store             export-ignore
+
+/phpunit.xml           export-ignore
+/phpunit.xml.dist      export-ignore
+/.phpunit.result.cache export-ignore
+
+/.php-cs-fixer.php         export-ignore
+/.php-cs-fixer.dist.php    export-ignore
+/.php_cs                   export-ignore
+/.php_cs.dist              export-ignore
+/phpcs.xml                 export-ignore
+/phpcs.xml.dist            export-ignore
+/phpmd.xml                 export-ignore
+/phpmd.xmxl.dist            export-ignore
+/phpstan.neon              export-ignore
+/phpstan.neon.dist         export-ignore
+/psalm.xml                 export-ignore
+/psalm.xml.dist            export-ignore
+/infection.json            export-ignore
+/infection.json.dist       export-ignore
+/rector.php                export-ignore
+/ecs.php                   export-ignore
+/pint.json                 export-ignore
+/pint.json.dist            export-ignore
+
+/composer.lock         export-ignore
