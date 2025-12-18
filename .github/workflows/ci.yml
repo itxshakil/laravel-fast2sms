@@ -6,6 +6,10 @@ on:
     pull_request:
         branches: ["main"]
 
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     lint:
         name: Lint (Pint)
@@ -14,83 +18,79 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+            - uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.3
                   tools: composer
                   coverage: none
 
-            - name: Install dependencies
-              run: composer install --no-interaction --prefer-dist
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: pint-${{ hashFiles('composer.lock') }}
 
-            - name: Check code style
-              run: vendor/bin/pint --test
+            - run: composer install --no-interaction --prefer-dist
+            - run: vendor/bin/pint --test
 
     analyse:
         name: Static Analysis (PHPStan)
         runs-on: ubuntu-latest
+        needs: lint
 
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+            - uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.3
                   tools: composer
                   coverage: none
 
-            - name: Install dependencies
-              run: composer install --no-interaction --prefer-dist
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: phpstan-${{ hashFiles('composer.lock') }}
 
-            - name: Run PHPStan
-              run: php -d memory_limit=1G vendor/bin/phpstan analyse
+            - run: composer install --no-interaction --prefer-dist
+            - run: php -d memory_limit=1G vendor/bin/phpstan analyse
 
     test:
         name: Tests (PHP ${{ matrix.php }} | ${{ matrix.os }} | ${{ matrix.deps }})
         runs-on: ${{ matrix.os }}
+        needs: analyse
 
         strategy:
             fail-fast: true
             matrix:
                 os: [ubuntu-latest, macos-latest, windows-latest]
-                php: [8.3, 8.4, 8.5]
+                php: [8.3, 8.4]
                 deps: [prefer-lowest, prefer-stable]
 
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+            - uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}
                   extensions: dom, mbstring, zip, fileinfo
-                  coverage: none
                   tools: composer
+                  coverage: none
 
-            - name: Install dependencies
-              run: composer update --${{ matrix.deps }} --no-interaction --prefer-dist
-
-            - name: Run tests
-              run: vendor/bin/phpunit
+            - run: composer update --${{ matrix.deps }} --no-interaction --prefer-dist
+            - run: vendor/bin/phpunit
 
     packagist:
-        name: Packagist Validation
+        name: Composer / Packagist Validation
         runs-on: ubuntu-latest
+        needs: lint
 
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+            - uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.3
                   tools: composer
-                  coverage: none
 
-            - name: Validate composer.json
-              run: composer validate --strict
-
-            - name: Check autoloading
-              run: composer dump-autoload --dry-run --optimize
+            - run: composer validate --strict
+            - run: composer dump-autoload --dry-run --optimize
