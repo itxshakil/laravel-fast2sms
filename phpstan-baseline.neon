@@ -13,12 +13,6 @@ parameters:
 			path: src/BaseFast2smsService.php
 
 		-
-			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:mapApiResponse\(\) has parameter \$data with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/BaseFast2smsService.php
-
-		-
 			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:mapApiResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -373,12 +367,6 @@ parameters:
 			path: src/Responses/DltManagerResponse.php
 
 		-
-			message: '#^Method Shakil\\Fast2sms\\Responses\\DltManagerResponse\:\:getSenders\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Responses/DltManagerResponse.php
-
-		-
 			message: '#^Method Shakil\\Fast2sms\\Responses\\DltManagerResponse\:\:getTemplates\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -413,105 +401,3 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Responses/WalletBalanceResponse.php
-
-		-
-			message: '#^Access to an undefined property Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:\$balance\.$#'
-			identifier: property.notFound
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Access to an undefined property Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:\$smsCount\.$#'
-			identifier: property.notFound
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Call to an undefined method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:getSenders\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Call to an undefined method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:getTemplates\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Feature\\SmsSendingTest\:\:mockSuccessfulSmsResponse\(\) has parameter \$extraData with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Parameter \#1 \$type of static method Shakil\\Fast2sms\\Facades\\Fast2sms\:\:dltManager\(\) expects string, Shakil\\Fast2sms\\Enums\\DltManagerType\:\:SENDER given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Parameter \#1 \$type of static method Shakil\\Fast2sms\\Facades\\Fast2sms\:\:dltManager\(\) expects string, Shakil\\Fast2sms\\Enums\\DltManagerType\:\:TEMPLATE given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Unable to resolve the template type TKey in call to function collect$#'
-			identifier: argument.templateType
-			count: 5
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Unable to resolve the template type TValue in call to function collect$#'
-			identifier: argument.templateType
-			count: 5
-			path: tests/Feature/SmsSendingTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_be_created_with_content\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_chain_methods\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_create_dlt_message\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_content\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_language\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_route\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_sender_id\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
-
-		-
-			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_template\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: tests/Unit/Messages/SmsMessageTest.php
