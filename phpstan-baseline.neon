@@ -1,0 +1,517 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:executeApiCall\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/BaseFast2smsService.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:handleSuccessResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/BaseFast2smsService.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:mapApiResponse\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/BaseFast2smsService.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\BaseFast2smsService\:\:mapApiResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/BaseFast2smsService.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Contracts\\Fast2smsInterface\:\:to\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Contracts/Fast2smsInterface.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Contracts\\Fast2smsInterface\:\:variables\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Contracts/Fast2smsInterface.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\DataTransferObjects\\SmsParameters\:\:__construct\(\) has parameter \$variablesValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DataTransferObjects/SmsParameters.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Events\\SmsFailed\:\:__construct\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Events/SmsFailed.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Events\\SmsFailed\:\:__construct\(\) has parameter \$response with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Events/SmsFailed.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Events\\SmsSent\:\:__construct\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Events/SmsSent.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method assertNotSent\(\) parameter \#1 \$callback with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method assertSent\(\) parameter \#1 \$callback with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method dlt\(\) parameter \#1 \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method dlt\(\) parameter \#3 \$variablesValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method otp\(\) parameter \#1 \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method quick\(\) parameter \#1 \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method to\(\) parameter \#1 \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Facades\\Fast2sms has PHPDoc tag @method for method variables\(\) parameter \#1 \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^PHPDoc tag @method for method Shakil\\Fast2sms\\Facades\\Fast2sms\:\:sentMessages\(\) return type contains generic class Illuminate\\Support\\Collection but does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Facades/Fast2sms.php
+
+		-
+			message: '#^Match arm comparison between Shakil\\Fast2sms\\Enums\\SmsRoute\:\:OTP and Shakil\\Fast2sms\\Enums\\SmsRoute\:\:OTP is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Match arm comparison between Shakil\\Fast2sms\\Enums\\SmsRoute\:\:QUICK and Shakil\\Fast2sms\\Enums\\SmsRoute\:\:QUICK is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:assertNotSent\(\) has parameter \$callback with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:assertSent\(\) has parameter \$callback with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:delay\(\) has invalid return type Shakil\\Fast2sms\\Traits\\QueuesSms\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:dlt\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:dlt\(\) has parameter \$variablesValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:dltQueue\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:dltQueue\(\) has parameter \$variablesValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:entityId\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:flash\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:getNumbers\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:getVariablesValues\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:language\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:message\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:onConnection\(\) has invalid return type Shakil\\Fast2sms\\Traits\\QueuesSms\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:onQueue\(\) has invalid return type Shakil\\Fast2sms\\Traits\\QueuesSms\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:otp\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:otpQueue\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:quick\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:quickQueue\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:route\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:schedule\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:senderId\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:sentMessages\(\) return type with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:setDlt\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:setDlt\(\) has parameter \$variablesValues with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:setOtp\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:setQuick\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:templateId\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:to\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:to\(\) has parameter \$numbers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:variables\(\) has invalid return type Shakil\\Fast2sms\\Traits\\ManagesSmsParameters\.$#'
+			identifier: return.trait
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Fast2sms\:\:variables\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^PHPDoc tag @return with type Shakil\\Fast2sms\\Fast2sms\|Shakil\\Fast2sms\\Traits\\ManagesSmsParameters is not subtype of native type Shakil\\Fast2sms\\Fast2sms\.$#'
+			identifier: return.phpDocType
+			count: 10
+			path: src/Fast2sms.php
+
+		-
+			message: '#^PHPDoc tag @return with type Shakil\\Fast2sms\\Fast2sms\|Shakil\\Fast2sms\\Traits\\QueuesSms is not subtype of native type Shakil\\Fast2sms\\Fast2sms\.$#'
+			identifier: return.phpDocType
+			count: 3
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Property Shakil\\Fast2sms\\Fast2sms\:\:\$numbers type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^Property Shakil\\Fast2sms\\Fast2sms\:\:\$sentMessages with generic class Illuminate\\Support\\Collection does not specify its types\: TKey, TValue$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Fast2sms.php
+
+		-
+			message: '#^PHPDoc tag @implements has invalid value \(ShouldQueue\)\: Unexpected token "\\n ", expected ''\<'' at offset 345 on line 8$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/Jobs/SendSmsJob.php
+
+		-
+			message: '#^Class Shakil\\Fast2sms\\Notifications\\Messages\\SmsMessage has PHPDoc tag @property\-read for property \$variables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Notifications/Messages/SmsMessage.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Notifications\\Messages\\SmsMessage\:\:template\(\) has parameter \$variables with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Notifications/Messages/SmsMessage.php
+
+		-
+			message: '#^Property Shakil\\Fast2sms\\Notifications\\Messages\\SmsMessage\:\:\$variables type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Notifications/Messages/SmsMessage.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\DltManagerResponse\:\:getData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/DltManagerResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\DltManagerResponse\:\:getSenders\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/DltManagerResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\DltManagerResponse\:\:getTemplates\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/DltManagerResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/Fast2smsResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:getRawData\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/Fast2smsResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/Fast2smsResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\SmsResponse\:\:getMessages\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/SmsResponse.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Responses\\WalletBalanceResponse\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Responses/WalletBalanceResponse.php
+
+		-
+			message: '#^Access to an undefined property Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:\$balance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Access to an undefined property Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:\$smsCount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Call to an undefined method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:getSenders\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Call to an undefined method Shakil\\Fast2sms\\Responses\\Fast2smsResponse\:\:getTemplates\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Feature\\SmsSendingTest\:\:mockSuccessfulSmsResponse\(\) has parameter \$extraData with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Parameter \#1 \$type of static method Shakil\\Fast2sms\\Facades\\Fast2sms\:\:dltManager\(\) expects string, Shakil\\Fast2sms\\Enums\\DltManagerType\:\:SENDER given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Parameter \#1 \$type of static method Shakil\\Fast2sms\\Facades\\Fast2sms\:\:dltManager\(\) expects string, Shakil\\Fast2sms\\Enums\\DltManagerType\:\:TEMPLATE given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Unable to resolve the template type TKey in call to function collect$#'
+			identifier: argument.templateType
+			count: 5
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Unable to resolve the template type TValue in call to function collect$#'
+			identifier: argument.templateType
+			count: 5
+			path: tests/Feature/SmsSendingTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_be_created_with_content\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_chain_methods\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_create_dlt_message\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_content\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_language\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_route\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_sender_id\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php
+
+		-
+			message: '#^Method Shakil\\Fast2sms\\Tests\\Unit\\Messages\\SmsMessageTest\:\:it_can_set_template\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: tests/Unit/Messages/SmsMessageTest.php

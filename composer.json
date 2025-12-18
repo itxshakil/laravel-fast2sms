@@ -25,7 +25,10 @@
     "require-dev": {
         "orchestra/testbench": "^10.4",
         "phpunit/phpunit": "^12.0",
-        "laravel/pint": "^1.24"
+        "laravel/pint": "^1.24",
+        "rector/rector": "^2.2",
+        "driftingly/rector-laravel": "^2.1",
+        "larastan/larastan": "^3.0"
     },
   "autoload": {
     "psr-4": {
@@ -49,8 +52,23 @@
   },
   "scripts": {
       "test": "phpunit",
-      "lint": "pint"
+      "analyse": "phpstan analyse --memory-limit=1G",
+      "lint:fix": [
+          "rector process",
+          "pint --dirty"
+      ],
+      "lint": [
+          "@analyse",
+          "pint --parallel"
+      ],
+      "qa": [
+          "@lint",
+          "@test"
+      ]
   },
+    "scripts-descriptions": {
+        "test": "Run the test suite"
+    },
   "minimum-stability": "dev",
   "prefer-stable": true
 }
