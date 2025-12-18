@@ -67,7 +67,11 @@
       ]
   },
     "scripts-descriptions": {
-        "test": "Run the test suite"
+        "test": "Run the PHPUnit test suite",
+        "analyse": "Run static analysis using PHPStan",
+        "lint:fix": "Automatically fix code style issues using Rector and Laravel Pint",
+        "lint": "Run static analysis and code style checks without modifying files",
+        "qa": "Run full quality assurance checks (lint + tests)"
     },
   "minimum-stability": "dev",
   "prefer-stable": true
