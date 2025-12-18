@@ -1,0 +1,37 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*.*.*"
+
+jobs:
+    release-checks:
+        name: Release Checks
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.3
+                  extensions: dom, mbstring, zip, fileinfo
+                  coverage: none
+                  tools: composer
+
+            - name: Install dependencies
+              run: composer install --no-interaction --prefer-dist --no-dev
+
+            - name: Validate composer.json
+              run: composer validate --strict
+
+            - name: Check code style
+              run: vendor/bin/pint --test
+
+            - name: Static analysis
+              run: php -d memory_limit=1G vendor/bin/phpstan analyse
+
+            - name: Run tests
+              run: vendor/bin/phpunit

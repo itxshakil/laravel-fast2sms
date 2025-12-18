@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Responses;
 
+use function count;
+
 use InvalidArgumentException;
 
-use function count;
 use function is_array;
 use function is_bool;
 use function is_int;
@@ -34,13 +35,13 @@ class Fast2smsResponse
     /**
      * The raw data from the Fast2sms API response.
      *
-     * @param  array  $data  The raw response data from the API.
+     * @param array $data The raw response data from the API.
      *
      * @throws InvalidArgumentException if the response data is invalid or malformed.
      */
     public function __construct(protected array $data)
     {
-        if (empty($this->data)) {
+        if ($this->data === []) {
             throw new InvalidArgumentException('Response data cannot be empty.');
         }
 
@@ -65,32 +66,6 @@ class Fast2smsResponse
     }
 
     /**
-     * Extracts a human-readable message from the response data.
-     *
-     * This method handles various formats of the 'message' key in the response
-     * and falls back to a default message if no message is found.
-     *
-     * @return string The extracted message or a default message if none is found.
-     */
-    private function message(): string
-    {
-        if (isset($this->data['message']) && is_string($this->data['message'])) {
-            return $this->data['message'];
-        }
-
-        if (isset($this->data['message']) && is_array($this->data['message']) && count($this->data['message']) > 0) {
-            return $this->data['message'][array_key_first($this->data['message'])];
-        }
-
-        $errorMessage = $this->getErrorMessage();
-        if ($errorMessage) {
-            return $errorMessage;
-        }
-
-        return 'No message provided';
-    }
-
-    /**
      * Gets the error message from the response.
      *
      * @return string|null The error message if available, otherwise null.
@@ -109,7 +84,7 @@ class Fast2smsResponse
      */
     public function isSuccess(): bool
     {
-        return $this->success === true;
+        return $this->success;
     }
 
     /**
@@ -142,5 +117,31 @@ class Fast2smsResponse
     public function toArray(): array
     {
         return $this->data;
+    }
+
+    /**
+     * Extracts a human-readable message from the response data.
+     *
+     * This method handles various formats of the 'message' key in the response
+     * and falls back to a default message if no message is found.
+     *
+     * @return string The extracted message or a default message if none is found.
+     */
+    private function message(): string
+    {
+        if (isset($this->data['message']) && is_string($this->data['message'])) {
+            return $this->data['message'];
+        }
+
+        if (isset($this->data['message']) && is_array($this->data['message']) && count($this->data['message']) > 0) {
+            return $this->data['message'][array_key_first($this->data['message'])];
+        }
+
+        $errorMessage = $this->getErrorMessage();
+        if ($errorMessage) {
+            return $errorMessage;
+        }
+
+        return 'No message provided';
     }
 }

@@ -18,7 +18,7 @@ interface Fast2smsInterface
     /**
      * Set the recipient mobile number(s).
      *
-     * @param  string|array  $numbers  Single number as string or multiple numbers as an array.
+     * @param  string|array $numbers Single number as string or multiple numbers as an array.
      * @return $this
      */
     public function to(string|array $numbers): self;
@@ -28,7 +28,7 @@ interface Fast2smsInterface
      * For DLT routes, this should be the DLT approved Message ID.
      * For Quick SMS, this is the actual message text.
      *
-     * @param  string  $message  The SMS message content or DLT message ID.
+     * @param  string $message The SMS message content or DLT message ID.
      * @return $this
      */
     public function message(string $message): self;
@@ -36,7 +36,7 @@ interface Fast2smsInterface
     /**
      * Set the DLT approved sender ID.
      *
-     * @param  string  $senderId  The DLT approved sender ID (3-6 letters).
+     * @param  string $senderId The DLT approved sender ID (3-6 letters).
      * @return $this
      */
     public function senderId(string $senderId): self;
@@ -44,7 +44,7 @@ interface Fast2smsInterface
     /**
      * Set the SMS route.
      *
-     * @param  SmsRoute  $route  The SMS route enum (e.g., SmsRoute::DLT, SmsRoute::OTP, SmsRoute::QUICK).
+     * @param  SmsRoute $route The SMS route enum (e.g., SmsRoute::DLT, SmsRoute::OTP, SmsRoute::QUICK).
      * @return $this
      */
     public function route(SmsRoute $route): self;
@@ -53,7 +53,7 @@ interface Fast2smsInterface
      * Set the DLT Principal Entity ID.
      * Required for DLT routes.
      *
-     * @param  string  $entityId  The DLT Principal Entity ID.
+     * @param  string $entityId The DLT Principal Entity ID.
      * @return $this
      */
     public function entityId(string $entityId): self;
@@ -62,7 +62,7 @@ interface Fast2smsInterface
      * Set the DLT Content Template ID.
      * Required for DLT routes.
      *
-     * @param  string  $templateId  The DLT Content Template ID.
+     * @param  string $templateId The DLT Content Template ID.
      * @return $this
      */
     public function templateId(string $templateId): self;
@@ -71,7 +71,7 @@ interface Fast2smsInterface
      * Set the variable values for DLT templates.
      * Values should be provided as an array and will be pipe-separated.
      *
-     * @param  array  $values  An array of variable values.
+     * @param  array $values An array of variable values.
      * @return $this
      */
     public function variables(array $values): self;
@@ -79,7 +79,7 @@ interface Fast2smsInterface
     /**
      * Set whether to send a flash message.
      *
-     * @param  bool  $flash  True to send as flash message, false otherwise.
+     * @param  bool  $flash True to send as flash message, false otherwise.
      * @return $this
      */
     public function flash(bool $flash = true): self;
@@ -87,7 +87,7 @@ interface Fast2smsInterface
     /**
      * Schedule the SMS to be sent at a future time.
      *
-     * @param  DateTimeInterface|string  $time  The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
+     * @param  DateTimeInterface|string $time The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
      * @return $this
      *
      * @throws Fast2smsException If the time format is invalid.
@@ -97,7 +97,7 @@ interface Fast2smsInterface
     /**
      * Set the language of the SMS message.
      *
-     * @param  SmsLanguage  $language  The SMS language enum (e.g., SmsLanguage::ENGLISH, SmsLanguage::UNICODE).
+     * @param  SmsLanguage $language The SMS language enum (e.g., SmsLanguage::ENGLISH, SmsLanguage::UNICODE).
      * @return $this
      */
     public function language(SmsLanguage $language): self;

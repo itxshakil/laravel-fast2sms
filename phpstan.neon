@@ -1,0 +1,26 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - src
+
+    tmpDir: .phpstan/cache
+
+    treatPhpDocTypesAsCertain: false
+
+    inferPrivatePropertyTypeFromConstructor: true
+
+    reportUnmatchedIgnoredErrors: false
+
+    ignoreErrors:
+        # Laravel container magic
+        - '#Call to an undefined method Illuminate\\Contracts\\.*#'
+
+        # Facades in packages
+        - '#Static call to instance method#'
+
+    editorUrl: "phpstorm://open?file=%f&line=%l"

@@ -6,12 +6,13 @@ namespace Shakil\Fast2sms\Channels;
 
 use BadMethodCallException;
 use Illuminate\Notifications\Notification;
+
+use function is_string;
+
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
 
-use function get_class;
-use function is_string;
 use function sprintf;
 
 /**
@@ -34,8 +35,8 @@ class SmsChannel
      * - Language settings
      * - Route specification
      *
-     * @param  mixed  $notifiable  The entity receiving the notification
-     * @param  Notification  $notification  The notification instance
+     * @param mixed        $notifiable   The entity receiving the notification
+     * @param Notification $notification The notification instance
      *
      * @throws Fast2smsException When there's an error sending the SMS
      */
@@ -47,7 +48,7 @@ class SmsChannel
 
         if (! method_exists($notification, 'toSms')) {
             throw new BadMethodCallException(
-                sprintf('Method [toSms] missing from notification [%s].', get_class($notification))
+                sprintf('Method [toSms] missing from notification [%s].', $notification::class),
             );
         }
 

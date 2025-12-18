@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
+use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Fast2sms;
 
@@ -32,10 +33,10 @@ class SendSmsJob implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  SmsParameters  $parameters  Data transfer object containing all SMS parameters
+     * @param SmsParameters $parameters Data transfer object containing all SMS parameters
      */
     public function __construct(
-        public readonly SmsParameters $parameters
+        public readonly SmsParameters $parameters,
     ) {}
 
     /**
@@ -44,7 +45,7 @@ class SendSmsJob implements ShouldQueue
      * Configures the Fast2sms instance with the stored parameters and sends the SMS.
      * All optional parameters are only set if they have values to maintain clean configuration.
      *
-     * @param  Fast2sms  $fast2sms  The Fast2sms service instance
+     * @param Fast2sms $fast2sms The Fast2sms service instance
      *
      * @throws Fast2smsException If SMS sending fails or validation fails
      */
@@ -55,7 +56,7 @@ class SendSmsJob implements ShouldQueue
             ->message($this->parameters->message)
             ->route($this->parameters->route);
 
-        if ($this->parameters->language) {
+        if ($this->parameters->language instanceof SmsLanguage) {
             $fast2sms->language($this->parameters->language);
         }
 

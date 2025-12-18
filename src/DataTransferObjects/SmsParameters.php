@@ -21,16 +21,16 @@ readonly class SmsParameters
     /**
      * Creates a new SMS parameters instance.
      *
-     * @param  array<int|string>  $numbers  List of phone numbers to send SMS to
-     * @param  string  $message  The SMS message content
-     * @param  SmsRoute  $route  The routing method for the SMS
-     * @param  SmsLanguage|null  $language  The language encoding for the message (default: null)
-     * @param  string|null  $senderId  The sender ID for the message (3-6 characters)
-     * @param  string|null  $entityId  The DLT entity ID for the message
-     * @param  string|null  $templateId  The DLT template ID for the message
-     * @param  array|string|null  $variablesValues  Template variables values
-     * @param  bool  $flash  Whether to send as a flash message
-     * @param  string|null  $scheduleTime  Scheduled time for delayed sending (ISO 8601 format)
+     * @param array<int|string> $numbers         List of phone numbers to send SMS to
+     * @param string            $message         The SMS message content
+     * @param SmsRoute          $route           The routing method for the SMS
+     * @param SmsLanguage|null  $language        The language encoding for the message (default: null)
+     * @param string|null       $senderId        The sender ID for the message (3-6 characters)
+     * @param string|null       $entityId        The DLT entity ID for the message
+     * @param string|null       $templateId      The DLT template ID for the message
+     * @param array|string|null $variablesValues Template variables values
+     * @param bool              $flash           Whether to send as a flash message
+     * @param string|null       $scheduleTime    Scheduled time for delayed sending (ISO 8601 format)
      */
     public function __construct(
         public array $numbers,
@@ -51,8 +51,8 @@ readonly class SmsParameters
      * This factory method extracts all necessary parameters from an existing Fast2sms instance
      * and creates a new SmsParameters object with those values.
      *
-     * @param  Fast2sms  $fast2sms  The source Fast2sms instance
-     * @return self New SmsParameters instance with values from Fast2sms object
+     * @param  Fast2sms $fast2sms The source Fast2sms instance
+     * @return self     New SmsParameters instance with values from Fast2sms object
      */
     public static function fromFast2sms(Fast2sms $fast2sms): self
     {

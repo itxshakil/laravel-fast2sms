@@ -18,14 +18,17 @@
     }
   ],
   "require": {
-    "php": "^8.3|^8.4",
+    "php": "^8.3",
     "illuminate/support": "^12.0",
     "illuminate/http": "^12.0"
   },
     "require-dev": {
         "orchestra/testbench": "^10.4",
         "phpunit/phpunit": "^12.0",
-        "laravel/pint": "^1.24"
+        "laravel/pint": "^1.24",
+        "rector/rector": "^2.2",
+        "driftingly/rector-laravel": "^2.1",
+        "larastan/larastan": "^3.0"
     },
   "autoload": {
     "psr-4": {
@@ -49,8 +52,27 @@
   },
   "scripts": {
       "test": "phpunit",
-      "lint": "pint"
+      "analyse": "phpstan analyse --memory-limit=1G",
+      "lint:fix": [
+          "rector process",
+          "pint --dirty"
+      ],
+      "lint": [
+          "@analyse",
+          "pint --parallel"
+      ],
+      "qa": [
+          "@lint",
+          "@test"
+      ]
   },
+    "scripts-descriptions": {
+        "test": "Run the PHPUnit test suite",
+        "analyse": "Run static analysis using PHPStan",
+        "lint:fix": "Automatically fix code style issues using Rector and Laravel Pint",
+        "lint": "Run static analysis and code style checks without modifying files",
+        "qa": "Run full quality assurance checks (lint + tests)"
+    },
   "minimum-stability": "dev",
   "prefer-stable": true
 }

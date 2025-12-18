@@ -17,11 +17,11 @@ class DltManagerResponse extends Fast2smsResponse
      *
      * Each sender's data is normalized to include 'sender_id', 'entity_id', and 'entity_name'.
      *
-     * @return array An array of sender data, with each element being an associative array.
+     * @return mixed[][] An array of sender data, with each element being an associative array.
      */
     public function getSenders(): array
     {
-        return array_map(fn ($item) => [
+        return array_map(fn (array $item): array => [
             'sender_id' => $item['sender_id'] ?? null,
             'entity_id' => $item['entity_id'] ?? null,
             'entity_name' => $item['entity_name'] ?? null,

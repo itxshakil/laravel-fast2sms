@@ -7,10 +7,12 @@ namespace Shakil\Fast2sms\Traits;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use PHPUnit\Framework\Assert;
-use Shakil\Fast2sms\Exceptions\Fast2smsException;
 
 use function is_array;
+
+use PHPUnit\Framework\Assert;
+
+use Shakil\Fast2sms\Exceptions\Fast2smsException;
 
 /**
  * Trait to handle faking and assertion for Fast2sms during testing.
@@ -37,7 +39,7 @@ trait HandlesFaking
         self::$sentMessages = collect();
 
         Http::fake([
-            config('fast2sms.base_url').'*' => function ($request) {
+            config('fast2sms.base_url') . '*' => function ($request) {
                 // Convert multipart request into array
                 $payload = [];
                 foreach ($request->data() as $part) {
@@ -69,14 +71,14 @@ trait HandlesFaking
             Assert::assertGreaterThan(
                 0,
                 self::$sentMessages->count(),
-                'No SMS was sent.'
+                'No SMS was sent.',
             );
 
             return;
         }
 
         Assert::assertTrue(
-            self::$sentMessages->contains(function ($message) use ($callback) {
+            self::$sentMessages->contains(function (array $message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
                         if (! isset($message[$key]) || $message[$key] !== $value) {
@@ -89,7 +91,7 @@ trait HandlesFaking
 
                 return $callback($message);
             }),
-            'An SMS with the given criteria was not sent.'
+            'An SMS with the given criteria was not sent.',
         );
     }
 
@@ -108,14 +110,14 @@ trait HandlesFaking
             Assert::assertEquals(
                 0,
                 self::$sentMessages->count(),
-                'SMS was sent when it should not have been.'
+                'SMS was sent when it should not have been.',
             );
 
             return;
         }
 
         Assert::assertFalse(
-            self::$sentMessages->contains(function ($message) use ($callback) {
+            self::$sentMessages->contains(function (array $message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
                         if (! isset($message[$key]) || $message[$key] !== $value) {
@@ -128,7 +130,7 @@ trait HandlesFaking
 
                 return $callback($message);
             }),
-            'An SMS with the given criteria was sent when it should not have been.'
+            'An SMS with the given criteria was sent when it should not have been.',
         );
     }
 
@@ -146,7 +148,7 @@ trait HandlesFaking
         Assert::assertEquals(
             $count,
             self::$sentMessages->count(),
-            "Expected $count SMS messages to be sent, but ".self::$sentMessages->count().' were sent.'
+            "Expected $count SMS messages to be sent, but " . self::$sentMessages->count() . ' were sent.',
         );
     }
 

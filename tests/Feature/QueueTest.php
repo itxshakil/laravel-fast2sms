@@ -54,7 +54,7 @@ class QueueTest extends TestCase
             '1234567890',
             'template123',
             ['var1', 'var2'],
-            'SENDER1'
+            'SENDER1',
         );
 
         Queue::assertPushed(SendSmsJob::class, function ($job) {

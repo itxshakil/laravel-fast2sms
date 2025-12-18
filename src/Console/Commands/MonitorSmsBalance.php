@@ -56,6 +56,16 @@ class MonitorSmsBalance extends Command
         }
     }
 
+    public function handleBalance(?float $balance, float $threshold): void
+    {
+        $this->info("Current SMS balance: ₹$balance");
+
+        if ($balance <= $threshold) {
+            event(new LowBalanceDetected($balance, $threshold));
+            $this->warn("Balance (₹$balance) is below threshold (₹$threshold)");
+        }
+    }
+
     /**
      * Get the SMS balance threshold from the command option or configuration.
      *
@@ -65,15 +75,5 @@ class MonitorSmsBalance extends Command
     {
         return (float) ($this->option('threshold')
             ?? config('fast2sms.balance_threshold', 1000));
-    }
-
-    public function handleBalance(?float $balance, float $threshold): void
-    {
-        $this->info("Current SMS balance: ₹$balance");
-
-        if ($balance <= $threshold) {
-            event(new LowBalanceDetected($balance, $threshold));
-            $this->warn("Balance (₹$balance) is below threshold (₹$threshold)");
-        }
     }
 }

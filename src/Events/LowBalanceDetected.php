@@ -12,11 +12,11 @@ readonly class LowBalanceDetected
     /**
      * Create a new LowBalanceDetected event instance.
      *
-     * @param  float  $balance  The current SMS balance.
-     * @param  float  $threshold  The balance threshold that triggered the event.
+     * @param float $balance   The current SMS balance.
+     * @param float $threshold The balance threshold that triggered the event.
      */
     public function __construct(
         public float $balance,
-        public float $threshold
+        public float $threshold,
     ) {}
 }

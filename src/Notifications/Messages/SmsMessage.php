@@ -56,15 +56,26 @@ class SmsMessage
 
     public function __construct(string $content = '')
     {
-        if ($content) {
+        if ($content !== '' && $content !== '0') {
             $this->content($content);
         }
     }
 
     /**
+     * Get a property value.
+     *
+     * @param  string $name Property name
+     * @return mixed  The property value
+     */
+    public function __get(string $name): mixed
+    {
+        return $this->{$name} ?? null;
+    }
+
+    /**
      * Set the message content.
      *
-     * @param  string  $content  The message text
+     * @param  string $content The message text
      * @return $this
      */
     public function content(string $content): self
@@ -77,7 +88,7 @@ class SmsMessage
     /**
      * Set the DLT template and its variables.
      *
-     * @param  string  $templateId  The DLT template ID
+     * @param  string $templateId The DLT template ID
      * @param  array  $variables  Variables to be replaced in the template
      * @return $this
      */
@@ -92,7 +103,7 @@ class SmsMessage
     /**
      * Set the sender ID.
      *
-     * @param  string  $senderId  The sender ID
+     * @param  string $senderId The sender ID
      * @return $this
      */
     public function from(string $senderId): self
@@ -105,7 +116,7 @@ class SmsMessage
     /**
      * Set the SMS route.
      *
-     * @param  SmsRoute  $route  The route to use (QUICK/DLT/OTP)
+     * @param  SmsRoute $route The route to use (QUICK/DLT/OTP)
      * @return $this
      */
     public function route(SmsRoute $route): self
@@ -118,7 +129,7 @@ class SmsMessage
     /**
      * Set the message language.
      *
-     * @param  SmsLanguage  $language  The language to use
+     * @param  SmsLanguage $language The language to use
      * @return $this
      */
     public function language(SmsLanguage $language): self
@@ -126,16 +137,5 @@ class SmsMessage
         $this->language = $language;
 
         return $this;
-    }
-
-    /**
-     * Get a property value.
-     *
-     * @param  string  $name  Property name
-     * @return mixed The property value
-     */
-    public function __get(string $name): mixed
-    {
-        return $this->{$name} ?? null;
     }
 }

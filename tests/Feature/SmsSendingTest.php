@@ -26,20 +26,6 @@ class SmsSendingTest extends TestCase
         config(['fast2sms.api_key' => 'test-api-key']);
     }
 
-    /**
-     * Helper to mock a successful SMS send response.
-     */
-    private function mockSuccessfulSmsResponse(array $extraData = []): void
-    {
-        Http::fake([
-            config('fast2sms.base_url').'*' => Http::response(array_merge([
-                'return' => true,
-                'message' => 'SMS sent successfully.',
-                'request_id' => 'xyz-123',
-            ], $extraData)),
-        ]);
-    }
-
     // --- Happy Path: Quick SMS ---
 
     #[Test]
@@ -123,7 +109,7 @@ class SmsSendingTest extends TestCase
             $this->testNumber,
             $this->testTemplateId,
             ['Hello', 'World'],
-            $this->testSenderId
+            $this->testSenderId,
         );
 
         $this->assertTrue($response->isSuccess());
@@ -168,7 +154,7 @@ class SmsSendingTest extends TestCase
     public function it_can_check_the_wallet_balance(): void
     {
         Http::fake([
-            config('fast2sms.base_url').'/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000]),
+            config('fast2sms.base_url') . '/wallet' => Http::response(['return' => true, 'wallet' => '500.50', 'sms_count' => 1000]),
         ]);
 
         $response = Fast2sms::checkBalance();
@@ -182,7 +168,7 @@ class SmsSendingTest extends TestCase
     public function it_can_retrieve_dlt_manager_senders(): void
     {
         Http::fake([
-            config('fast2sms.base_url').'/dlt_manager*' => Http::response([
+            config('fast2sms.base_url') . '/dlt_manager*' => Http::response([
                 'success' => true,
                 'data' => [
                     ['sender_id' => 'SENDER1', 'entity_id' => '1', 'entity_name' => 'Name 1'],
@@ -203,7 +189,7 @@ class SmsSendingTest extends TestCase
     public function it_can_retrieve_dlt_manager_templates(): void
     {
         Http::fake([
-            config('fast2sms.base_url').'/dlt_manager*' => Http::response([
+            config('fast2sms.base_url') . '/dlt_manager*' => Http::response([
                 'success' => true,
                 'data' => [
                     ['templates' => [['template_id' => 'TPL1'], ['template_id' => 'TPL2']]],
@@ -217,5 +203,19 @@ class SmsSendingTest extends TestCase
         $this->assertTrue($response->isSuccess());
         $this->assertCount(2, $templates);
         $this->assertEquals('TPL1', $templates[0]['template_id']);
+    }
+
+    /**
+     * Helper to mock a successful SMS send response.
+     */
+    private function mockSuccessfulSmsResponse(array $extraData = []): void
+    {
+        Http::fake([
+            config('fast2sms.base_url') . '*' => Http::response(array_merge([
+                'return' => true,
+                'message' => 'SMS sent successfully.',
+                'request_id' => 'xyz-123',
+            ], $extraData)),
+        ]);
     }
 }
