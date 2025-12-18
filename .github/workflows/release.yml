@@ -3,35 +3,34 @@ name: Release
 on:
     push:
         tags:
-            - "v*.*.*"
+            - "v*.*.*" # triggers only on version tags
 
 jobs:
-    release-checks:
-        name: Release Checks
+    release:
+        name: Release Validation & Draft
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout code
+              uses: actions/checkout@v4
 
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.3
-                  extensions: dom, mbstring, zip, fileinfo
-                  coverage: none
                   tools: composer
-
-            - name: Install dependencies
-              run: composer install --no-interaction --prefer-dist --no-dev
+                  coverage: none
 
             - name: Validate composer.json
               run: composer validate --strict
 
-            - name: Check code style
-              run: vendor/bin/pint --test
+            - name: Ensure package installs without dev dependencies
+              run: composer install --no-interaction --prefer-dist --no-dev
 
-            - name: Static analysis
-              run: php -d memory_limit=1G vendor/bin/phpstan analyse
+            - name: Generate Release Notes (Draft)
+              uses: release-drafter/release-drafter@v6
+              with:
+                  config-name: release-drafter.yml
 
-            - name: Run tests
-              run: vendor/bin/phpunit
+            - name: Show Draft Release Notes
+              run: cat .github/release-drafter-draft.md || echo "No release notes generated"

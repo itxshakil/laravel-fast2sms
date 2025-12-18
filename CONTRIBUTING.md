@@ -1,6 +1,6 @@
 # Contributing to Laravel Fast2SMS
 
-First off, thank you for considering contributing to Laravel Fast2SMS! It's people like you that make this package better for everyone.
+First off, thank you for considering contributing to Laravel Fast2SMS! Your contributions help make this package better for everyone.
 
 ## Code of Conduct
 
@@ -10,33 +10,32 @@ Our Code of Conduct governs this project and everyone participating in it. By pa
 
 ### Reporting Bugs
 
-Before creating bug reports, please check the existing issues to avoid duplicates. When you create a bug report, include as many details as possible:
+Before creating bug reports, please check existing issues to avoid duplicates. Include as many details as possible:
 
-* Use a clear and descriptive title
-* Describe the exact steps to reproduce the problem
-* Provide specific examples
-* Describe the behavior you observed and what behavior you expected
-* Include PHP and package versions
-* If possible, include code snippets or a minimal reproduction
+* Clear and descriptive title
+* Steps to reproduce the problem
+* Expected vs observed behavior
+* PHP and package versions
+* Minimal reproducible example if possible
 
 ### Suggesting Enhancements
 
 If you have a suggestion for the project:
 
-* Use a clear and descriptive title
-* Provide a detailed description of the suggested enhancement
-* Explain why this enhancement would be useful
-* List any additional context or screenshots
+* Clear, descriptive title
+* Detailed explanation of the enhancement
+* Why it’s useful
+* Any additional context or screenshots
 
 ### Pull Requests
 
 1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
+2. Create a branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Run the tests (`composer test`)
-5. Ensure code style compliance (`composer lint`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
+4. Run tests: `composer test`
+5. Ensure code style: `composer lint`
+6. Commit changes: `git commit -m 'Add amazing feature'`
+7. Push branch: `git push origin feature/amazing-feature`
 8. Open a Pull Request
 
 #### Development Prerequisites
@@ -55,33 +54,46 @@ If you have a suggestion for the project:
 
 ### Development Setup
 
-1. Clone your fork of the repository
-```
-bash
+```bash
 git clone https://github.com/itxshakil/laravel-fast2sms.git
-```
-2. Install dependencies
-```
-bash
 composer install
-```
-3. Run tests to ensure everything is set up correctly
-```
-bash
 composer test
 ```
+
 ## Pull Request Guidelines
 
-* Update the README.md with details of changes to the interface, if applicable
-* Update the CHANGELOG.md with a note describing your changes
-* The PR should work for PHP 8.1 and above
+* Update `README.md` if the interface changes
+* Update `CHANGELOG.md` via PR notes (labels are automatically mapped to changelog categories)
+* The PR must work for PHP 8.3+
 * Include tests for new features
-* Follow the existing coding style
-* Write clear, descriptive commit messages
+* Follow existing coding style
+* Use clear, descriptive commit messages
+
+### Label Guidance (for Automatic Changelog)
+
+Your PR labels determine how changes are grouped in release notes:
+
+| Label              | Purpose / Changelog Category       |
+| ------------------ | ---------------------------------- |
+| `feature` / `core` | New features / core API            |
+| `http`             | HTTP client, responses, exceptions |
+| `notifications`    | Notification channel updates       |
+| `queue`            | Jobs and queued SMS handling       |
+| `config`           | Configuration updates              |
+| `breaking-change`  | ⚠️ Breaking changes                |
+| `tests`            | 🧪 Test additions                  |
+| `ci` / `tooling`   | 🔧 CI or tooling updates           |
+| `dependencies`     | ⬆️ Dependency updates              |
+| `documentation`    | 📝 Docs updates                    |
+| `meta`             | 🧹 Maintenance / housekeeping      |
+
+> The **Release Drafter** workflow uses these labels to generate automatic release notes grouped by category.
+
+---
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the same license that covers the project.
+By contributing, your contributions are licensed under the same license as the project (MIT).
 
 ## Questions?
 

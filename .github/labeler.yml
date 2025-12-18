@@ -1,0 +1,90 @@
+core:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Fast2sms.php
+                - src/BaseFast2smsService.php
+                - src/Traits/**
+
+http:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/BaseFast2smsService.php
+                - src/Responses/**
+                - src/Exceptions/**
+
+service-provider:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Fast2smsServiceProvider.php
+
+config:
+    - changed-files:
+          - any-glob-to-any-file:
+                - config/fast2sms.php
+
+notifications:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Channels/**
+                - src/Notifications/**
+
+queue:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Jobs/**
+
+events:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Events/**
+
+console:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/Console/**
+
+tests:
+    - changed-files:
+          - any-glob-to-any-file:
+                - tests/**
+                - phpunit.xml
+                - phpunit.xml.dist
+
+documentation:
+    - changed-files:
+          - any-glob-to-any-file:
+                - README.md
+                - CHANGELOG.md
+                - docs/**
+
+ci:
+    - changed-files:
+          - any-glob-to-any-file:
+                - .github/workflows/**
+                - .github/labeler.yml
+
+tooling:
+    - changed-files:
+          - any-glob-to-any-file:
+                - rector.php
+                - phpstan.neon
+                - pint.json
+                - .editorconfig
+
+dependencies:
+    - changed-files:
+          - any-glob-to-any-file:
+                - composer.json
+                - composer.lock
+
+meta:
+    - changed-files:
+          - any-glob-to-any-file:
+                - .github/**
+                - .gitignore
+                - .gitattributes
+
+breaking-change:
+    - changed-files:
+          - any-glob-to-any-file:
+                - src/**
