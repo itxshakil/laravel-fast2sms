@@ -54,7 +54,7 @@ abstract class BaseFast2smsService
     {
         $response = null;
         $multipart = collect($payload)
-            ->map(fn ($v, $k) => ['name' => $k, 'contents' => $v])
+            ->map(fn ($v, $k): array => ['name' => $k, 'contents' => $v])
             ->values()
             ->toArray();
 
@@ -104,6 +104,7 @@ abstract class BaseFast2smsService
 
     /**
      * Maps API response data to the correct response object.
+     * @param array<string, mixed> $data
      */
     private function mapApiResponse(array $payload, array $data): Fast2smsResponse
     {

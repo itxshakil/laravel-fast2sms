@@ -296,7 +296,7 @@ trait ManagesSmsParameters
     public function setQuick(array|string $numbers, string $message, ?SmsLanguage $language): void
     {
         $this->to($numbers)->message($message)->route(SmsRoute::QUICK);
-        if ($language) {
+        if ($language instanceof SmsLanguage) {
             $this->language($language);
         }
     }

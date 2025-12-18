@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Jobs;
 
+use Shakil\Fast2sms\Enums\SmsLanguage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -55,7 +56,7 @@ class SendSmsJob implements ShouldQueue
             ->message($this->parameters->message)
             ->route($this->parameters->route);
 
-        if ($this->parameters->language) {
+        if ($this->parameters->language instanceof SmsLanguage) {
             $fast2sms->language($this->parameters->language);
         }
 

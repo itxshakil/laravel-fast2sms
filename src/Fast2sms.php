@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
+use Shakil\Fast2sms\Events\LowBalanceDetected;
+use Override;
 use Shakil\Fast2sms\Contracts\Fast2smsInterface;
 use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Enums\SmsLanguage;
@@ -234,7 +236,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
         if ($threshold !== null) {
             $balance = $response->balance;
             if ($balance <= $threshold) {
-                event(new Events\LowBalanceDetected($balance, $threshold));
+                event(new LowBalanceDetected($balance, $threshold));
             }
         }
 
@@ -250,7 +252,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
      */
     public function dltManager(DltManagerType $type): Fast2smsResponse
     {
-        $this->validateDltManagerType($type);
+        $this->validateDltManagerType();
 
         return $this->executeApiCall(['type' => $type->value], '/dlt_manager');
     }
@@ -258,11 +260,10 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Validate the DLT manager type value.
      *
-     * @param  DltManagerType  $type  Must be "sender" or "template".
      *
      * @throws Fast2smsException If the value is invalid.
      */
-    private function validateDltManagerType(DltManagerType $type): void
+    private function validateDltManagerType(): void
     {
         $this->assertNotEmpty($this->apiKey, 'Fast2sms API Key is not configured.');
     }
@@ -272,6 +273,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
      *
      * Used to reset SMS parameters for the next request.
      */
+    #[Override]
     protected function afterApiCall(): void
     {
         $this->resetParameters();

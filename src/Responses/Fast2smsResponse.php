@@ -40,7 +40,7 @@ class Fast2smsResponse
      */
     public function __construct(protected array $data)
     {
-        if (empty($this->data)) {
+        if ($this->data === []) {
             throw new InvalidArgumentException('Response data cannot be empty.');
         }
 
@@ -109,7 +109,7 @@ class Fast2smsResponse
      */
     public function isSuccess(): bool
     {
-        return $this->success === true;
+        return $this->success;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
+use Override;
 use Illuminate\Support\ServiceProvider;
 use Shakil\Fast2sms\Console\Commands\MonitorSmsBalance;
 
@@ -15,15 +16,14 @@ class Fast2smsServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/fast2sms.php', 'fast2sms'
         );
 
-        $this->app->singleton('fast2sms', function ($app) {
-            return new Fast2sms;
-        });
+        $this->app->singleton('fast2sms', fn($app): Fast2sms => new Fast2sms);
     }
 
     /**

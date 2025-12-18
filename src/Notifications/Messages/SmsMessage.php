@@ -56,7 +56,7 @@ class SmsMessage
 
     public function __construct(string $content = '')
     {
-        if ($content) {
+        if ($content !== '' && $content !== '0') {
             $this->content($content);
         }
     }

@@ -76,7 +76,7 @@ trait HandlesFaking
         }
 
         Assert::assertTrue(
-            self::$sentMessages->contains(function ($message) use ($callback) {
+            self::$sentMessages->contains(function (array $message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
                         if (! isset($message[$key]) || $message[$key] !== $value) {
@@ -115,7 +115,7 @@ trait HandlesFaking
         }
 
         Assert::assertFalse(
-            self::$sentMessages->contains(function ($message) use ($callback) {
+            self::$sentMessages->contains(function (array $message) use ($callback) {
                 if (is_array($callback)) {
                     foreach ($callback as $key => $value) {
                         if (! isset($message[$key]) || $message[$key] !== $value) {
