@@ -35,7 +35,7 @@ class Fast2smsResponse
     /**
      * The raw data from the Fast2sms API response.
      *
-     * @param array $data The raw response data from the API.
+     * @param array<string, mixed> $data The raw response data from the API.
      *
      * @throws InvalidArgumentException if the response data is invalid or malformed.
      */

@@ -28,7 +28,7 @@ readonly class SmsParameters
      * @param string|null       $senderId        The sender ID for the message (3-6 characters)
      * @param string|null       $entityId        The DLT entity ID for the message
      * @param string|null       $templateId      The DLT template ID for the message
-     * @param array|string|null $variablesValues Template variables values
+     * @param array<int, string>|string|null $variablesValues Template variables values
      * @param bool              $flash           Whether to send as a flash message
      * @param string|null       $scheduleTime    Scheduled time for delayed sending (ISO 8601 format)
      */

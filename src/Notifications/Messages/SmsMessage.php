@@ -17,7 +17,7 @@ use Shakil\Fast2sms\Enums\SmsRoute;
  *
  * @property-read string|null $content The message content
  * @property-read string|null $templateId The DLT template ID
- * @property-read array|null $variables Template variables
+ * @property-read array<int, string>|null $variables Template variables
  * @property-read string|null $senderId Sender ID for the message
  * @property-read SmsRoute|null $route SMS route (QUICK/DLT/OTP)
  * @property-read SmsLanguage|null $language Message language
@@ -36,6 +36,7 @@ class SmsMessage
 
     /**
      * The template variables.
+     * @var array<int, string>|null
      */
     protected ?array $variables = null;
 
@@ -89,7 +90,7 @@ class SmsMessage
      * Set the DLT template and its variables.
      *
      * @param  string $templateId The DLT template ID
-     * @param  array  $variables  Variables to be replaced in the template
+     * @param  array<int, string>  $variables  Variables to be replaced in the template
      * @return $this
      */
     public function template(string $templateId, array $variables = []): self

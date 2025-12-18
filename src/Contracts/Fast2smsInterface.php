@@ -18,7 +18,7 @@ interface Fast2smsInterface
     /**
      * Set the recipient mobile number(s).
      *
-     * @param  string|array $numbers Single number as string or multiple numbers as an array.
+     * @param  string|array<int, string|int> $numbers Single number as string or multiple numbers as an array.
      * @return $this
      */
     public function to(string|array $numbers): self;
@@ -71,7 +71,7 @@ interface Fast2smsInterface
      * Set the variable values for DLT templates.
      * Values should be provided as an array and will be pipe-separated.
      *
-     * @param  array $values An array of variable values.
+     * @param  array<int, string> $values An array of variable values.
      * @return $this
      */
     public function variables(array $values): self;

@@ -21,6 +21,7 @@ trait ManagesSmsParameters
 {
     /**
      * The recipient mobile numbers.
+     * @var array<int, string|int>
      */
     protected array $numbers = [];
 
@@ -72,8 +73,7 @@ trait ManagesSmsParameters
     /**
      * Set the recipient mobile number(s).
      *
-     * @param  string|array                  $numbers Single number as string or multiple numbers as an array.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param string|array<int, string|int> $numbers Single number as string or multiple numbers as an array.
      */
     public function to(string|array $numbers): self
     {
@@ -87,8 +87,7 @@ trait ManagesSmsParameters
      * For DLT routes, this should be the DLT approved Message ID.
      * For Quick SMS, this is the actual message text.
      *
-     * @param  string                        $message The SMS message content or DLT message ID.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param string $message The SMS message content or DLT message ID.
      */
     public function message(string $message): self
     {
@@ -100,8 +99,7 @@ trait ManagesSmsParameters
     /**
      * Set the DLT approved sender ID.
      *
-     * @param  string                        $senderId The DLT approved sender ID (3-6 letters).
-     * @return ManagesSmsParameters|Fast2sms
+     * @param string $senderId The DLT approved sender ID (3-6 letters).
      */
     public function senderId(string $senderId): self
     {
@@ -113,8 +111,7 @@ trait ManagesSmsParameters
     /**
      * Set the SMS route.
      *
-     * @param  SmsRoute                      $route The SMS route enum (e.g., SmsRoute::DLT, SmsRoute::OTP, SmsRoute::QUICK).
-     * @return ManagesSmsParameters|Fast2sms
+     * @param SmsRoute $route The SMS route enum (e.g., SmsRoute::DLT, SmsRoute::OTP, SmsRoute::QUICK).
      */
     public function route(SmsRoute $route): self
     {
@@ -127,8 +124,7 @@ trait ManagesSmsParameters
      * Set the DLT Principal Entity ID.
      * Required for DLT routes.
      *
-     * @param  string                        $entityId The DLT Principal Entity ID.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param string $entityId The DLT Principal Entity ID.
      */
     public function entityId(string $entityId): self
     {
@@ -141,8 +137,7 @@ trait ManagesSmsParameters
      * Set the DLT Content Template ID.
      * Required for DLT routes.
      *
-     * @param  string                        $templateId The DLT Content Template ID.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param string $templateId The DLT Content Template ID.
      */
     public function templateId(string $templateId): self
     {
@@ -155,8 +150,7 @@ trait ManagesSmsParameters
      * Set the variable values for DLT templates.
      * Values should be provided as an array and will be pipe-separated.
      *
-     * @param  array|string                  $values An array of variable values.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param array<int, string>|string $values An array of variable values.
      */
     public function variables(array|string $values): self
     {
@@ -169,8 +163,7 @@ trait ManagesSmsParameters
     /**
      * Set whether to send a flash message.
      *
-     * @param  bool                          $flash True to send as flash message, false otherwise.
-     * @return ManagesSmsParameters|Fast2sms
+     * @param bool $flash True to send as flash message, false otherwise.
      */
     public function flash(bool $flash = true): self
     {
@@ -182,8 +175,7 @@ trait ManagesSmsParameters
     /**
      * Schedule the SMS to be sent at a future time.
      *
-     * @param  DateTimeInterface|string      $time The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
-     * @return ManagesSmsParameters|Fast2sms
+     * @param DateTimeInterface|string $time The schedule time (DateTimeInterface object or YYYY-MM-DD-HH-MM string).
      *
      * @throws Fast2smsException If the time format is invalid.
      */
@@ -205,8 +197,7 @@ trait ManagesSmsParameters
     /**
      * Set the language of the SMS message.
      *
-     * @param  SmsLanguage                   $language The SMS language enum (e.g., SmsLanguage::ENGLISH, SmsLanguage::UNICODE).
-     * @return ManagesSmsParameters|Fast2sms
+     * @param SmsLanguage $language The SMS language enum (e.g., SmsLanguage::ENGLISH, SmsLanguage::UNICODE).
      */
     public function language(SmsLanguage $language): self
     {
@@ -217,6 +208,8 @@ trait ManagesSmsParameters
 
     /**
      * Get the current numbers.
+     *
+     * @return array<int, string|int>
      */
     public function getNumbers(): array
     {
@@ -273,6 +266,8 @@ trait ManagesSmsParameters
 
     /**
      * Get the current variables values.
+     *
+     * @return array<int, string>|string|null
      */
     public function getVariablesValues(): array|string|null
     {
@@ -295,6 +290,9 @@ trait ManagesSmsParameters
         return $this->scheduleTime;
     }
 
+    /**
+     * @param array<int, string|int>|string $numbers
+     */
     public function setQuick(array|string $numbers, string $message, ?SmsLanguage $language): void
     {
         $this->to($numbers)->message($message)->route(SmsRoute::QUICK);
@@ -303,6 +301,10 @@ trait ManagesSmsParameters
         }
     }
 
+    /**
+     * @param array<int, string|int>|string $numbers
+     * @param array<int, string>|string     $variablesValues
+     */
     public function setDlt(array|string $numbers, string $templateId, array|string $variablesValues, ?string $senderId, ?string $entityId): void
     {
         $this->to($numbers)
@@ -319,6 +321,9 @@ trait ManagesSmsParameters
         }
     }
 
+    /**
+     * @param array<int, string|int>|string $numbers
+     */
     public function setOtp(array|string $numbers, string $otpValue): void
     {
         $this->to($numbers)->message($otpValue)->route(SmsRoute::OTP);

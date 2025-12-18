@@ -42,6 +42,11 @@ abstract class BaseFast2smsService
         $this->apiKey = $apiKey;
     }
 
+    /**
+     * @param array $payload
+     * @param PromiseInterface|Response $response
+     * @return Fast2smsResponse
+     */
     public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
     {
         // TODO: Handle response based on the payload and response structure.

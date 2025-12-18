@@ -38,9 +38,9 @@ trait QueuesSms
     /**
      * Queue a quick SMS with minimal configuration.
      *
-     * @param string|array     $numbers  One or more recipient numbers.
-     * @param string           $message  The SMS message content.
-     * @param SmsLanguage|null $language Optional message language.
+     * @param string|array<int, int|string> $numbers  One or more recipient numbers.
+     * @param string                        $message  The SMS message content.
+     * @param SmsLanguage|null              $language Optional message language.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -83,8 +83,6 @@ trait QueuesSms
 
     /**
      * Set the queue connection to be used.
-     *
-     * @return QueuesSms|Fast2sms
      */
     public function onConnection(string $connection): self
     {
@@ -95,8 +93,6 @@ trait QueuesSms
 
     /**
      * Set the queue name to be used.
-     *
-     * @return QueuesSms|Fast2sms
      */
     public function onQueue(string $queue): self
     {
@@ -105,11 +101,6 @@ trait QueuesSms
         return $this;
     }
 
-    /**
-     * Set the delay for the queued job.
-     *
-     * @return QueuesSms|Fast2sms
-     */
     public function delay(int $seconds): self
     {
         $this->queueDelay = $seconds;
@@ -120,11 +111,11 @@ trait QueuesSms
     /**
      * Queue an SMS via DLT route.
      *
-     * @param string|array $numbers         One or more recipient numbers.
-     * @param string       $templateId      The registered DLT template ID.
-     * @param array|string $variablesValues Template variable values.
-     * @param string|null  $senderId        Optional sender ID.
-     * @param string|null  $entityId        Optional entity ID (required for DLT_MANUAL route).
+     * @param string|array<int, string|number> $numbers         One or more recipient numbers.
+     * @param string                           $templateId      The registered DLT template ID.
+     * @param array<int, string>|string        $variablesValues Template variable values.
+     * @param string|null                      $senderId        Optional sender ID.
+     * @param string|null                      $entityId        Optional entity ID (required for DLT_MANUAL route).
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -143,8 +134,8 @@ trait QueuesSms
     /**
      * Queue an OTP SMS.
      *
-     * @param string|array $numbers  One or more recipient numbers.
-     * @param string       $otpValue The OTP code to send.
+     * @param string|array<int, string|number> $numbers  One or more recipient numbers.
+     * @param string                           $otpValue The OTP code to send.
      *
      * @throws Fast2smsException If validation fails.
      */

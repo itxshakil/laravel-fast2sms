@@ -60,7 +60,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Quickly send an SMS with minimal configuration.
      *
-     * @param string|array     $numbers  One or more recipient numbers.
+     * @param string|array<int, string|number> $numbers  One or more recipient numbers.
      * @param string           $message  The SMS message content.
      * @param SmsLanguage|null $language Optional message language.
      *
@@ -76,11 +76,11 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Send an SMS via DLT route.
      *
-     * @param string|array $numbers         One or more recipient numbers.
-     * @param string       $templateId      The registered DLT template ID.
-     * @param array|string $variablesValues Template variable values.
-     * @param string|null  $senderId        Optional sender ID.
-     * @param string|null  $entityId        Optional entity ID (required for DLT_MANUAL route).
+     * @param string|array<int, string|number> $numbers         One or more recipient numbers.
+     * @param string                           $templateId      The registered DLT template ID.
+     * @param array<int, string>|string                     $variablesValues Template variable values.
+     * @param string|null                      $senderId        Optional sender ID.
+     * @param string|null                      $entityId        Optional entity ID (required for DLT_MANUAL route).
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -94,8 +94,8 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Send an OTP SMS.
      *
-     * @param string|array $numbers  One or more recipient numbers.
-     * @param string       $otpValue The OTP code to send.
+     * @param string|array<int, string|number> $numbers  One or more recipient numbers.
+     * @param string                           $otpValue The OTP code to send.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -184,7 +184,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
             SmsRoute::QUICK => $this->assertNotEmpty($this->message, 'Message content is required for Quick SMS.'),
             SmsRoute::DLT, SmsRoute::DLT_MANUAL => $this->validateDltParameters(),
             SmsRoute::OTP => $this->assertNotEmpty($this->message, 'OTP value is required for OTP SMS.'),
-            default => null
         };
     }
 
@@ -235,7 +234,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
             SmsRoute::DLT, SmsRoute::DLT_MANUAL => $this->payloadForDlt(),
             SmsRoute::OTP => ['variables_values' => $this->message],
             SmsRoute::QUICK => $this->payloadForQuick(),
-            default => [],
         }, $this->scheduleTime ? ['schedule_time' => $this->scheduleTime] : []);
     }
 
