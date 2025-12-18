@@ -42,11 +42,17 @@ abstract class BaseFast2smsService
         $this->apiKey = $apiKey;
     }
 
+    public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
+    {
+        // TODO: Handle response based on the payload and response structure.
+        return $this->mapApiResponse($payload, $response->json());
+    }
+
     /**
      * Executes the API call to Fast2sms and returns the mapped response.
      *
-     * @param  array  $payload  The request payload.
-     * @param  string  $path  The API endpoint path (default: /bulkV2).
+     * @param array  $payload The request payload.
+     * @param string $path    The API endpoint path (default: /bulkV2).
      *
      * @throws Fast2smsException
      */
@@ -75,7 +81,7 @@ abstract class BaseFast2smsService
                 $exception = new Fast2smsException(
                     "Fast2sms API call failed: {$e->getMessage()}",
                     $e->getCode(),
-                    $e
+                    $e,
                 );
                 Event::dispatch(new SmsFailed($payload, $exception, $response?->json()));
             }
@@ -96,14 +102,20 @@ abstract class BaseFast2smsService
             ->asMultipart();
     }
 
-    public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
+    /**
+     * Hook method executed after every API call.
+     *
+     * Child classes can override this to reset state or perform
+     * post-request cleanup.
+     */
+    protected function afterApiCall(): void
     {
-        // TODO: Handle response based on the payload and response structure.
-        return $this->mapApiResponse($payload, $response->json());
+        // Default: no action. Override in subclasses.
     }
 
     /**
      * Maps API response data to the correct response object.
+     *
      * @param array<string, mixed> $data
      */
     private function mapApiResponse(array $payload, array $data): Fast2smsResponse
@@ -124,16 +136,5 @@ abstract class BaseFast2smsService
         }
 
         return new Fast2smsResponse($data);
-    }
-
-    /**
-     * Hook method executed after every API call.
-     *
-     * Child classes can override this to reset state or perform
-     * post-request cleanup.
-     */
-    protected function afterApiCall(): void
-    {
-        // Default: no action. Override in subclasses.
     }
 }

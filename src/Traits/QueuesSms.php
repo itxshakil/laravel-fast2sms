@@ -11,7 +11,7 @@ use Shakil\Fast2sms\Fast2sms;
 use Shakil\Fast2sms\Jobs\SendSmsJob;
 
 /**
- * Trait QueuesSms
+ * Trait QueuesSms.
  *
  * Provides queueing functionality for SMS messages in the Fast2sms package.
  * This trait handles the configuration and execution of queued SMS jobs,
@@ -38,9 +38,9 @@ trait QueuesSms
     /**
      * Queue a quick SMS with minimal configuration.
      *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $message  The SMS message content.
-     * @param  SmsLanguage|null  $language  Optional message language.
+     * @param string|array     $numbers  One or more recipient numbers.
+     * @param string           $message  The SMS message content.
+     * @param SmsLanguage|null $language Optional message language.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -118,23 +118,13 @@ trait QueuesSms
     }
 
     /**
-     * Reset queue configuration.
-     */
-    private function resetQueueConfig(): void
-    {
-        $this->queueConnection = null;
-        $this->queueName = null;
-        $this->queueDelay = null;
-    }
-
-    /**
      * Queue an SMS via DLT route.
      *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $templateId  The registered DLT template ID.
-     * @param  array|string  $variablesValues  Template variable values.
-     * @param  string|null  $senderId  Optional sender ID.
-     * @param  string|null  $entityId  Optional entity ID (required for DLT_MANUAL route).
+     * @param string|array $numbers         One or more recipient numbers.
+     * @param string       $templateId      The registered DLT template ID.
+     * @param array|string $variablesValues Template variable values.
+     * @param string|null  $senderId        Optional sender ID.
+     * @param string|null  $entityId        Optional entity ID (required for DLT_MANUAL route).
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -143,7 +133,7 @@ trait QueuesSms
         string $templateId,
         array|string $variablesValues,
         ?string $senderId = null,
-        ?string $entityId = null
+        ?string $entityId = null,
     ): void {
         $this->setDlt($numbers, $templateId, $variablesValues, $senderId, $entityId);
 
@@ -153,8 +143,8 @@ trait QueuesSms
     /**
      * Queue an OTP SMS.
      *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $otpValue  The OTP code to send.
+     * @param string|array $numbers  One or more recipient numbers.
+     * @param string       $otpValue The OTP code to send.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -162,5 +152,15 @@ trait QueuesSms
     {
         $this->setOtp($numbers, $otpValue);
         $this->queue();
+    }
+
+    /**
+     * Reset queue configuration.
+     */
+    private function resetQueueConfig(): void
+    {
+        $this->queueConnection = null;
+        $this->queueName = null;
+        $this->queueDelay = null;
     }
 }

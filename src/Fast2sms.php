@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
-use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Override;
 use Shakil\Fast2sms\Contracts\Fast2smsInterface;
 use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
 use Shakil\Fast2sms\Responses\WalletBalanceResponse;
@@ -58,6 +58,104 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     }
 
     /**
+     * Quickly send an SMS with minimal configuration.
+     *
+     * @param string|array     $numbers  One or more recipient numbers.
+     * @param string           $message  The SMS message content.
+     * @param SmsLanguage|null $language Optional message language.
+     *
+     * @throws Fast2smsException If validation fails.
+     */
+    public function quick(string|array $numbers, string $message, ?SmsLanguage $language = null): Fast2smsResponse
+    {
+        $this->setQuick($numbers, $message, $language);
+
+        return $this->send();
+    }
+
+    /**
+     * Send an SMS via DLT route.
+     *
+     * @param string|array $numbers         One or more recipient numbers.
+     * @param string       $templateId      The registered DLT template ID.
+     * @param array|string $variablesValues Template variable values.
+     * @param string|null  $senderId        Optional sender ID.
+     * @param string|null  $entityId        Optional entity ID (required for DLT_MANUAL route).
+     *
+     * @throws Fast2smsException If validation fails.
+     */
+    public function dlt(string|array $numbers, string $templateId, array|string $variablesValues, ?string $senderId = null, ?string $entityId = null): Fast2smsResponse
+    {
+        $this->setDlt($numbers, $templateId, $variablesValues, $senderId, $entityId);
+
+        return $this->send();
+    }
+
+    /**
+     * Send an OTP SMS.
+     *
+     * @param string|array $numbers  One or more recipient numbers.
+     * @param string       $otpValue The OTP code to send.
+     *
+     * @throws Fast2smsException If validation fails.
+     */
+    public function otp(string|array $numbers, string $otpValue): Fast2smsResponse
+    {
+        $this->setOtp($numbers, $otpValue);
+
+        return $this->send();
+    }
+
+    /**
+     * Retrieve the wallet balance from Fast2sms.
+     *
+     * @param float|null $threshold Optional threshold to check for low balance
+     *
+     * @throws Fast2smsException If the API call fails.
+     */
+    public function checkBalance(?float $threshold = null): Fast2smsResponse
+    {
+        /**
+         * @var WalletBalanceResponse $response
+         */
+        $response = $this->executeApiCall([], '/wallet');
+
+        if ($threshold !== null) {
+            $balance = $response->balance;
+            if ($balance <= $threshold) {
+                event(new LowBalanceDetected($balance, $threshold));
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Retrieve DLT manager details from Fast2sms.
+     *
+     * @param DltManagerType $type The type of DLT manager data ('sender' or 'template').
+     *
+     * @throws Fast2smsException If validation fails or API call fails.
+     */
+    public function dltManager(DltManagerType $type): Fast2smsResponse
+    {
+        $this->validateDltManagerType();
+
+        return $this->executeApiCall(['type' => $type->value], '/dlt_manager');
+    }
+
+    /**
+     * Hook method called after every API call.
+     *
+     * Used to reset SMS parameters for the next request.
+     */
+    #[Override]
+    protected function afterApiCall(): void
+    {
+        $this->resetParameters();
+    }
+
+    /**
      * Execute an SMS send request to Fast2sms.
      *
      *
@@ -93,8 +191,8 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     /**
      * Assert that a value is not empty.
      *
-     * @param  mixed  $value  The value to check.
-     * @param  string  $message  The error message if the value is empty.
+     * @param mixed  $value   The value to check.
+     * @param string $message The error message if the value is empty.
      *
      * @throws Fast2smsException If the value is empty.
      */
@@ -171,93 +269,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     }
 
     /**
-     * Quickly send an SMS with minimal configuration.
-     *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $message  The SMS message content.
-     * @param  SmsLanguage|null  $language  Optional message language.
-     *
-     * @throws Fast2smsException If validation fails.
-     */
-    public function quick(string|array $numbers, string $message, ?SmsLanguage $language = null): Fast2smsResponse
-    {
-        $this->setQuick($numbers, $message, $language);
-
-        return $this->send();
-    }
-
-    /**
-     * Send an SMS via DLT route.
-     *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $templateId  The registered DLT template ID.
-     * @param  array|string  $variablesValues  Template variable values.
-     * @param  string|null  $senderId  Optional sender ID.
-     * @param  string|null  $entityId  Optional entity ID (required for DLT_MANUAL route).
-     *
-     * @throws Fast2smsException If validation fails.
-     */
-    public function dlt(string|array $numbers, string $templateId, array|string $variablesValues, ?string $senderId = null, ?string $entityId = null): Fast2smsResponse
-    {
-        $this->setDlt($numbers, $templateId, $variablesValues, $senderId, $entityId);
-
-        return $this->send();
-    }
-
-    /**
-     * Send an OTP SMS.
-     *
-     * @param  string|array  $numbers  One or more recipient numbers.
-     * @param  string  $otpValue  The OTP code to send.
-     *
-     * @throws Fast2smsException If validation fails.
-     */
-    public function otp(string|array $numbers, string $otpValue): Fast2smsResponse
-    {
-        $this->setOtp($numbers, $otpValue);
-
-        return $this->send();
-    }
-
-    /**
-     * Retrieve the wallet balance from Fast2sms.
-     *
-     * @param  float|null  $threshold  Optional threshold to check for low balance
-     *
-     * @throws Fast2smsException If the API call fails.
-     */
-    public function checkBalance(?float $threshold = null): Fast2smsResponse
-    {
-        /**
-         * @var WalletBalanceResponse $response
-         */
-        $response = $this->executeApiCall([], '/wallet');
-
-        if ($threshold !== null) {
-            $balance = $response->balance;
-            if ($balance <= $threshold) {
-                event(new LowBalanceDetected($balance, $threshold));
-            }
-        }
-
-        return $response;
-    }
-
-    /**
-     * Retrieve DLT manager details from Fast2sms.
-     *
-     * @param  DltManagerType  $type  The type of DLT manager data ('sender' or 'template').
-     *
-     * @throws Fast2smsException If validation fails or API call fails.
-     */
-    public function dltManager(DltManagerType $type): Fast2smsResponse
-    {
-        $this->validateDltManagerType();
-
-        return $this->executeApiCall(['type' => $type->value], '/dlt_manager');
-    }
-
-    /**
      * Validate the DLT manager type value.
      *
      *
@@ -266,16 +277,5 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     private function validateDltManagerType(): void
     {
         $this->assertNotEmpty($this->apiKey, 'Fast2sms API Key is not configured.');
-    }
-
-    /**
-     * Hook method called after every API call.
-     *
-     * Used to reset SMS parameters for the next request.
-     */
-    #[Override]
-    protected function afterApiCall(): void
-    {
-        $this->resetParameters();
     }
 }
