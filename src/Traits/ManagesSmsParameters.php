@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Traits;
 
 use DateTimeInterface;
+use Illuminate\Support\Collection;
 
 use function is_array;
 
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
-
-use Shakil\Fast2sms\Fast2sms;
 
 /**
  * Trait to manage SMS parameters for Fast2sms.
@@ -73,10 +72,14 @@ trait ManagesSmsParameters
     /**
      * Set the recipient mobile number(s).
      *
-     * @param string|array<int, string|int> $numbers Single number as string or multiple numbers as an array.
+     * @param string|array<int, string|int>|Collection $numbers Single number as string or multiple numbers as an array.
      */
-    public function to(string|array $numbers): self
+    public function to(string|array|Collection $numbers): self
     {
+        if ($numbers instanceof Collection) {
+            $numbers = $numbers->toArray();
+        }
+
         $this->numbers = is_array($numbers) ? $numbers : [$numbers];
 
         return $this;

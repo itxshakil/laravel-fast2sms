@@ -66,6 +66,18 @@ class Fast2smsResponse
     }
 
     /**
+     * Dynamically access properties.
+     */
+    public function __get(string $name): mixed
+    {
+        if ($name === 'requestId') {
+            return $this->data['request_id'] ?? null;
+        }
+
+        return $this->data[$name] ?? null;
+    }
+
+    /**
      * Gets the error message from the response.
      *
      * @return string|null The error message if available, otherwise null.
@@ -115,6 +127,18 @@ class Fast2smsResponse
      * @return array The complete, raw response data from the API.
      */
     public function toArray(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * Gets the raw response data as an array.
+     *
+     * This is an alias for getRawData().
+     *
+     * @return array The complete, raw response data from the API.
+     */
+    public function json(): array
     {
         return $this->data;
     }

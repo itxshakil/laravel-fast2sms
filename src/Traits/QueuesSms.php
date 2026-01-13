@@ -7,7 +7,6 @@ namespace Shakil\Fast2sms\Traits;
 use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
-use Shakil\Fast2sms\Fast2sms;
 use Shakil\Fast2sms\Jobs\SendSmsJob;
 
 /**

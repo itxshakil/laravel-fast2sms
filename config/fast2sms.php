@@ -60,6 +60,30 @@ return [
     */
     'timeout' => 30,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Fast2sms Driver
+    |--------------------------------------------------------------------------
+    |
+    | This defines the driver to use for sending SMS.
+    | Options: 'api' (default), 'log'.
+    | 'api' will hit the actual Fast2sms API.
+    | 'log' will write the SMS content to your laravel.log file.
+    |
+    */
+    'driver' => env('FAST2SMS_DRIVER', 'api'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Logging
+    |--------------------------------------------------------------------------
+    |
+    | If set to true, the package will log all sent SMS messages to a
+    | 'fast2sms_logs' database table.
+    |
+    */
+    'database_logging' => env('FAST2SMS_DATABASE_LOGGING', false),
+
     /**
      * ---------------------------------------------------------------------------
      * Fast2sms Balance Threshold

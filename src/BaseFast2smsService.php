@@ -9,6 +9,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
@@ -29,17 +30,23 @@ abstract class BaseFast2smsService
     protected string $apiKey;
 
     /**
+     * The driver to use for sending SMS.
+     */
+    protected string $driver;
+
+    /**
      * @throws Fast2smsException
      */
     public function __construct()
     {
         $apiKey = config('fast2sms.api_key');
 
-        if ($apiKey === null || $apiKey === '') {
+        if (($apiKey === null || $apiKey === '') && config('fast2sms.driver') !== 'log') {
             throw new Fast2smsException('Fast2sms API Key is not configured. Please set FAST2SMS_API_KEY in your .env file.');
         }
 
-        $this->apiKey = $apiKey;
+        $this->apiKey = $apiKey ?? '';
+        $this->driver = config('fast2sms.driver', 'api');
     }
 
     /**
@@ -63,6 +70,10 @@ abstract class BaseFast2smsService
      */
     protected function executeApiCall(array $payload = [], string $path = '/bulkV2'): Fast2smsResponse
     {
+        if ($this->driver === 'log') {
+            return $this->executeLogCall($payload, $path);
+        }
+
         $response = null;
         $multipart = collect($payload)
             ->map(fn ($v, $k): array => ['name' => $k, 'contents' => $v])
@@ -91,6 +102,40 @@ abstract class BaseFast2smsService
                 Event::dispatch(new SmsFailed($payload, $exception, $response?->json()));
             }
             throw $exception;
+        } finally {
+            $this->afterApiCall();
+        }
+    }
+
+    /**
+     * Execute a log call instead of an API call.
+     */
+    protected function executeLogCall(array $payload, string $path): Fast2smsResponse
+    {
+        Log::info("Fast2sms SMS Log [Path: {$path}]:", $payload);
+
+        $mockData = [
+            'return' => true,
+            'request_id' => 'log-' . uniqid('', true),
+            'message' => ['SMS sent successfully (logged)'],
+        ];
+
+        if ($path === '/wallet') {
+            $mockData = [
+                'return' => true,
+                'wallet' => 1000,
+            ];
+        }
+
+        if ($path === '/dlt_manager') {
+            $mockData = [
+                'success' => true,
+                'data' => [],
+            ];
+        }
+
+        try {
+            return $this->mapApiResponse($payload, $mockData);
         } finally {
             $this->afterApiCall();
         }

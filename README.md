@@ -47,6 +47,21 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
 
 ## 🚀 Quick Start Guide
 
+- ✅ **Laravel Notification Channel Support**
+- ✅ **Fluent API** (Fast2sms::to()->message()->send())
+- ✅ **Database Logging** (Optional tracking of all sent SMS)
+- ✅ **Log Driver** (Zero-cost local development)
+- ✅ **DLT Support** (Sender ID, Template ID)
+- ✅ **OTP Support**
+- ✅ **Balance Monitoring** (CLI & Events)
+- ✅ **Queuing & Faking Support**
+- ✅ **Validation Helpers** (Indian phone number validation)
+- ✅ **Automatic Retries** (Built-in resilience)
+
+---
+
+## ⚡ Quick Start
+
 1. **Install via Composer:**
     ```bash
     composer require itxshakil/laravel-fast2sms
@@ -56,14 +71,21 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
     ```bash
     php artisan vendor:publish --tag=fast2sms-config
     ```
-   This creates `fast2sms.php` in your `config` directory.
 
-3. **Update Environment Variables:**
+3. **Database Logging (Optional):**
+    ```bash
+    php artisan vendor:publish --tag="fast2sms-migrations"
+    php artisan migrate
+    ```
+
+4. **Update Environment Variables:**
    Add to your `.env`:
     ```ini
     FAST2SMS_API_KEY="YOUR_API_KEY"
     FAST2SMS_DEFAULT_SENDER_ID="FSTSMS"
     FAST2SMS_DEFAULT_ROUTE="dlt"
+    FAST2SMS_DRIVER="api" # Use 'log' for local development
+    FAST2SMS_DATABASE_LOGGING=true
     ```
 
 4. **Send Your First DLT SMS:**
@@ -293,72 +315,78 @@ Fast2sms::to('9999999999')
 
 ---
 
+### Validation Helpers
+
+The package includes a custom validation rule to ensure phone numbers are valid 10-digit Indian mobile numbers.
+
+```php
+use Shakil\Fast2sms\Rules\Fast2smsPhone;
+
+$request->validate([
+    'phone' => ['required', new Fast2smsPhone],
+]);
+```
+
+---
+
 ### 📱 Notifications Channel
 
-Use Fast2sms as a notification channel in your Laravel applications:
+Use Fast2sms as a notification channel in your Laravel applications. The `SmsChannel` supports both simple strings and fluent `SmsMessage` objects.
 
 **Create a Notification:**
 ```php
 use Illuminate\Notifications\Notification;
-use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Notifications\Messages\SmsMessage;
 use Shakil\Fast2sms\Enums\SmsRoute;
-class LowSmsBalanceNotification extends Notification
-{
-    public function __construct(
-        protected float $balance,
-        protected float $threshold
-    ) {}
 
+class OrderShipped extends Notification
+{
     public function via($notifiable)
     {
         return ['fast2sms'];
     }
 
-    public function toFast2sms($notifiable)
+    public function toSms($notifiable)
     {
-        return Fast2sms::to($notifiable->phone)
-            ->message("Low SMS balance: {$this->balance}. Threshold: {$this->threshold}.")
-            ->route(SmsRoute::QUICK)
-            ->send();
+        // Option 1: Return a simple string (uses default route/sender)
+        // return "Your order #123 has been shipped!";
+
+        // Option 2: Return a fluent SmsMessage object
+        return (new SmsMessage)
+            ->to($notifiable->phone) // Optional: will fallback to routeNotificationForSms
+            ->route(SmsRoute::DLT)
+            ->template('TEMPLATE_ID', ['Order #123'])
+            ->from('SENDER');
     }
 }
-```
-**Use route in SMS Notification:**
-```php
-use Illuminate\Notifications\RoutesNotifications;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Model;
-class User extends Model
-{
-    use Notifiable, RoutesNotifications;
-
-    protected $fillable = ['name', 'email', 'phone'];
-
-    public function routeNotificationForFast2sms()
-    {
-        return $this->phone; // Return the phone number for Fast2sms
-    }
-}
-```
-
-**Send the notification:**
-```php
-use App\Notifications\LowSmsBalanceNotification;
-use Illuminate\Support\Facades\Notification;
-Notification::route('fast2sms', '9999999999')
-    ->notify(new LowSmsBalanceNotification(500, 1000));
 ```
 
 **Model Setup:**
-Ensure your model has a `phone` attribute:
+Ensure your model has a `routeNotificationForSms` method or a `phone` attribute:
 ```php
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
+
 class User extends Model
 {
-    protected $fillable = ['name', 'email', 'phone'];
+    use Notifiable;
+
+    public function routeNotificationForSms()
+    {
+        return $this->phone;
+    }
 }
 ```
+
+**Direct Sending from Notification Message:**
+The `SmsMessage` can also be sent directly if needed:
+```php
+(new SmsMessage("Hello"))->to('9999999999')->send();
+```
+
 ---
+
+### 📊 Database Logging (Optional)
 
 **Schedule the command:**
 ```bash

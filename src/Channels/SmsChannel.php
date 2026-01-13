@@ -56,23 +56,25 @@ class SmsChannel
 
         if (is_string($message)) {
             Fast2sms::quick($to, $message);
-        } else {
-            Fast2sms::to($to)
-                ->route($message->route ?? SmsRoute::from(config('fast2sms.default_route')))
-                ->senderId($message->senderId ?? config('fast2sms.default_sender_id'));
 
-            if ($message->templateId !== null) {
-                Fast2sms::templateId($message->templateId)
-                    ->variables($message->variables ?? []);
-            } else {
-                Fast2sms::message($message->content);
-            }
-
-            if ($message->language !== null) {
-                Fast2sms::language($message->language);
-            }
-
-            Fast2sms::send();
+            return;
         }
+
+        $service = Fast2sms::to($message->to ?? $to)
+            ->route($message->route ?? SmsRoute::from(config('fast2sms.default_route')))
+            ->senderId($message->senderId ?? config('fast2sms.default_sender_id'));
+
+        if ($message->templateId !== null) {
+            $service->templateId($message->templateId)
+                ->variables($message->variables ?? []);
+        } else {
+            $service->message($message->content);
+        }
+
+        if ($message->language !== null) {
+            $service->language($message->language);
+        }
+
+        $service->send();
     }
 }

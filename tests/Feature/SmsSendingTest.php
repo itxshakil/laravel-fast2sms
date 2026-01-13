@@ -205,6 +205,37 @@ class SmsSendingTest extends TestCase
         $this->assertEquals('TPL1', $templates[0]['template_id']);
     }
 
+    #[Test]
+    public function it_retries_api_calls_on_failure(): void
+    {
+        Http::fake([
+            config('fast2sms.base_url') . '*' => Http::sequence()
+                ->push('Error', 500)
+                ->push('Error', 500)
+                ->push(['return' => true, 'request_id' => 'retried-123'], 200),
+        ]);
+
+        $response = Fast2sms::to($this->testNumber)->message('Test')->send();
+
+        $this->assertTrue($response->isSuccess());
+        $this->assertEquals('retried-123', $response->getRequestId());
+        Http::assertSentCount(3);
+    }
+
+    #[Test]
+    public function it_can_send_sms_using_log_driver(): void
+    {
+        config(['fast2sms.driver' => 'log']);
+        \Illuminate\Support\Facades\Log::shouldReceive('info')
+            ->once()
+            ->withArgs(fn ($message, $context) => str_contains($message, 'Fast2sms SMS Log') && $context['numbers'] === $this->testNumber);
+
+        $response = Fast2sms::to($this->testNumber)->message('Log test')->send();
+
+        $this->assertTrue($response->isSuccess());
+        $this->assertStringStartsWith('log-', $response->getRequestId());
+    }
+
     /**
      * Helper to mock a successful SMS send response.
      */

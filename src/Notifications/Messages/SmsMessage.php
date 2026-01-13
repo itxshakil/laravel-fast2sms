@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Notifications\Messages;
 
+use Illuminate\Support\Collection;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Exceptions\Fast2smsException;
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Responses\Fast2smsResponse;
 
 /**
  * SMS Message builder for Fast2SMS notifications.
@@ -21,6 +25,7 @@ use Shakil\Fast2sms\Enums\SmsRoute;
  * @property-read string|null $senderId Sender ID for the message
  * @property-read SmsRoute|null $route SMS route (QUICK/DLT/OTP)
  * @property-read SmsLanguage|null $language Message language
+ * @property-read string|array|Collection|null $to Recipient number(s)
  */
 class SmsMessage
 {
@@ -28,6 +33,11 @@ class SmsMessage
      * The message content.
      */
     protected ?string $content = null;
+
+    /**
+     * The recipient number(s).
+     */
+    protected string|array|Collection|null $to = null;
 
     /**
      * The DLT template ID.
@@ -89,8 +99,8 @@ class SmsMessage
     /**
      * Set the DLT template and its variables.
      *
-     * @param  string $templateId The DLT template ID
-     * @param  array<int, string>  $variables  Variables to be replaced in the template
+     * @param  string             $templateId The DLT template ID
+     * @param  array<int, string> $variables  Variables to be replaced in the template
      * @return $this
      */
     public function template(string $templateId, array $variables = []): self
@@ -138,5 +148,48 @@ class SmsMessage
         $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * Set the recipient's mobile number.
+     *
+     * @param  string|array<int, string|int>|Collection $to Recipient number(s)
+     * @return $this
+     */
+    public function to(string|array|Collection $to): self
+    {
+        $this->to = $to;
+
+        return $this;
+    }
+
+    /**
+     * Send the message immediately.
+     * @throws Fast2smsException
+     */
+    public function send(): Fast2smsResponse
+    {
+        $service = Fast2sms::to($this->to);
+
+        if ($this->route instanceof SmsRoute) {
+            $service->route($this->route);
+        }
+
+        if ($this->senderId) {
+            $service->senderId($this->senderId);
+        }
+
+        if ($this->language instanceof SmsLanguage) {
+            $service->language($this->language);
+        }
+
+        if ($this->templateId) {
+            $service->templateId($this->templateId)
+                ->variables($this->variables ?? []);
+        } else {
+            $service->message($this->content);
+        }
+
+        return $service->send();
     }
 }

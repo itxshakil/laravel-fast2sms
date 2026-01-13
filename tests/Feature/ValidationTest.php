@@ -30,11 +30,26 @@ class ValidationTest extends TestCase
     #[Test]
     public function it_throws_an_exception_if_api_key_is_missing(): void
     {
-        config(['fast2sms.api_key' => null]);
+        config(['fast2sms.api_key' => '']);
+        config(['fast2sms.driver' => 'api']);
+
         $this->expectException(Fast2smsException::class);
         $this->expectExceptionMessage('Fast2sms API Key is not configured. Please set FAST2SMS_API_KEY in your .env file.');
 
-        Fast2sms::to($this->testNumber)->message('Test')->send();
+        $provider = new \Shakil\Fast2sms\Fast2smsServiceProvider(app());
+        $provider->boot();
+    }
+
+    #[Test]
+    public function it_throws_an_exception_if_base_url_is_missing(): void
+    {
+        config(['fast2sms.base_url' => '']);
+
+        $this->expectException(Fast2smsException::class);
+        $this->expectExceptionMessage('Fast2sms base_url is not configured');
+
+        $provider = new \Shakil\Fast2sms\Fast2smsServiceProvider(app());
+        $provider->boot();
     }
 
     #[Test]
