@@ -65,4 +65,32 @@ class Fast2smsResponseTest extends TestCase
         $this->assertEquals(500.50, $response->balance);
         $this->assertEquals(1000, $response->smsCount);
     }
+
+    #[Test]
+    public function it_can_access_data_dynamically(): void
+    {
+        $data = ['return' => true, 'custom_key' => 'custom_value', 'request_id' => 'req_123'];
+        $response = new Fast2smsResponse($data);
+
+        $this->assertEquals('custom_value', $response->custom_key);
+        $this->assertEquals('req_123', $response->requestId);
+        $this->assertNull($response->non_existent);
+    }
+
+    #[Test]
+    public function it_can_return_json_array(): void
+    {
+        $data = ['return' => true, 'foo' => 'bar'];
+        $response = new Fast2smsResponse($data);
+
+        $this->assertEquals($data, $response->json());
+    }
+
+    #[Test]
+    public function it_throws_exception_if_return_or_success_key_missing(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Response data must contain "return" or "success" key.');
+        new Fast2smsResponse(['foo' => 'bar']);
+    }
 }

@@ -20,6 +20,7 @@ trait ManagesSmsParameters
 {
     /**
      * The recipient mobile numbers.
+     *
      * @var array<int, string|int>
      */
     protected array $numbers = [];
@@ -185,8 +186,9 @@ trait ManagesSmsParameters
     public function schedule(string|DateTimeInterface $time): self
     {
         if ($time instanceof DateTimeInterface) {
-            $this->scheduleTime = $time->format('Y-m-d-H-i');
+            $time = $time->format('Y-m-d-H-i');
         }
+
         // Validate string format YYYY-MM-DD-HH-MM
         if (! preg_match('/^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}$/', $time)) {
             throw new Fast2smsException('Invalid schedule time format. Expected YYYY-MM-DD-HH-MM.');
