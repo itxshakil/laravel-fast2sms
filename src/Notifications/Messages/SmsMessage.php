@@ -25,7 +25,7 @@ use Shakil\Fast2sms\Responses\Fast2smsResponse;
  * @property-read string|null $senderId Sender ID for the message
  * @property-read SmsRoute|null $route SMS route (QUICK/DLT/OTP)
  * @property-read SmsLanguage|null $language Message language
- * @property-read string|array|Collection|null $to Recipient number(s)
+ * @property-read string|array<int, string|int>|Collection<int, string|int>|null $to Recipient number(s)
  */
 class SmsMessage
 {
@@ -36,6 +36,8 @@ class SmsMessage
 
     /**
      * The recipient number(s).
+     *
+     * @var string|array<int, string|int>|Collection<int, string|int>|null
      */
     protected string|array|Collection|null $to = null;
 
@@ -153,7 +155,7 @@ class SmsMessage
     /**
      * Set the recipient's mobile number.
      *
-     * @param  string|array<int, string|int>|Collection $to Recipient number(s)
+     * @param  string|array<int, string|int>|Collection<int, string|int> $to Recipient number(s)
      * @return $this
      */
     public function to(string|array|Collection $to): self

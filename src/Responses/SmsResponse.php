@@ -11,6 +11,8 @@ use function is_array;
  *
  * This class extends the base Fast2smsResponse and provides specific methods
  * for accessing SMS-related data, such as the request ID and the list of messages.
+ *
+ * @property-read string|null $requestId
  */
 class SmsResponse extends Fast2smsResponse
 {

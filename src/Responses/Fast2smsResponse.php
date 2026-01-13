@@ -136,7 +136,7 @@ class Fast2smsResponse
      *
      * This is an alias for getRawData().
      *
-     * @return array The complete, raw response data from the API.
+     * @return array<string, mixed> The complete, raw response data from the API.
      */
     public function json(): array
     {

@@ -73,7 +73,7 @@ trait ManagesSmsParameters
     /**
      * Set the recipient mobile number(s).
      *
-     * @param string|array<int, string|int>|Collection $numbers Single number as string or multiple numbers as an array.
+     * @param string|array<int, string|int>|Collection<int, string|int> $numbers Single number as string or multiple numbers as an array.
      */
     public function to(string|array|Collection $numbers): self
     {

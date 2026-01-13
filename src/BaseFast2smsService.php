@@ -104,6 +104,8 @@ abstract class BaseFast2smsService
 
     /**
      * Execute a log call instead of an API call.
+     *
+     * @param array<string, mixed> $payload
      */
     protected function executeLogCall(array $payload, string $path): Fast2smsResponse
     {
