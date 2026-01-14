@@ -49,6 +49,9 @@ abstract class BaseFast2smsService
         $this->driver = config('fast2sms.driver', 'api');
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
     {
         // TODO: Handle response based on the payload and response structure.
@@ -58,8 +61,8 @@ abstract class BaseFast2smsService
     /**
      * Executes the API call to Fast2sms and returns the mapped response.
      *
-     * @param array  $payload The request payload.
-     * @param string $path    The API endpoint path (default: /bulkV2).
+     * @param array<string, mixed> $payload The request payload.
+     * @param string               $path    The API endpoint path (default: /bulkV2).
      *
      * @throws Fast2smsException
      */
@@ -163,6 +166,7 @@ abstract class BaseFast2smsService
     /**
      * Maps API response data to the correct response object.
      *
+     * @param array<string, mixed> $payload
      * @param array<string, mixed> $data
      */
     private function mapApiResponse(array $payload, array $data): Fast2smsResponse

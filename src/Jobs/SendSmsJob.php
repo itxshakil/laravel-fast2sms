@@ -20,8 +20,6 @@ use Shakil\Fast2sms\Fast2sms;
  * This job class is responsible for processing queued SMS requests using the Fast2sms service.
  * It takes an SmsParameters object containing all necessary SMS configuration and sends
  * the message using the injected Fast2sms service instance.
- *
- * @implements ShouldQueue
  */
 class SendSmsJob implements ShouldQueue
 {

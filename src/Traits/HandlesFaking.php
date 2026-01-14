@@ -26,6 +26,8 @@ trait HandlesFaking
 
     /**
      * The collection of "sent" messages when faking.
+     *
+     * @var Collection<int, array<string, mixed>>
      */
     protected static Collection $sentMessages;
 
@@ -58,6 +60,8 @@ trait HandlesFaking
 
     /**
      * Assert that an SMS was sent.
+     *
+     * @param array<string, mixed>|Closure|null $callback
      *
      * @throws Fast2smsException
      */
@@ -97,6 +101,8 @@ trait HandlesFaking
 
     /**
      * Assert that an SMS was not sent.
+     *
+     * @param array<string, mixed>|Closure|null $callback
      *
      * @throws Fast2smsException
      */
@@ -154,6 +160,8 @@ trait HandlesFaking
 
     /**
      * Get all "sent" messages when faking.
+     *
+     * @return Collection<int, array<string, mixed>>
      */
     public static function sentMessages(): Collection
     {

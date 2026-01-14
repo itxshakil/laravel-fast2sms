@@ -25,7 +25,7 @@ class WalletBalanceResponse extends Fast2smsResponse
     /**
      * Creates a new WalletBalanceResponse instance.
      *
-     * @param array $data The raw response data from the API.
+     * @param array<string, mixed> $data The raw response data from the API.
      */
     public function __construct(array $data)
     {

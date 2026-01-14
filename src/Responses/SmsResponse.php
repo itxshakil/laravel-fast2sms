@@ -34,7 +34,7 @@ class SmsResponse extends Fast2smsResponse
      * This method retrieves an array of message details, which may include
      * status, mobile number, and other information for each message sent.
      *
-     * @return array An array of message data, or an empty array if not present.
+     * @return array<int, mixed> An array of message data, or an empty array if not present.
      */
     public function getMessages(): array
     {

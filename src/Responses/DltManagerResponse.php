@@ -33,7 +33,7 @@ class DltManagerResponse extends Fast2smsResponse
      *
      * This method is useful for accessing the core DLT information within the response.
      *
-     * @return array The 'data' array from the response, or an empty array if not present.
+     * @return array<int, array<string, mixed>> The 'data' array from the response, or an empty array if not present.
      */
     public function getData(): array
     {
@@ -46,7 +46,7 @@ class DltManagerResponse extends Fast2smsResponse
      * This method iterates through the response data and aggregates all 'templates'
      * from each item into a single, flat array.
      *
-     * @return array A consolidated array of all template data found in the response.
+     * @return array<int, mixed> A consolidated array of all template data found in the response.
      */
     public function getTemplates(): array
     {

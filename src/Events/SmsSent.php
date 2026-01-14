@@ -19,8 +19,8 @@ class SmsSent
     /**
      * Create a new event instance.
      *
-     * @param array       $payload  The data payload sent to Fast2sms.
-     * @param SmsResponse $response The successful response from Fast2sms API.
+     * @param array<string, mixed> $payload  The data payload sent to Fast2sms.
+     * @param SmsResponse          $response The successful response from Fast2sms API.
      */
     public function __construct(
         public array $payload,

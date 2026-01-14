@@ -112,7 +112,7 @@ class Fast2smsResponse
     /**
      * Gets the raw response data.
      *
-     * @return array The complete, raw response data from the API.
+     * @return array<string, mixed> The complete, raw response data from the API.
      */
     public function getRawData(): array
     {
@@ -124,7 +124,7 @@ class Fast2smsResponse
      *
      * This is an alias for getRawData().
      *
-     * @return array The complete, raw response data from the API.
+     * @return array<string, mixed> The complete, raw response data from the API.
      */
     public function toArray(): array
     {

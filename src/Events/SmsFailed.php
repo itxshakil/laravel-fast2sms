@@ -19,9 +19,9 @@ class SmsFailed
     /**
      * Create a new event instance.
      *
-     * @param array<int, mixed> $payload   The data payload attempted to be sent to Fast2sms.
-     * @param Throwable         $exception The exception that occurred.
-     * @param array|null        $response  The API response, if any was received before the error.
+     * @param array<string, mixed>      $payload   The data payload attempted to be sent to Fast2sms.
+     * @param Throwable                 $exception The exception that occurred.
+     * @param array<string, mixed>|null $response  The API response, if any was received before the error.
      */
     public function __construct(
         public array $payload,
