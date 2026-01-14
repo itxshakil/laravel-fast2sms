@@ -48,6 +48,7 @@ class SmsMessage
 
     /**
      * The template variables.
+     *
      * @var array<int, string>|null
      */
     protected ?array $variables = null;
@@ -167,6 +168,7 @@ class SmsMessage
 
     /**
      * Send the message immediately.
+     *
      * @throws Fast2smsException
      */
     public function send(): Fast2smsResponse

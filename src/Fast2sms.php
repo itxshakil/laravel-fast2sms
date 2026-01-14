@@ -61,8 +61,8 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
      * Quickly send an SMS with minimal configuration.
      *
      * @param string|array<int, string|number> $numbers  One or more recipient numbers.
-     * @param string           $message  The SMS message content.
-     * @param SmsLanguage|null $language Optional message language.
+     * @param string                           $message  The SMS message content.
+     * @param SmsLanguage|null                 $language Optional message language.
      *
      * @throws Fast2smsException If validation fails.
      */
@@ -78,7 +78,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
      *
      * @param string|array<int, string|number> $numbers         One or more recipient numbers.
      * @param string                           $templateId      The registered DLT template ID.
-     * @param array<int, string>|string                     $variablesValues Template variable values.
+     * @param array<int, string>|string        $variablesValues Template variable values.
      * @param string|null                      $senderId        Optional sender ID.
      * @param string|null                      $entityId        Optional entity ID (required for DLT_MANUAL route).
      *

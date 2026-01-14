@@ -34,6 +34,7 @@ class Fast2smsServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
      * @throws Fast2smsException
      */
     public function boot(): void
@@ -78,6 +79,7 @@ class Fast2smsServiceProvider extends ServiceProvider
 
     /**
      * Validate the package configuration.
+     *
      * @throws Fast2smsException
      */
     protected function validateConfig(): void
