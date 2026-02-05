@@ -6,9 +6,11 @@ namespace Shakil\Fast2sms;
 
 use Override;
 use Shakil\Fast2sms\Contracts\Fast2smsInterface;
+use Shakil\Fast2sms\Contracts\WhatsAppInterface;
 use Shakil\Fast2sms\Enums\DltManagerType;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
@@ -142,6 +144,71 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
         $this->validateDltManagerType();
 
         return $this->executeApiCall(['type' => $type->value], '/dlt_manager');
+    }
+
+    /**
+     * Start a fluent WhatsApp message builder.
+     *
+     * @param string|array<int, string>|null $to
+     */
+    public function viaWhatsApp(string|array|null $to = null): WhatsAppInterface
+    {
+        $whatsapp = $this->whatsapp();
+        if ($to !== null) {
+            $whatsapp->to($to);
+        }
+
+        return $whatsapp;
+    }
+
+    /**
+     * Set the message body text for WhatsApp messages.
+     */
+    public function body(string $text): WhatsAppInterface
+    {
+        return $this->viaWhatsApp()->body($text);
+    }
+
+    /**
+     * Set Meta format components for WhatsApp messages.
+     *
+     * @param array<int, array<string, mixed>> $components
+     */
+    public function components(array $components): WhatsAppInterface
+    {
+        return $this->viaWhatsApp()->components($components);
+    }
+
+    /**
+     * Set the message type for WhatsApp messages.
+     */
+    public function type(WhatsAppType $type): WhatsAppInterface
+    {
+        return $this->viaWhatsApp()->type($type);
+    }
+
+    /**
+     * Set the template ID for WhatsApp template messages.
+     */
+    public function template(string|int $templateId): WhatsAppInterface
+    {
+        return $this->viaWhatsApp()->template($templateId);
+    }
+
+    /**
+     * Set the media URL for WhatsApp messages.
+     */
+    public function media(string $url): WhatsAppInterface
+    {
+        return $this->viaWhatsApp()->media($url);
+    }
+
+    /**
+     * Access the WhatsApp service.
+     */
+    public function whatsapp(): WhatsAppInterface
+    {
+        return app('fast2sms.whatsapp');
     }
 
     /**

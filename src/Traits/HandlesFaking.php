@@ -42,17 +42,42 @@ trait HandlesFaking
 
         Http::fake([
             config('fast2sms.base_url') . '*' => function ($request) {
-                // Convert multipart request into array
+                // Determine if it's a multipart (SMS) or JSON (WhatsApp) request
                 $payload = [];
-                foreach ($request->data() as $part) {
-                    $payload[$part['name']] = $part['contents'];
+
+                if (str_contains($request->header('content-type')[0] ?? '', 'application/json')) {
+                    $payload = json_decode($request->body(), true, 512, JSON_THROW_ON_ERROR);
+                } elseif (str_contains($request->header('content-type')[0] ?? '', 'multipart/form-data')) {
+                    foreach ($request->data() as $part) {
+                        $payload[$part['name']] = $part['contents'];
+                    }
+                } else {
+                    $payload = $request->data();
+                    if (is_array($payload)) {
+                        foreach ($payload as $key => $value) {
+                            if (is_array($value) && isset($value['name'], $value['contents'])) {
+                                $payload[$value['name']] = $value['contents'];
+                                unset($payload[$key]);
+                            }
+                        }
+                    }
+                }
+
+                // Normalizing payload keys to avoid issues with different API formats
+                if (isset($payload['to']) && ! isset($payload['numbers'])) {
+                    $payload['numbers'] = $payload['to'];
+                }
+                if (isset($payload['phone_number_id']) && ! isset($payload['sender_id'])) {
+                    $payload['sender_id'] = $payload['phone_number_id'];
                 }
 
                 self::$sentMessages->push($payload);
 
                 return Http::response([
                     'return' => true,
-                    'message' => 'SMS sent successfully (faked).',
+                    'success' => true,
+                    'status' => true,
+                    'message' => 'Message sent successfully (faked).',
                 ]);
             },
         ]);

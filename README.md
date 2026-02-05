@@ -39,6 +39,8 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
 - **Queue Support:** Built-in job queueing for asynchronous processing.
 - **Easy Configuration:** Simple config file and environment variable setup.
 - **DLT Compliant:** Send DLT messages with templates and variables.
+- **WhatsApp Support:** Send session, template, interactive, and media messages via WhatsApp.
+- **WABA Management:** Manage templates, business profiles, and blocked users via API or CLI.
 - **Service & Facade:** Use the `Fast2sms` service directly or via facade.
 - **API Helpers:** Check wallet balance and DLT details.
 - **Artisan Commands:** Publish configuration and monitor balance.
@@ -47,11 +49,12 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
 
 ## 🚀 Quick Start Guide
 
-- ✅ **Laravel Notification Channel Support**
+- ✅ **Laravel Notification Channel Support** (SMS & WhatsApp)
 - ✅ **Fluent API** (Fast2sms::to()->message()->send())
 - ✅ **Database Logging** (Optional tracking of all sent SMS)
 - ✅ **Log Driver** (Zero-cost local development)
 - ✅ **DLT Support** (Sender ID, Template ID)
+- ✅ **WhatsApp Support** (Session & Template Messages)
 - ✅ **OTP Support**
 - ✅ **Balance Monitoring** (CLI & Events)
 - ✅ **Queuing & Faking Support**
@@ -86,6 +89,10 @@ Supports **Quick SMS**, **DLT templates**, **OTP**, queueing, scheduling, and ba
     FAST2SMS_DEFAULT_ROUTE="dlt"
     FAST2SMS_DRIVER="api" # Use 'log' for local development
     FAST2SMS_DATABASE_LOGGING=true
+    
+    # WhatsApp Configuration (Optional)
+    FAST2SMS_WHATSAPP_PHONE_NUMBER_ID="YOUR_PHONE_NUMBER_ID"
+    FAST2SMS_WHATSAPP_WABA_ID="YOUR_WABA_ID"
     ```
 
 4. **Send Your First DLT SMS:**
@@ -166,6 +173,53 @@ use Shakil\Fast2sms\Facades\Fast2sms;
 Fast2sms::otp('9999999999', '123456');
 ```
 
+### WhatsApp Messages
+
+```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
+// Send a simple text message
+Fast2sms::viaWhatsApp()
+    ->to('919876543210')
+    ->sendText('Hello from WhatsApp!');
+
+// Send an image
+Fast2sms::viaWhatsApp()
+    ->to('919876543210')
+    ->sendImage('https://example.com/image.jpg', 'Check this out!');
+
+// Send a template message
+Fast2sms::viaWhatsApp()
+    ->to('919876543210')
+    ->template('WELCOME_01')
+    ->variables(['John Doe'])
+    ->send();
+
+// Send with Meta format components (Advanced)
+Fast2sms::viaWhatsApp('919876543210')
+    ->template('welcome_msg')
+    ->components([
+        [
+            'type' => 'body',
+            'parameters' => [['type' => 'text', 'text' => 'John']],
+        ],
+    ])
+    ->send();
+
+// Send Interactive Message (Buttons/List)
+Fast2sms::viaWhatsApp('919876543210')
+    ->sendInteractive([
+        'type' => 'button',
+        'body' => ['text' => 'Are you interested?'],
+        'action' => [
+            'buttons' => [
+                ['type' => 'reply', 'reply' => ['id' => 'yes', 'title' => 'Yes']],
+                ['type' => 'reply', 'reply' => ['id' => 'no', 'title' => 'No']],
+            ]
+        ]
+    ]);
+```
+
 ### Fluent Interface
 
 ```php
@@ -231,6 +285,8 @@ foreach ($sendersResponse->getSenders() as $sender) {
 | `->otp(...)` | Helper for OTP messages. |
 | `->checkBalance()` | Retrieves wallet balance. |
 | `->dltManager(string $type)` | Retrieves DLT manager details for `sender` or `template`. |
+| `->viaWhatsApp()` | Access the fluent WhatsApp message builder. |
+| `->whatsapp()` | Access the low-level WhatsApp service. |
 
 ---
 
@@ -252,6 +308,25 @@ try {
 ---
 
 ## 🧩 Advanced Features
+
+### WhatsApp Support (Version 2.0+)
+
+The package provides full integration with the Fast2sms WhatsApp API.
+
+```php
+use Shakil\Fast2sms\Facades\Fast2sms;
+
+// Send text
+Fast2sms::viaWhatsApp('919876543210')->sendText('Hello!');
+
+// Send template
+Fast2sms::viaWhatsApp('919876543210')
+    ->template('WELCOME_01')
+    ->variables(['John Doe'])
+    ->send();
+```
+
+For more details, see the [WhatsApp Documentation](docs/whatsapp.md).
 
 ### 🚀 Queue Integration
 
@@ -331,9 +406,10 @@ $request->validate([
 
 ### 📱 Notifications Channel
 
-Use Fast2sms as a notification channel in your Laravel applications. The `SmsChannel` supports both simple strings and fluent `SmsMessage` objects.
+Use Fast2sms as a notification channel in your Laravel applications for both SMS and WhatsApp.
 
-**Create a Notification:**
+#### SMS Notifications
+
 ```php
 use Illuminate\Notifications\Notification;
 use Shakil\Fast2sms\Notifications\Messages\SmsMessage;
@@ -348,12 +424,7 @@ class OrderShipped extends Notification
 
     public function toSms($notifiable)
     {
-        // Option 1: Return a simple string (uses default route/sender)
-        // return "Your order #123 has been shipped!";
-
-        // Option 2: Return a fluent SmsMessage object
         return (new SmsMessage)
-            ->to($notifiable->phone) // Optional: will fallback to routeNotificationForSms
             ->route(SmsRoute::DLT)
             ->template('TEMPLATE_ID', ['Order #123'])
             ->from('SENDER');
@@ -361,12 +432,30 @@ class OrderShipped extends Notification
 }
 ```
 
-**Model Setup:**
-Ensure your model has a `routeNotificationForSms` method or a `phone` attribute:
-```php
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Model;
+#### WhatsApp Notifications
 
+```php
+use Illuminate\Notifications\Notification;
+use Shakil\Fast2sms\Notifications\Messages\WhatsAppMessage;
+
+class WelcomeNotification extends Notification
+{
+    public function via($notifiable)
+    {
+        return ['whatsapp'];
+    }
+
+    public function toWhatsApp($notifiable)
+    {
+        return (new WhatsAppMessage)
+            ->template('WELCOME_USER_01', ['John Doe']);
+    }
+}
+```
+
+**Model Setup:**
+Ensure your model has the appropriate routing method:
+```php
 class User extends Model
 {
     use Notifiable;
@@ -375,13 +464,19 @@ class User extends Model
     {
         return $this->phone;
     }
+
+    public function routeNotificationForWhatsApp()
+    {
+        return $this->whatsapp_number;
+    }
 }
 ```
 
 **Direct Sending from Notification Message:**
-The `SmsMessage` can also be sent directly if needed:
+The `SmsMessage` or `WhatsAppMessage` can also be sent directly if needed:
 ```php
 (new SmsMessage("Hello"))->to('9999999999')->send();
+(new WhatsAppMessage("Hello"))->to('919876543210')->send();
 ```
 
 ---
@@ -427,8 +522,18 @@ protected function schedule(Schedule $schedule)
 }
 ```
 
----
+### Artisan Commands
 
+```bash
+# Monitor SMS Balance
+php artisan sms:monitor --threshold=100
+
+# Get WhatsApp WABA/Template Details
+php artisan whatsapp:waba --type=number
+php artisan whatsapp:waba --type=template
+```
+
+---
 
 ## 📚 Documentation
 
@@ -445,6 +550,7 @@ Learn how to use Laravel Fast2sms effectively:
 - [Queue Integration](docs/queues.md)
 - [Notifications](docs/notifications.md)
 - [Events & Listeners](docs/events.md)
+- [WhatsApp Support](docs/whatsapp.md)
 
 ---
 

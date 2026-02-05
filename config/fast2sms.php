@@ -106,4 +106,18 @@ return [
         'name' => env('FAST2SMS_QUEUE_NAME', 'fast2sms'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | WhatsApp Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure the WhatsApp settings for sending WhatsApp messages.
+    |
+    */
+    'whatsapp' => [
+        'default_phone_number_id' => env('FAST2SMS_WHATSAPP_PHONE_NUMBER_ID', ''),
+        'default_waba_id' => env('FAST2SMS_WHATSAPP_WABA_ID', ''),
+        'version' => env('FAST2SMS_WHATSAPP_VERSION', 'v24.0'),
+    ],
+
 ];

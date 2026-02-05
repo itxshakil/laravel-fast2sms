@@ -8,8 +8,10 @@ use Closure;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
+use Shakil\Fast2sms\Contracts\WhatsAppInterface;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
 
 /**
@@ -29,6 +31,17 @@ use Shakil\Fast2sms\Responses\Fast2smsResponse;
  * @method static Fast2smsResponse                      otp(string|array<int, string> $numbers, string $otpValue)
  * @method static Fast2smsResponse                      checkBalance()
  * @method static Fast2smsResponse                      dltManager(string $type)
+ * @method static WhatsAppInterface                     whatsapp()
+ * @method static WhatsAppInterface                     viaWhatsApp(string|array<int, string>|null $to = null)
+ * @method static WhatsAppInterface                     type(WhatsAppType $type)
+ * @method static WhatsAppInterface                     body(string $text)
+ * @method static WhatsAppInterface                     components(array $components)
+ * @method static WhatsAppInterface                     template(string|int $templateId)
+ * @method static WhatsAppInterface                     media(string $url)
+ * @method static void                                  queue()
+ * @method static \Shakil\Fast2sms\Fast2sms             onConnection(string $connection)
+ * @method static \Shakil\Fast2sms\Fast2sms             onQueue(string $queue)
+ * @method static \Shakil\Fast2sms\Fast2sms             delay(int $seconds)
  * @method static void                                  fake()
  * @method static void                                  assertSent(array<string, mixed>|Closure|null $callback = null)
  * @method static void                                  assertNotSent(array<string, mixed>|Closure|null $callback = null)

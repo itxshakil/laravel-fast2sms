@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
+use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\ServiceProvider;
 use Override;
+use Shakil\Fast2sms\Channels\SmsChannel;
+use Shakil\Fast2sms\Channels\WhatsAppChannel;
 use Shakil\Fast2sms\Console\Commands\MonitorSmsBalance;
+use Shakil\Fast2sms\Console\Commands\WhatsAppWabaDetails;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
@@ -30,6 +34,14 @@ class Fast2smsServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton('fast2sms', fn ($app): Fast2sms => new Fast2sms);
+        $this->app->singleton('fast2sms.whatsapp', fn ($app): WhatsApp => new WhatsApp);
+
+        $this->app->extend(ChannelManager::class, function ($service, $app) {
+            $service->extend('fast2sms', fn ($app) => $app->make(SmsChannel::class));
+            $service->extend('whatsapp', fn ($app) => $app->make(WhatsAppChannel::class));
+
+            return $service;
+        });
     }
 
     /**
@@ -44,6 +56,7 @@ class Fast2smsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 MonitorSmsBalance::class,
+                WhatsAppWabaDetails::class,
             ]);
 
             $this->loadMigrations();
@@ -58,6 +71,17 @@ class Fast2smsServiceProvider extends ServiceProvider
         ], 'fast2sms-migrations');
 
         $this->registerEventListeners();
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array<int, string>
+     */
+    #[Override]
+    public function provides(): array
+    {
+        return ['fast2sms', 'fast2sms.whatsapp'];
     }
 
     /**

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Contracts;
 
 use DateTimeInterface;
+use Illuminate\Support\Collection;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
 
@@ -18,10 +20,10 @@ interface Fast2smsInterface
     /**
      * Set the recipient mobile number(s).
      *
-     * @param  string|array<int, string|int> $numbers Single number as string or multiple numbers as an array.
+     * @param  string|array<int, string|int>|Collection<int, string|int> $numbers Single number as string or multiple numbers as an array.
      * @return $this
      */
-    public function to(string|array $numbers): self;
+    public function to(string|array|Collection $numbers): self;
 
     /**
      * Set the SMS message content.
@@ -110,4 +112,63 @@ interface Fast2smsInterface
      * @throws Fast2smsException If required parameters are missing or API call fails.
      */
     public function send(): Fast2smsResponse;
+
+    /**
+     * Queue the SMS message.
+     */
+    public function queue(): void;
+
+    /**
+     * Set the queue connection.
+     */
+    public function onConnection(string $connection): self;
+
+    /**
+     * Set the queue name.
+     */
+    public function onQueue(string $queue): self;
+
+    /**
+     * Set the queue delay.
+     */
+    public function delay(int $seconds): self;
+
+    /**
+     * Access the WhatsApp service.
+     */
+    public function whatsapp(): WhatsAppInterface;
+
+    /**
+     * Start a fluent WhatsApp message builder.
+     *
+     * @param string|array<int, string>|null $to
+     */
+    public function viaWhatsApp(string|array|null $to = null): WhatsAppInterface;
+
+    /**
+     * Set the message body text for WhatsApp messages.
+     */
+    public function body(string $text): WhatsAppInterface;
+
+    /**
+     * Set Meta format components for WhatsApp messages.
+     *
+     * @param array<int, array<string, mixed>> $components
+     */
+    public function components(array $components): WhatsAppInterface;
+
+    /**
+     * Set the message type for WhatsApp messages.
+     */
+    public function type(WhatsAppType $type): WhatsAppInterface;
+
+    /**
+     * Set the template ID for WhatsApp template messages.
+     */
+    public function template(string|int $templateId): WhatsAppInterface;
+
+    /**
+     * Set the media URL for WhatsApp messages.
+     */
+    public function media(string $url): WhatsAppInterface;
 }

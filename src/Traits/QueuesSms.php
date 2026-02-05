@@ -100,6 +100,9 @@ trait QueuesSms
         return $this;
     }
 
+    /**
+     * Set the queue delay.
+     */
     public function delay(int $seconds): self
     {
         $this->queueDelay = $seconds;
