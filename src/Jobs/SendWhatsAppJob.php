@@ -45,7 +45,7 @@ class SendWhatsAppJob implements ShouldQueue
         }
 
         if ($this->parameters->type) {
-            $whatsapp->type(WhatsAppType::from($this->parameters->type));
+            $whatsapp->type(WhatsAppType::tryFrom($this->parameters->type) ?? WhatsAppType::TEXT);
         }
 
         if ($this->parameters->body) {

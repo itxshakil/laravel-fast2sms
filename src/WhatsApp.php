@@ -5,57 +5,27 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms;
 
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Override;
 use Shakil\Fast2sms\Contracts\WhatsAppInterface;
-use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
-use Shakil\Fast2sms\Jobs\SendWhatsAppJob;
 use Shakil\Fast2sms\Responses\WhatsAppResponse;
+use Shakil\Fast2sms\Traits\ManagesWhatsAppParameters;
 
 /**
  * Service class for interacting with the Fast2sms WhatsApp API.
  */
 class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
 {
+    use ManagesWhatsAppParameters;
+
     protected string $defaultPhoneNumberId;
 
     protected string $defaultWabaId;
 
     protected string $version;
-
-    protected ?string $to = null;
-
-    protected ?string $fromPhoneNumberId = null;
-
-    protected ?WhatsAppType $type = null;
-
-    protected ?string $body = null;
-
-    protected ?string $templateId = null;
-
-    /**
-     * @var array<int, string>|array<string, mixed>|null
-     */
-    protected ?array $variables = null;
-
-    protected ?string $mediaUrl = null;
-
-    protected ?string $documentFilename = null;
-
-    /**
-     * @var array<int, array<string, mixed>>|null
-     */
-    protected ?array $components = null;
-
-    protected ?string $queueConnection = null;
-
-    protected ?string $queueName = null;
-
-    protected ?int $queueDelay = null;
 
     /**
      * Create a new WhatsApp instance.
@@ -211,52 +181,6 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
     }
 
     /**
-     * Set the recipient mobile number.
-     *
-     * @param string|array<int, string>|Collection<int, string> $to
-     */
-    public function to(string|array|Collection $to): self
-    {
-        if ($to instanceof Collection) {
-            $to = $to->toArray();
-        }
-
-        $this->to = is_array($to) ? implode(',', $to) : (string) $to;
-
-        return $this;
-    }
-
-    /**
-     * Set the sender phone number ID.
-     */
-    public function from(string $phoneNumberId): self
-    {
-        $this->fromPhoneNumberId = $phoneNumberId;
-
-        return $this;
-    }
-
-    /**
-     * Set the message type.
-     */
-    public function type(WhatsAppType $type): self
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Set the message body text.
-     */
-    public function body(string $text): self
-    {
-        $this->body = $text;
-
-        return $this;
-    }
-
-    /**
      * Send a text message.
      */
     public function sendText(string $message): WhatsAppResponse
@@ -300,60 +224,6 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
             'type' => 'document',
             'document' => $document,
         ], $this->fromPhoneNumberId);
-    }
-
-    /**
-     * Set the template ID for template messages.
-     */
-    public function template(string|int $templateId): self
-    {
-        $this->templateId = (string) $templateId;
-
-        return $this;
-    }
-
-    /**
-     * Set variables for template messages.
-     *
-     * @param array<int, string>|array<string, mixed> $variables
-     */
-    public function variables(array $variables): self
-    {
-        $this->variables = $variables;
-
-        return $this;
-    }
-
-    /**
-     * Set media URL for template messages.
-     */
-    public function media(string $url): self
-    {
-        $this->mediaUrl = $url;
-
-        return $this;
-    }
-
-    /**
-     * Set the document filename for template messages.
-     */
-    public function documentFilename(string $filename): self
-    {
-        $this->documentFilename = $filename;
-
-        return $this;
-    }
-
-    /**
-     * Set components for template messages (Meta format).
-     *
-     * @param array<int, array<string, mixed>> $components
-     */
-    public function components(array $components): self
-    {
-        $this->components = $components;
-
-        return $this;
     }
 
     /**
@@ -657,72 +527,6 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
     }
 
     /**
-     * Queue the WhatsApp message.
-     */
-    public function queue(): void
-    {
-        $parameters = new WhatsAppParameters(
-            to: $this->to,
-            phoneNumberId: $this->fromPhoneNumberId,
-            type: $this->type?->value,
-            body: $this->body,
-            templateId: $this->templateId,
-            variables: $this->variables,
-            mediaUrl: $this->mediaUrl,
-            documentFilename: $this->documentFilename,
-            components: $this->components,
-        );
-
-        $job = new SendWhatsAppJob($parameters);
-
-        if ($this->queueConnection) {
-            $job->onConnection($this->queueConnection);
-        }
-
-        if ($this->queueName) {
-            $job->onQueue($this->queueName);
-        }
-
-        if ($this->queueDelay) {
-            $job->delay($this->queueDelay);
-        }
-
-        dispatch($job);
-
-        $this->afterApiCall();
-    }
-
-    /**
-     * Set the queue connection.
-     */
-    public function onConnection(string $connection): self
-    {
-        $this->queueConnection = $connection;
-
-        return $this;
-    }
-
-    /**
-     * Set the queue name.
-     */
-    public function onQueue(string $queue): self
-    {
-        $this->queueName = $queue;
-
-        return $this;
-    }
-
-    /**
-     * Set the queue delay.
-     */
-    public function delay(int $seconds): self
-    {
-        $this->queueDelay = $seconds;
-
-        return $this;
-    }
-
-    /**
      * Hook method executed after every API call.
      *
      * Reset the fluent state for the next request.
@@ -730,19 +534,7 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
     #[Override]
     protected function afterApiCall(): void
     {
-        $this->to = null;
-        $this->fromPhoneNumberId = null;
-        $this->type = null;
-        $this->body = null;
-        $this->templateId = null;
-        $this->variables = null;
-        $this->mediaUrl = null;
-        $this->documentFilename = null;
-        $this->components = null;
-
-        $this->queueConnection = null;
-        $this->queueName = null;
-        $this->queueDelay = null;
+        $this->resetWhatsAppParameters();
     }
 
     /**

@@ -28,11 +28,7 @@ use Shakil\Fast2sms\Jobs\SendSmsJob;
  */
 trait QueuesSms
 {
-    protected ?string $queueConnection = null;
-
-    protected ?string $queueName = null;
-
-    protected ?int $queueDelay = null;
+    use HasQueueing;
 
     /**
      * Queue a quick SMS with minimal configuration.
@@ -81,36 +77,6 @@ trait QueuesSms
     }
 
     /**
-     * Set the queue connection to be used.
-     */
-    public function onConnection(string $connection): self
-    {
-        $this->queueConnection = $connection;
-
-        return $this;
-    }
-
-    /**
-     * Set the queue name to be used.
-     */
-    public function onQueue(string $queue): self
-    {
-        $this->queueName = $queue;
-
-        return $this;
-    }
-
-    /**
-     * Set the queue delay.
-     */
-    public function delay(int $seconds): self
-    {
-        $this->queueDelay = $seconds;
-
-        return $this;
-    }
-
-    /**
      * Queue an SMS via DLT route.
      *
      * @param string|array<int, string|number> $numbers         One or more recipient numbers.
@@ -145,15 +111,5 @@ trait QueuesSms
     {
         $this->setOtp($numbers, $otpValue);
         $this->queue();
-    }
-
-    /**
-     * Reset queue configuration.
-     */
-    private function resetQueueConfig(): void
-    {
-        $this->queueConnection = null;
-        $this->queueName = null;
-        $this->queueDelay = null;
     }
 }

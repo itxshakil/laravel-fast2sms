@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\DataTransferObjects;
 
+use Shakil\Fast2sms\WhatsApp;
+
 /**
  * Data Transfer Object for WhatsApp parameters.
  *
@@ -27,4 +29,22 @@ readonly class WhatsAppParameters
         public ?string $documentFilename = null,
         public ?array $components = null,
     ) {}
+
+    /**
+     * Create a new instance from a WhatsApp object.
+     */
+    public static function fromWhatsApp(WhatsApp $whatsapp): self
+    {
+        return new self(
+            to: $whatsapp->getTo(),
+            phoneNumberId: $whatsapp->getFromPhoneNumberId(),
+            type: $whatsapp->getType()?->value,
+            body: $whatsapp->getBody(),
+            templateId: $whatsapp->getTemplateId(),
+            variables: $whatsapp->getVariables(),
+            mediaUrl: $whatsapp->getMediaUrl(),
+            documentFilename: $whatsapp->getDocumentFilename(),
+            components: $whatsapp->getComponents(),
+        );
+    }
 }
