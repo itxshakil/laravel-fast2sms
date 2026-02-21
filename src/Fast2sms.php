@@ -162,48 +162,6 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
     }
 
     /**
-     * Set the message body text for WhatsApp messages.
-     */
-    public function body(string $text): WhatsAppInterface
-    {
-        return $this->viaWhatsApp()->body($text);
-    }
-
-    /**
-     * Set Meta format components for WhatsApp messages.
-     *
-     * @param array<int, array<string, mixed>> $components
-     */
-    public function components(array $components): WhatsAppInterface
-    {
-        return $this->viaWhatsApp()->components($components);
-    }
-
-    /**
-     * Set the message type for WhatsApp messages.
-     */
-    public function type(WhatsAppType $type): WhatsAppInterface
-    {
-        return $this->viaWhatsApp()->type($type);
-    }
-
-    /**
-     * Set the template ID for WhatsApp template messages.
-     */
-    public function template(string|int $templateId): WhatsAppInterface
-    {
-        return $this->viaWhatsApp()->template($templateId);
-    }
-
-    /**
-     * Set the media URL for WhatsApp messages.
-     */
-    public function media(string $url): WhatsAppInterface
-    {
-        return $this->viaWhatsApp()->media($url);
-    }
-
-    /**
      * Access the WhatsApp service.
      */
     public function whatsapp(): WhatsAppInterface

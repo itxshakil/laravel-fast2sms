@@ -134,11 +134,6 @@ interface Fast2smsInterface
     public function delay(int $seconds): self;
 
     /**
-     * Access the WhatsApp service.
-     */
-    public function whatsapp(): WhatsAppInterface;
-
-    /**
      * Start a fluent WhatsApp message builder.
      *
      * @param string|array<int, string>|null $to
@@ -146,29 +141,7 @@ interface Fast2smsInterface
     public function viaWhatsApp(string|array|null $to = null): WhatsAppInterface;
 
     /**
-     * Set the message body text for WhatsApp messages.
+     * Access the WhatsApp service.
      */
-    public function body(string $text): WhatsAppInterface;
-
-    /**
-     * Set Meta format components for WhatsApp messages.
-     *
-     * @param array<int, array<string, mixed>> $components
-     */
-    public function components(array $components): WhatsAppInterface;
-
-    /**
-     * Set the message type for WhatsApp messages.
-     */
-    public function type(WhatsAppType $type): WhatsAppInterface;
-
-    /**
-     * Set the template ID for WhatsApp template messages.
-     */
-    public function template(string|int $templateId): WhatsAppInterface;
-
-    /**
-     * Set the media URL for WhatsApp messages.
-     */
-    public function media(string $url): WhatsAppInterface;
+    public function whatsapp(): WhatsAppInterface;
 }
