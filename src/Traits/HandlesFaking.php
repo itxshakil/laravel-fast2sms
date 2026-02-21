@@ -44,15 +44,19 @@ trait HandlesFaking
             config('fast2sms.base_url') . '*' => function ($request) {
                 // Determine if it's a multipart (SMS) or JSON (WhatsApp) request
                 $payload = [];
+                $contentType = $request->header('content-type')[0] ?? '';
 
-                if (str_contains($request->header('content-type')[0] ?? '', 'application/json')) {
+                if (str_contains($contentType, 'application/json')) {
                     $payload = json_decode($request->body(), true, 512, JSON_THROW_ON_ERROR);
-                } elseif (str_contains($request->header('content-type')[0] ?? '', 'multipart/form-data')) {
+                } elseif (str_contains($contentType, 'multipart/form-data')) {
                     foreach ($request->data() as $part) {
                         $payload[$part['name']] = $part['contents'];
                     }
                 } else {
                     $payload = $request->data();
+                    if (! is_array($payload)) {
+                        parse_str($request->body(), $payload);
+                    }
                     if (is_array($payload)) {
                         foreach ($payload as $key => $value) {
                             if (is_array($value) && isset($value['name'], $value['contents'])) {
@@ -73,12 +77,22 @@ trait HandlesFaking
 
                 self::$sentMessages->push($payload);
 
-                return Http::response([
+                $responseBody = [
                     'return' => true,
                     'success' => true,
                     'status' => true,
                     'message' => 'Message sent successfully (faked).',
-                ]);
+                ];
+
+                // Mock data for specific endpoints to support various tests
+                $path = parse_url($request->url(), PHP_URL_PATH);
+                if (str_contains($path, 'whatsapp-waba') || str_contains($path, 'dlt_manager/whatsapp')) {
+                    $responseBody['data'] = [['id' => 'mock_id']];
+                } elseif (str_contains($path, 'media')) {
+                    $responseBody['id'] = 'MEDIA_ID';
+                }
+
+                return Http::response($responseBody);
             },
         ]);
     }

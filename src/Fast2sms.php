@@ -15,7 +15,6 @@ use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
 use Shakil\Fast2sms\Responses\WalletBalanceResponse;
-use Shakil\Fast2sms\Traits\HandlesFaking;
 use Shakil\Fast2sms\Traits\ManagesSmsParameters;
 use Shakil\Fast2sms\Traits\QueuesSms;
 
@@ -28,7 +27,6 @@ use Shakil\Fast2sms\Traits\QueuesSms;
  */
 class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
 {
-    use HandlesFaking;
     use ManagesSmsParameters;
     use QueuesSms;
 

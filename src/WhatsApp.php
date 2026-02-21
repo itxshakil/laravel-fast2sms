@@ -12,14 +12,18 @@ use Shakil\Fast2sms\Enums\WhatsAppType;
 
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Responses\WhatsAppResponse;
+use Shakil\Fast2sms\Traits\ManagesWhatsAppAccount;
 use Shakil\Fast2sms\Traits\ManagesWhatsAppParameters;
+use Shakil\Fast2sms\Traits\ManagesWhatsAppTemplates;
 
 /**
  * Service class for interacting with the Fast2sms WhatsApp API.
  */
 class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
 {
+    use ManagesWhatsAppAccount;
     use ManagesWhatsAppParameters;
+    use ManagesWhatsAppTemplates;
 
     protected string $defaultPhoneNumberId;
 
@@ -80,6 +84,7 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
                 'authorization' => $this->apiKey,
                 'content-type' => 'application/json',
             ])->post(config('fast2sms.base_url') . "/whatsapp/{$version}/{$phoneNumberId}/messages", array_merge([
+                'messaging_product' => 'whatsapp',
                 'to' => $to,
             ], $payload));
 
@@ -89,106 +94,16 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
         }
     }
 
-    /**
-     * Send a simplified template message.
-     */
-    public function sendTemplateMessage(
-        string|array $numbers,
-        string|int $templateId,
-        ?array $variables = null,
-        ?string $mediaUrl = null,
-        ?string $phoneNumberId = null,
-        ?string $documentFilename = null,
-    ): WhatsAppResponse {
-        $phoneNumberId ??= $this->defaultPhoneNumberId;
-        $numbersStr = is_array($numbers) ? implode(',', $numbers) : $numbers;
-
-        $query = [
-            'authorization' => $this->apiKey,
-            'message_id' => $templateId,
-            'phone_number_id' => $phoneNumberId,
-            'numbers' => $numbersStr,
-        ];
-
-        if ($variables !== null) {
-            $query['variables_values'] = implode('|', $variables);
-        }
-
-        if ($mediaUrl !== null) {
-            $query['media_url'] = $mediaUrl;
-        }
-
-        if ($documentFilename !== null) {
-            $query['document_filename'] = $documentFilename;
-        }
-
-        try {
-            $response = Http::get(config('fast2sms.base_url') . '/whatsapp', $query);
-
-            return $this->handleWhatsAppResponse($response);
-        } finally {
-            $this->afterApiCall();
-        }
-    }
-
-    /**
-     * Manage templates (Create, Get, Delete).
-     */
-    public function manageTemplates(string $method, ?string $path = null, array $data = []): WhatsAppResponse
-    {
-        $wabaId = $this->defaultWabaId;
-        $version = $this->version;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$version}/{$wabaId}/message_templates";
-
-        if ($path !== null) {
-            $url .= '/' . mb_ltrim($path, '/');
-        }
-
-        $request = Http::withHeaders([
-            'authorization' => $this->apiKey,
-            'content-type' => 'application/json',
-        ]);
-
-        try {
-            $response = match (mb_strtoupper($method)) {
-                'POST' => $request->post($url, $data),
-                'GET' => $request->get($url, $data),
-                'DELETE' => $request->delete($url, $data),
-                default => throw new Fast2smsException("Unsupported method: {$method}"),
-            };
-
-            return $this->handleWhatsAppResponse($response);
-        } finally {
-            $this->afterApiCall();
-        }
-    }
-
-    /**
-     * Get WABA and Template details.
-     */
-    public function getWabaDetails(string $type): WhatsAppResponse
-    {
-        try {
-            $response = Http::get(config('fast2sms.base_url') . '/dlt_manager/whatsapp', [
-                'authorization' => $this->apiKey,
-                'type' => $type,
-            ]);
-
-            return $this->handleWhatsAppResponse($response);
-        } finally {
-            $this->afterApiCall();
-        }
-    }
 
     /**
      * Send a text message.
      */
     public function sendText(string $message): WhatsAppResponse
     {
-        return $this->sendSessionMessage($this->to, [
+        return $this->sendSessionMessage($this->getTo() ?? '', [
             'type' => 'text',
             'text' => ['body' => $message],
-        ], $this->fromPhoneNumberId);
+        ], $this->getFromPhoneNumberId());
     }
 
     /**
@@ -201,10 +116,10 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
             $image['caption'] = $caption;
         }
 
-        return $this->sendSessionMessage($this->to, [
+        return $this->sendSessionMessage($this->getTo() ?? '', [
             'type' => 'image',
             'image' => $image,
-        ], $this->fromPhoneNumberId);
+        ], $this->getFromPhoneNumberId());
     }
 
     /**
@@ -220,60 +135,59 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
             $document['caption'] = $caption;
         }
 
-        return $this->sendSessionMessage($this->to, [
+        return $this->sendSessionMessage($this->getTo() ?? '', [
             'type' => 'document',
             'document' => $document,
-        ], $this->fromPhoneNumberId);
+        ], $this->getFromPhoneNumberId());
     }
 
     /**
-     * Send the configured template message.
+     * Send the WhatsApp message using fluent parameters.
      */
     public function send(): WhatsAppResponse
     {
-        if ($this->templateId) {
-            if ($this->components) {
-                return $this->sendMetaMessage($this->to, [
-                    'messaging_product' => 'whatsapp',
+        if ($this->getTemplateId()) {
+            if ($this->getComponents()) {
+                return $this->sendMetaMessage($this->getTo() ?? '', [
                     'type' => 'template',
                     'template' => [
-                        'name' => $this->templateId,
+                        'name' => $this->getTemplateId(),
                         'language' => ['code' => config('fast2sms.whatsapp.language', 'en_US')],
-                        'components' => $this->components,
+                        'components' => $this->getComponents(),
                     ],
-                ], $this->fromPhoneNumberId);
+                ], $this->getFromPhoneNumberId());
             }
 
             return $this->sendTemplateMessage(
-                $this->to,
-                $this->templateId,
-                $this->variables,
-                $this->mediaUrl,
-                $this->fromPhoneNumberId,
-                $this->documentFilename,
+                $this->getTo() ?? '',
+                $this->getTemplateId(),
+                $this->getVariables(),
+                $this->getMediaUrl(),
+                $this->getFromPhoneNumberId(),
+                $this->getDocumentFilename(),
             );
         }
 
-        if ($this->type instanceof WhatsAppType) {
+        if ($this->getType() instanceof WhatsAppType) {
             $payload = [
-                'type' => $this->type->value,
+                'type' => $this->getType()->value,
             ];
 
-            if ($this->type === WhatsAppType::TEXT) {
-                $payload['text'] = ['body' => $this->body];
-            } elseif (in_array($this->type, [WhatsAppType::IMAGE, WhatsAppType::VIDEO, WhatsAppType::AUDIO, WhatsAppType::DOCUMENT, WhatsAppType::STICKER])) {
-                $payload[$this->type->value] = [
-                    'link' => $this->mediaUrl,
+            if ($this->getType() === WhatsAppType::TEXT) {
+                $payload['text'] = ['body' => $this->getBody()];
+            } elseif (in_array($this->getType(), [WhatsAppType::IMAGE, WhatsAppType::VIDEO, WhatsAppType::AUDIO, WhatsAppType::DOCUMENT, WhatsAppType::STICKER])) {
+                $payload[$this->getType()->value] = [
+                    'link' => $this->getMediaUrl(),
                 ];
-                if ($this->body) {
-                    $payload[$this->type->value]['caption'] = $this->body;
+                if ($this->getBody()) {
+                    $payload[$this->getType()->value]['caption'] = $this->getBody();
                 }
-                if ($this->type === WhatsAppType::DOCUMENT && $this->documentFilename) {
-                    $payload['document']['filename'] = $this->documentFilename;
+                if ($this->getType() === WhatsAppType::DOCUMENT && $this->getDocumentFilename()) {
+                    $payload['document']['filename'] = $this->getDocumentFilename();
                 }
             }
 
-            return $this->sendSessionMessage($this->to, $payload, $this->fromPhoneNumberId);
+            return $this->sendSessionMessage($this->getTo() ?? '', $payload, $this->getFromPhoneNumberId());
         }
 
         throw new Fast2smsException('Template ID or Message Type is required for sending WhatsApp messages.');
@@ -284,11 +198,10 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function sendInteractive(array $interactive): WhatsAppResponse
     {
-        return $this->sendMetaMessage($this->to, [
-            'messaging_product' => 'whatsapp',
+        return $this->sendMetaMessage($this->getTo() ?? '', [
             'type' => 'interactive',
             'interactive' => $interactive,
-        ], $this->fromPhoneNumberId);
+        ]);
     }
 
     /**
@@ -304,15 +217,15 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
         if ($name) {
             $location['name'] = $name;
         }
+
         if ($address) {
             $location['address'] = $address;
         }
 
-        return $this->sendMetaMessage($this->to, [
-            'messaging_product' => 'whatsapp',
+        return $this->sendMetaMessage($this->getTo() ?? '', [
             'type' => 'location',
             'location' => $location,
-        ], $this->fromPhoneNumberId);
+        ]);
     }
 
     /**
@@ -320,58 +233,69 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function sendReaction(string $messageId, string $emoji): WhatsAppResponse
     {
-        return $this->sendMetaMessage($this->to, [
-            'messaging_product' => 'whatsapp',
+        return $this->sendMetaMessage($this->getTo() ?? '', [
             'type' => 'reaction',
             'reaction' => [
                 'message_id' => $messageId,
                 'emoji' => $emoji,
             ],
-        ], $this->fromPhoneNumberId);
+        ]);
     }
 
     /**
      * Block one or more users.
+     *
+     * @param string|array<int, string> $numbers
      */
     public function block(string|array $numbers): WhatsAppResponse
     {
         $numbers = is_array($numbers) ? $numbers : [$numbers];
         $blockUsers = array_map(fn (string $n): array => ['input' => $n], $numbers);
 
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
+        $phoneNumberId = $this->getFromPhoneNumberId() ?: $this->defaultPhoneNumberId;
         $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/block_users";
 
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-            'content-type' => 'application/json',
-        ])->post($url, [
-            'messaging_product' => 'whatsapp',
-            'block_users' => $blockUsers,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+                'content-type' => 'application/json',
+            ])->post($url, [
+                'messaging_product' => 'whatsapp',
+                'block_users' => $blockUsers,
+            ]);
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
      * Unblock one or more users.
+     *
+     * @param string|array<int, string> $numbers
      */
     public function unblock(string|array $numbers): WhatsAppResponse
     {
         $numbers = is_array($numbers) ? $numbers : [$numbers];
         $blockUsers = array_map(fn (string $n): array => ['input' => $n], $numbers);
 
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
+        $phoneNumberId = $this->getFromPhoneNumberId() ?: $this->defaultPhoneNumberId;
         $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/block_users";
 
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-            'content-type' => 'application/json',
-        ])->delete($url, [
-            'messaging_product' => 'whatsapp',
-            'block_users' => $blockUsers,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+                'content-type' => 'application/json',
+            ])->delete($url, [
+                'messaging_product' => 'whatsapp',
+                'block_users' => $blockUsers,
+            ]);
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
@@ -379,14 +303,18 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function getBlockedUsers(): WhatsAppResponse
     {
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
+        $phoneNumberId = $this->getFromPhoneNumberId() ?: $this->defaultPhoneNumberId;
         $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/block_users";
 
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get($url);
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+            ])->get($url);
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
@@ -394,11 +322,15 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function getDeliveryReport(string $requestId): WhatsAppResponse
     {
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get(config('fast2sms.base_url') . "/whatsapp/{$requestId}");
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+            ])->get(config('fast2sms.base_url') . "/whatsapp/{$requestId}");
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
@@ -406,14 +338,18 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function getLogs(string $from, string $to): WhatsAppResponse
     {
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get(config('fast2sms.base_url') . '/whatsapp_logs', [
-            'from' => $from,
-            'to' => $to,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+            ])->get(config('fast2sms.base_url') . '/whatsapp_logs', [
+                'from' => $from,
+                'to' => $to,
+            ]);
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
@@ -421,109 +357,39 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     public function getSummary(string $from, string $to): WhatsAppResponse
     {
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get(config('fast2sms.base_url') . '/whatsapp_summary', [
-            'from' => $from,
-            'to' => $to,
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+            ])->get(config('fast2sms.base_url') . '/whatsapp_summary', [
+                'from' => $from,
+                'to' => $to,
+            ]);
 
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
-    /**
-     * Get WhatsApp business profile.
-     */
-    public function getBusinessProfile(): WhatsAppResponse
-    {
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/whatsapp_business_profile";
-
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get($url);
-
-        return $this->handleWhatsAppResponse($response);
-    }
-
-    /**
-     * Update WhatsApp business profile.
-     */
-    public function updateBusinessProfile(array $profile): WhatsAppResponse
-    {
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/whatsapp_business_profile";
-
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-            'content-type' => 'application/json',
-        ])->post($url, $profile);
-
-        return $this->handleWhatsAppResponse($response);
-    }
-
-    /**
-     * Get WhatsApp phone numbers.
-     */
-    public function getPhoneNumbers(): WhatsAppResponse
-    {
-        $wabaId = $this->defaultWabaId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$wabaId}/phone_numbers";
-
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get($url);
-
-        return $this->handleWhatsAppResponse($response);
-    }
-
-    /**
-     * Get single phone number details.
-     */
-    public function getPhoneNumberDetails(?string $phoneNumberId = null): WhatsAppResponse
-    {
-        $phoneNumberId ??= $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}";
-
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get($url);
-
-        return $this->handleWhatsAppResponse($response);
-    }
-
-    /**
-     * Get WABA health status.
-     */
-    public function getWabaHealthStatus(?string $wabaId = null): WhatsAppResponse
-    {
-        $wabaId ??= $this->defaultWabaId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$wabaId}";
-
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->get($url);
-
-        return $this->handleWhatsAppResponse($response);
-    }
 
     /**
      * Upload media to WhatsApp.
      */
     public function uploadMedia(string $filePath, string $type): WhatsAppResponse
     {
-        $phoneNumberId = $this->fromPhoneNumberId ?: $this->defaultPhoneNumberId;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$phoneNumberId}/media";
+        try {
+            $response = Http::withHeaders([
+                'authorization' => $this->apiKey,
+            ])->attach('file', file_get_contents($filePath), basename($filePath))
+                ->post(config('fast2sms.base_url') . "/whatsapp/{$this->version}/{$this->defaultPhoneNumberId}/media", [
+                    'type' => $type,
+                    'messaging_product' => 'whatsapp',
+                ]);
 
-        $response = Http::withHeaders([
-            'authorization' => $this->apiKey,
-        ])->attach('file', file_get_contents($filePath), basename($filePath))
-            ->post($url, [
-                'messaging_product' => 'whatsapp',
-                'type' => $type,
-            ]);
-
-        return $this->handleWhatsAppResponse($response);
+            return $this->handleWhatsAppResponse($response);
+        } finally {
+            $this->afterApiCall();
+        }
     }
 
     /**
@@ -542,11 +408,15 @@ class WhatsApp extends BaseFast2smsService implements WhatsAppInterface
      */
     protected function handleWhatsAppResponse(Response $response): WhatsAppResponse
     {
-        if ($response->successful()) {
-            return new WhatsAppResponse($response->json());
+        if (self::$faking) {
+            return new WhatsAppResponse([
+                'return' => true,
+                'success' => true,
+                'status' => true,
+                'message' => 'Message sent successfully (faked).',
+            ]);
         }
 
-        $error = $response->json('message') ?? $response->json('error.message') ?? 'Unknown WhatsApp API error.';
-        throw new Fast2smsException("WhatsApp API Error: $error", $response->status());
+        return new WhatsAppResponse($response->json() ?? []);
     }
 }

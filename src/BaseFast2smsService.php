@@ -17,6 +17,8 @@ use Shakil\Fast2sms\Responses\DltManagerResponse;
 use Shakil\Fast2sms\Responses\Fast2smsResponse;
 use Shakil\Fast2sms\Responses\SmsResponse;
 use Shakil\Fast2sms\Responses\WalletBalanceResponse;
+use Shakil\Fast2sms\Responses\ResponseFactory;
+use Shakil\Fast2sms\Traits\HandlesFaking;
 use Throwable;
 
 /**
@@ -24,6 +26,7 @@ use Throwable;
  */
 abstract class BaseFast2smsService
 {
+    use HandlesFaking;
     /**
      * The API key for Fast2sms.
      */
@@ -54,8 +57,7 @@ abstract class BaseFast2smsService
      */
     public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
     {
-        // TODO: Handle response based on the payload and response structure.
-        return $this->mapApiResponse($payload, $response->json());
+        return ResponseFactory::make($payload, $response->json());
     }
 
     /**
@@ -135,7 +137,7 @@ abstract class BaseFast2smsService
         }
 
         try {
-            return $this->mapApiResponse($payload, $mockData);
+            return ResponseFactory::make($payload, $mockData);
         } finally {
             $this->afterApiCall();
         }
@@ -161,31 +163,5 @@ abstract class BaseFast2smsService
     protected function afterApiCall(): void
     {
         // Default: no action. Override in subclasses.
-    }
-
-    /**
-     * Maps API response data to the correct response object.
-     *
-     * @param array<string, mixed> $payload
-     * @param array<string, mixed> $data
-     */
-    private function mapApiResponse(array $payload, array $data): Fast2smsResponse
-    {
-        if (isset($data['wallet'])) {
-            return new WalletBalanceResponse($data);
-        }
-
-        if (isset($data['request_id'])) {
-            $smsResponse = new SmsResponse($data);
-            Event::dispatch(new SmsSent($payload, $smsResponse));
-
-            return $smsResponse;
-        }
-
-        if (isset($data['success'], $data['data'])) {
-            return new DltManagerResponse($data);
-        }
-
-        return new Fast2smsResponse($data);
     }
 }
