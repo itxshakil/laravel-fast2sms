@@ -13,31 +13,21 @@ use function is_bool;
 use function is_int;
 use function is_string;
 
+use Shakil\Fast2sms\Contracts\ResponseInterface;
+
 /**
- * A class to handle responses from the Fast2sms API.
- *
- * This class provides a structured way to access data from the API response,
- * including checking for success, retrieving error codes and messages, and
- * accessing the raw response data.
+ * Base response wrapper for Fast2sms API responses.
  */
-class Fast2smsResponse
+class Fast2smsResponse implements ResponseInterface
 {
-    /**
-     * Indicates whether the API call was successful.
-     */
     public bool $success;
 
-    /**
-     * The message returned by the API, if any.
-     */
     public ?string $message;
 
     /**
-     * The raw data from the Fast2sms API response.
+     * @param array<string, mixed> $data
      *
-     * @param array<string, mixed> $data The raw response data from the API.
-     *
-     * @throws InvalidArgumentException if the response data is invalid or malformed.
+     * @throws InvalidArgumentException
      */
     public function __construct(protected array $data)
     {
@@ -65,9 +55,6 @@ class Fast2smsResponse
         $this->message = $this->message();
     }
 
-    /**
-     * Dynamically access properties.
-     */
     public function __get(string $name): mixed
     {
         if ($name === 'requestId') {
@@ -77,11 +64,11 @@ class Fast2smsResponse
         return $this->data[$name] ?? null;
     }
 
-    /**
-     * Gets the error message from the response.
-     *
-     * @return string|null The error message if available, otherwise null.
-     */
+    public function getMessage(): ?string
+    {
+        return $this->message;
+    }
+
     public function getErrorMessage(): ?string
     {
         return is_string($this->data['message'] ?? null)
@@ -89,30 +76,18 @@ class Fast2smsResponse
             : null;
     }
 
-    /**
-     * Determines if the API call was successful.
-     *
-     * @return bool True if the API call was successful, otherwise false.
-     */
     public function isSuccess(): bool
     {
         return $this->success;
     }
 
-    /**
-     * Gets the error code from the response.
-     *
-     * @return int|null The error code if available, otherwise null.
-     */
     public function getErrorCode(): ?int
     {
         return $this->data['status_code'] ?? null;
     }
 
     /**
-     * Gets the raw response data.
-     *
-     * @return array<string, mixed> The complete, raw response data from the API.
+     * @return array<string, mixed>
      */
     public function getRawData(): array
     {
@@ -120,11 +95,7 @@ class Fast2smsResponse
     }
 
     /**
-     * Gets the raw response data as an array.
-     *
-     * This is an alias for getRawData().
-     *
-     * @return array<string, mixed> The complete, raw response data from the API.
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -132,25 +103,13 @@ class Fast2smsResponse
     }
 
     /**
-     * Gets the raw response data as an array.
-     *
-     * This is an alias for getRawData().
-     *
-     * @return array<string, mixed> The complete, raw response data from the API.
+     * @return array<string, mixed>
      */
     public function json(): array
     {
         return $this->data;
     }
 
-    /**
-     * Extracts a human-readable message from the response data.
-     *
-     * This method handles various formats of the 'message' key in the response
-     * and falls back to a default message if no message is found.
-     *
-     * @return string The extracted message or a default message if none is found.
-     */
     private function message(): string
     {
         if (isset($this->data['message']) && is_string($this->data['message'])) {

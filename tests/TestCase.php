@@ -41,5 +41,11 @@ abstract class TestCase extends Orchestra
         $app['config']->set('fast2sms.default_route', 'q'); // or 'dlt'
         $app['config']->set('fast2sms.base_url', 'https://www.fast2sms.com/dev');
         $app['config']->set('fast2sms.timeout', 30);
+        $app['config']->set('fast2sms.driver', 'api');
+        $app['config']->set('fast2sms.database_logging', false);
+        $app['config']->set('fast2sms.events.enabled', true);
+        $app['config']->set('fast2sms.whatsapp.phone_number_id', 'test_phone_number_id');
+        $app['config']->set('fast2sms.whatsapp.waba_id', 'test_waba_id');
+        $app['config']->set('fast2sms.whatsapp.version', 'v24.0');
     }
 }

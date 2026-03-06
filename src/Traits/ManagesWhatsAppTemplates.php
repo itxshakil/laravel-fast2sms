@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Traits;
 
-use Illuminate\Support\Facades\Http;
-use Shakil\Fast2sms\Responses\WhatsAppResponse;
+use InvalidArgumentException;
 
-/**
- * Trait ManagesWhatsAppTemplates.
- *
- * Handles WhatsApp template-related API calls.
- */
+use function is_array;
+
+use Shakil\Fast2sms\Events\WhatsAppFailed;
+use Shakil\Fast2sms\Responses\WhatsAppResponse;
+use Throwable;
+
 trait ManagesWhatsAppTemplates
 {
     /**
-     * Send a simplified template message.
+     * @throws Throwable
      */
     public function sendTemplateMessage(
         string|array $numbers,
@@ -29,7 +29,7 @@ trait ManagesWhatsAppTemplates
         $numbersStr = is_array($numbers) ? implode(',', $numbers) : $numbers;
 
         $query = [
-            'authorization' => $this->apiKey,
+            'authorization' => $this->config->apiKey,
             'message_id' => $templateId,
             'phone_number_id' => $phoneNumberId,
             'numbers' => $numbersStr,
@@ -48,11 +48,14 @@ trait ManagesWhatsAppTemplates
         }
 
         try {
-            $response = Http::get(config('fast2sms.base_url') . '/whatsapp', $query);
+            $rawData = $this->client->get('/whatsapp', $query)->getRawData();
 
-            return $this->handleWhatsAppResponse($response);
-        } finally {
-            $this->afterApiCall();
+            return $this->makeWhatsAppResponse($query, $rawData);
+        } catch (Throwable $e) {
+            if (config('fast2sms.events.enabled', true)) {
+                event(new WhatsAppFailed($query, $e));
+            }
+            throw $e;
         }
     }
 
@@ -60,28 +63,37 @@ trait ManagesWhatsAppTemplates
      * Create, update, or delete WhatsApp templates.
      *
      * @param array<string, mixed> $data
+     *
+     * @throws Throwable
      */
     public function manageTemplates(string $method, ?string $path = null, array $data = []): WhatsAppResponse
     {
         $wabaId = $this->defaultWabaId;
         $version = $this->version;
-        $url = config('fast2sms.base_url') . "/whatsapp/{$version}/{$wabaId}/message_templates";
+        $url = "/whatsapp/$version/$wabaId/message_templates";
 
         if ($path) {
-            $url .= '/' . ltrim($path, '/');
+            $url .= '/' . mb_ltrim($path, '/');
         }
 
-        try {
-            $response = Http::withHeaders([
-                'authorization' => $this->apiKey,
-                'content-type' => 'application/json',
-            ])->send($method, $url, [
-                'json' => $data,
-            ]);
+        $method = mb_strtolower($method);
 
-            return $this->handleWhatsAppResponse($response);
-        } finally {
-            $this->afterApiCall();
+        try {
+            $response = match ($method) {
+                'get' => $this->client->get($url, $data),
+                'post' => $this->client->post($url, $data),
+                'delete' => $this->client->delete($url, $data),
+                default => throw new InvalidArgumentException("Unsupported method: {$method}"),
+            };
+
+            $rawData = $response->getRawData();
+
+            return $this->makeWhatsAppResponse($data, $rawData);
+        } catch (Throwable $e) {
+            if (config('fast2sms.events.enabled', true)) {
+                event(new WhatsAppFailed($data, $e));
+            }
+            throw $e;
         }
     }
 }

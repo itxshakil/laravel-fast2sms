@@ -17,9 +17,6 @@ class Fast2smsPhone implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // Fast2sms supports 10-digit Indian mobile numbers.
-        // It can be a single number or multiple numbers separated by commas.
-
         $numbers = explode(',', (string) $value);
 
         foreach ($numbers as $number) {

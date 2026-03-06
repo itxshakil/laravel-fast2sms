@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use function is_array;
 
 use Shakil\Fast2sms\Contracts\WhatsAppInterface;
+
 use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 
@@ -44,8 +45,8 @@ class SendWhatsAppJob implements ShouldQueue
             $whatsapp->from($this->parameters->phoneNumberId);
         }
 
-        if ($this->parameters->type) {
-            $whatsapp->type(WhatsAppType::tryFrom($this->parameters->type) ?? WhatsAppType::TEXT);
+        if ($this->parameters->type instanceof WhatsAppType) {
+            $whatsapp->type($this->parameters->type);
         }
 
         if ($this->parameters->body) {
@@ -68,8 +69,29 @@ class SendWhatsAppJob implements ShouldQueue
             $whatsapp->documentFilename($this->parameters->documentFilename);
         }
 
+        if ($this->parameters->messageId) {
+            $whatsapp->messageId($this->parameters->messageId);
+        }
+
+        if ($this->parameters->emoji) {
+            $whatsapp->emoji($this->parameters->emoji);
+        }
+
         if ($this->parameters->components) {
             $whatsapp->components($this->parameters->components);
+        }
+
+        if ($this->parameters->location) {
+            $whatsapp->location(
+                $this->parameters->location['latitude'],
+                $this->parameters->location['longitude'],
+                $this->parameters->location['name'] ?? null,
+                $this->parameters->location['address'] ?? null,
+            );
+        }
+
+        if ($this->parameters->interactive) {
+            $whatsapp->interactive($this->parameters->interactive);
         }
 
         $whatsapp->send();

@@ -9,6 +9,8 @@ jobs:
     release:
         name: Release Validation & Draft
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
 
         steps:
             - name: Checkout code
@@ -21,6 +23,13 @@ jobs:
                   tools: composer
                   coverage: none
 
+            - name: Cache Composer packages
+              uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: release-${{ hashFiles('composer.json') }}
+                  restore-keys: release-
+
             - name: Validate composer.json
               run: composer validate --strict
 
@@ -29,6 +38,8 @@ jobs:
 
             - name: Generate Release Notes (Draft)
               uses: release-drafter/release-drafter@v6
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                   config-name: release-drafter.yml
 

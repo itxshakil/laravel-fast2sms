@@ -1,78 +1,98 @@
 {
-  "name": "itxshakil/laravel-fast2sms",
-  "description": "A Laravel package for sending SMS using Fast2sms API with a fluent interface.",
-  "keywords": [
-    "laravel",
-    "fast2sms",
-    "sms",
-    "package",
-    "fluent-api"
-  ],
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Shakil Alam",
-      "email": "itxshakil@gmail.com",
-      "homepage": "https://github.com/itxshakil",
-      "role": "Developer"
-    }
-  ],
-  "require": {
-    "php": "^8.3",
-    "illuminate/support": "^12.0",
-    "illuminate/http": "^12.0"
-  },
-    "require-dev": {
-        "orchestra/testbench": "^10.4",
-        "phpunit/phpunit": "^12.0",
-        "laravel/pint": "^1.24",
-        "rector/rector": "^2.2",
-        "driftingly/rector-laravel": "^2.1",
-        "larastan/larastan": "^3.0"
+    "name": "itxshakil/laravel-fast2sms",
+    "description": "A Laravel package for sending SMS and WhatsApp messages via the Fast2SMS API with a fluent interface.",
+    "keywords": [
+        "laravel",
+        "laravel-package",
+        "fast2sms",
+        "sms",
+        "whatsapp",
+        "notifications",
+        "package",
+        "fluent-api"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shakil Alam",
+            "email": "itxshakil@gmail.com",
+            "homepage": "https://github.com/itxshakil",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0",
+        "illuminate/notifications": "^11.0|^12.0|^13.0",
+        "illuminate/queue": "^11.0|^12.0|^13.0",
+        "illuminate/events": "^11.0|^12.0|^13.0"
     },
-  "autoload": {
-    "psr-4": {
-      "Shakil\\Fast2sms\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Shakil\\Fast2sms\\Tests\\": "tests/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Shakil\\Fast2sms\\Fast2smsServiceProvider"
-      ],
-      "aliases": {
-        "Fast2sms": "Shakil\\Fast2sms\\Facades\\Fast2sms"
-      }
-    }
-  },
-  "scripts": {
-      "test": "phpunit",
-      "analyse": "phpstan analyse --memory-limit=1G",
-      "lint:fix": [
-          "rector process",
-          "pint --dirty"
-      ],
-      "lint": [
-          "@analyse",
-          "pint --parallel"
-      ],
-      "qa": [
-          "@lint",
-          "@test"
-      ]
-  },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "phpunit/phpunit": "^11.0|^12.0",
+        "laravel/pint": "^1.0",
+        "rector/rector": "^2.0",
+        "driftingly/rector-laravel": "^2.1",
+        "larastan/larastan": "^3.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Shakil\\Fast2sms\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shakil\\Fast2sms\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Shakil\\Fast2sms\\Fast2smsServiceProvider"
+            ],
+            "aliases": {
+                "Fast2sms": "Shakil\\Fast2sms\\Facades\\Fast2sms"
+            }
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-clover build/coverage/clover.xml --coverage-html build/coverage/html",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "rector": "rector process",
+        "lint:fix": [
+            "@rector",
+            "pint --dirty"
+        ],
+        "lint": [
+            "@analyse",
+            "pint --parallel"
+        ],
+        "qa": [
+            "@lint",
+            "@test"
+        ]
+    },
     "scripts-descriptions": {
         "test": "Run the PHPUnit test suite",
+        "rector": "Run Rector to automatically refactor and modernise code",
+        "test:coverage": "Run the PHPUnit test suite with code coverage reporting",
         "analyse": "Run static analysis using PHPStan",
         "lint:fix": "Automatically fix code style issues using Rector and Laravel Pint",
         "lint": "Run static analysis and code style checks without modifying files",
         "qa": "Run full quality assurance checks (lint + tests)"
     },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+    "support": {
+        "issues": "https://github.com/itxshakil/laravel-fast2sms/issues",
+        "source": "https://github.com/itxshakil/laravel-fast2sms",
+        "docs": "https://github.com/itxshakil/laravel-fast2sms/tree/main/docs"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
 }

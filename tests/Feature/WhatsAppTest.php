@@ -31,6 +31,7 @@ class WhatsAppTest extends TestCase
     {
         Http::fake([
             '*/whatsapp-session' => Http::response([
+                'return' => true,
                 'success' => true,
                 'message' => 'Message sent successfully',
             ], 200),
@@ -46,11 +47,13 @@ class WhatsAppTest extends TestCase
         $this->assertEquals('Message sent successfully', $response->message);
 
         Http::assertSent(function ($request) {
+            $data = $request->data();
+
             return $request->url() === 'https://www.fast2sms.com/dev/whatsapp-session'
-                && $request['to'] === '919876543210'
-                && $request['phone_number_id'] === '123456'
-                && $request['type'] === 'text'
-                && $request['text']['body'] === 'Hello World';
+                && ($data['to'] ?? null) === '919876543210'
+                && ($data['phone_number_id'] ?? null) === '123456'
+                && ($data['type'] ?? null) === 'text'
+                && ($data['text']['body'] ?? null) === 'Hello World';
         });
     }
 
@@ -62,6 +65,7 @@ class WhatsAppTest extends TestCase
                 'messaging_product' => 'whatsapp',
                 'contacts' => [['input' => '919876543210', 'wa_id' => '919876543210']],
                 'messages' => [['id' => 'wamid.HBgLOTExOTg3NjU0MzIxMBIDABEYEjk1NzlBQjY0MEE0RTRCQTlBQQA=']],
+                'return' => true,
                 'success' => true,
             ], 200),
         ]);
@@ -75,10 +79,12 @@ class WhatsAppTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
+            $data = $request->data();
+
             return $request->url() === 'https://www.fast2sms.com/dev/whatsapp/v24.0/123456/messages'
-                && $request['to'] === '919876543210'
-                && $request['messaging_product'] === 'whatsapp'
-                && $request['type'] === 'text';
+                && ($data['to'] ?? null) === '919876543210'
+                && ($data['messaging_product'] ?? null) === 'whatsapp'
+                && ($data['type'] ?? null) === 'text';
         });
     }
 
@@ -87,6 +93,7 @@ class WhatsAppTest extends TestCase
     {
         Http::fake([
             '*/whatsapp?*' => Http::response([
+                'return' => true,
                 'status' => true,
                 'message' => 'Message sent successfully',
                 'request_id' => '6a3b2c1d',
@@ -98,10 +105,12 @@ class WhatsAppTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
+            $data = $request->data();
+
             return str_contains($request->url(), '/whatsapp')
-                && $request['numbers'] === '919876543210'
-                && $request['message_id'] === 12345
-                && $request['variables_values'] === 'John|1234';
+                && ($data['numbers'] ?? null) === '919876543210'
+                && ($data['message_id'] ?? null) === 12345
+                && ($data['variables_values'] ?? null) === 'John|1234';
         });
     }
 
@@ -110,6 +119,7 @@ class WhatsAppTest extends TestCase
     {
         Http::fake([
             '*/message_templates' => Http::response([
+                'return' => true,
                 'success' => true,
                 'id' => '1063801391294860',
                 'status' => 'PENDING',
@@ -127,9 +137,11 @@ class WhatsAppTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
+            $data = $request->data();
+
             return str_contains($request->url(), '/message_templates')
                 && $request->method() === 'POST'
-                && $request['name'] === 'welcome_message';
+                && ($data['name'] ?? null) === 'welcome_message';
         });
     }
 
@@ -335,6 +347,7 @@ class WhatsAppTest extends TestCase
     public function it_can_queue_whatsapp_messages(): void
     {
         Queue::fake();
+        config(['fast2sms.queue.enabled' => true]);
 
         Fast2sms::viaWhatsApp('919876543210')
             ->template('WELCOME_01')

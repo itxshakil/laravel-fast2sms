@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Support\ConfigValidator;
 use Shakil\Fast2sms\Tests\TestCase;
 use TypeError;
 
@@ -36,8 +37,7 @@ class ValidationTest extends TestCase
         $this->expectException(Fast2smsException::class);
         $this->expectExceptionMessage('Fast2sms API Key is not configured. Please set FAST2SMS_API_KEY in your .env file.');
 
-        $provider = new \Shakil\Fast2sms\Fast2smsServiceProvider(app());
-        $provider->boot();
+        ConfigValidator::validate(config('fast2sms'));
     }
 
     #[Test]
@@ -48,8 +48,7 @@ class ValidationTest extends TestCase
         $this->expectException(Fast2smsException::class);
         $this->expectExceptionMessage('Fast2sms base_url is not configured');
 
-        $provider = new \Shakil\Fast2sms\Fast2smsServiceProvider(app());
-        $provider->boot();
+        ConfigValidator::validate(config('fast2sms'));
     }
 
     #[Test]
@@ -127,6 +126,9 @@ class ValidationTest extends TestCase
         Fast2sms::to($this->testNumber)->route(SmsRoute::OTP)->send();
     }
 
+    /**
+     * @throws Fast2smsException
+     */
     #[Test]
     public function it_throws_an_exception_for_invalid_dlt_manager_type(): void
     {

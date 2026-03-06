@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <rect width="400" height="120" rx="12" fill="#FF2D20"/>
+  <text x="200" y="52" font-family="sans-serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">Laravel Fast2SMS</text>
+  <text x="200" y="82" font-family="sans-serif" font-size="16" fill="#ffcccc" text-anchor="middle">Send SMS &amp; WhatsApp via Fast2SMS API</text>
+</svg>

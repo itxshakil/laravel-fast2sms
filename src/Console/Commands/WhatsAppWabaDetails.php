@@ -18,8 +18,10 @@ class WhatsAppWabaDetails extends Command
      *
      * @var string
      */
-    protected $signature = 'whatsapp:waba
-                          {type=number : The type of details to fetch (number or template)}';
+    protected $signature = 'fast2sms:waba
+                          {type=number : The type of details to fetch (number or template)}
+                          {--json : Output the result as JSON}
+                          {--refresh : Bypass any cached response and fetch fresh data}';
 
     /**
      * The console command description.
@@ -42,14 +44,23 @@ class WhatsAppWabaDetails extends Command
         }
 
         try {
-            $this->info("Fetching WhatsApp $type details...");
+            if (! $this->option('json')) {
+                $this->components->info("Fetching WhatsApp {$type} details...");
+            }
+
             $response = $whatsapp->getWabaDetails($type);
 
             if ($response->isSuccess()) {
                 $data = $response->getRawData();
 
+                if ($this->option('json')) {
+                    $this->line(json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
+
+                    return self::SUCCESS;
+                }
+
                 if ($data === []) {
-                    $this->warn("No details found for type: {$type}");
+                    $this->components->warn("No details found for type: {$type}");
 
                     return self::SUCCESS;
                 }
@@ -81,12 +92,20 @@ class WhatsAppWabaDetails extends Command
                 return self::SUCCESS;
             }
 
-            $this->error('Failed to fetch details: ' . $response->message);
+            if ($this->option('json')) {
+                $this->line(json_encode(['error' => $response->message], JSON_THROW_ON_ERROR));
+            } else {
+                $this->components->error('Failed to fetch details: ' . $response->message);
+            }
 
             return self::FAILURE;
 
         } catch (Fast2smsException $e) {
-            $this->error("Error: {$e->getMessage()}");
+            if ($this->option('json')) {
+                $this->line(json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR));
+            } else {
+                $this->components->error("Error: {$e->getMessage()}");
+            }
 
             return self::FAILURE;
         }

@@ -36,11 +36,11 @@ class NotificationTest extends TestCase
         $notifiable->notify($notification);
 
         Http::assertSent(function ($request) {
-            $data = $this->getMultipartPayload($request);
+            $data = $request->data();
 
-            return $data['numbers'] === '9999999999'
-                && $data['message'] === 'Test SMS Notification'
-                && $data['route'] === 'q';
+            return ($data['numbers'] ?? null) === '9999999999'
+                && ($data['message'] ?? null) === 'Test SMS Notification'
+                && ($data['route'] ?? null) === 'q';
         });
     }
 
@@ -68,7 +68,7 @@ class NotificationTest extends TestCase
     public function it_can_send_whatsapp_template_notification(): void
     {
         Http::fake([
-            '*/whatsapp?*' => Http::response(['status' => true, 'message' => 'Template sent'], 200),
+            '*/whatsapp?*' => Http::response(['return' => true, 'status' => true, 'message' => 'Template sent'], 200),
         ]);
 
         $notifiable = new TestNotifiable();
@@ -77,9 +77,11 @@ class NotificationTest extends TestCase
         $notifiable->notify($notification);
 
         Http::assertSent(function ($request) {
+            $data = $request->data();
+
             return str_contains($request->url(), '/whatsapp')
-                && $request['numbers'] === '919876543210'
-                && $request['message_id'] === 'WELCOME_01';
+                && ($data['numbers'] ?? null) === '919876543210'
+                && ($data['message_id'] ?? null) === 'WELCOME_01';
         });
     }
 
@@ -98,12 +100,12 @@ class TestNotifiable
 {
     use \Illuminate\Notifications\Notifiable;
 
-    public function routeNotificationForSms()
+    public function routeNotificationForFast2sms(): string
     {
         return '9999999999';
     }
 
-    public function routeNotificationForWhatsApp()
+    public function routeNotificationForWhatsapp(): string
     {
         return '919876543210';
     }
@@ -121,7 +123,7 @@ class TestSmsNotification extends Notification
         return ['fast2sms'];
     }
 
-    public function toSms($notifiable)
+    public function toSms(mixed $notifiable): SmsMessage
     {
         return (new SmsMessage('Test SMS Notification'))->route(SmsRoute::QUICK);
     }

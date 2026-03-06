@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Events;
 
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
 /**
  * Event triggered when the SMS balance falls below the defined threshold.
  */
-readonly class LowBalanceDetected
+class LowBalanceDetected
 {
+    use Dispatchable;
+    use SerializesModels;
+
     /**
      * Create a new LowBalanceDetected event instance.
      *

@@ -42,7 +42,7 @@ class SmsChannel
      */
     public function send(mixed $notifiable, Notification $notification): void
     {
-        if (! $to = $notifiable->routeNotificationFor('sms', $notification)) {
+        if (! $to = $notifiable->routeNotificationFor('fast2sms', $notification)) {
             return;
         }
 
@@ -61,8 +61,8 @@ class SmsChannel
         }
 
         $service = Fast2sms::to($message->to ?? $to)
-            ->route($message->route ?? SmsRoute::from(config('fast2sms.default_route')))
-            ->senderId($message->senderId ?? config('fast2sms.default_sender_id'));
+            ->route($message->route ?? SmsRoute::tryFrom(config('fast2sms.default_route', '')) ?? SmsRoute::DLT)
+            ->senderId($message->senderId ?? (string) config('fast2sms.default_sender_id', ''));
 
         if ($message->templateId !== null) {
             $service->templateId($message->templateId)
@@ -73,6 +73,18 @@ class SmsChannel
 
         if ($message->language !== null) {
             $service->language($message->language);
+        }
+
+        if ($message->flash) {
+            $service->flash();
+        }
+
+        if ($message->scheduleTime !== null) {
+            $service->schedule($message->scheduleTime);
+        }
+
+        if ($message->entityId !== null) {
+            $service->entityId($message->entityId);
         }
 
         $service->send();

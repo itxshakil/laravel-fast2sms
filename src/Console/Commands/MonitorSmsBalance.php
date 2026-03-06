@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Console\Commands;
 
 use Illuminate\Console\Command;
+use JsonException;
 use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Facades\Fast2sms;
@@ -20,8 +21,9 @@ class MonitorSmsBalance extends Command
      *
      * @var string
      */
-    protected $signature = 'sms:monitor
-                          {--threshold= : The balance threshold that triggers the alert}';
+    protected $signature = 'fast2sms:balance
+                          {--threshold= : The balance threshold that triggers the alert (default: fast2sms.balance_threshold config)}
+                          {--json : Output the result as JSON}';
 
     /**
      * The console command description.
@@ -37,33 +39,71 @@ class MonitorSmsBalance extends Command
      * threshold, and dispatches a LowBalanceDetected event if it is below threshold.
      *
      * @return int Exit code: self::SUCCESS on success, self::FAILURE on error.
+     *
+     * @throws JsonException
      */
     public function handle(): int
     {
         $threshold = $this->getThreshold();
+
         try {
             /** @var WalletBalanceResponse $response */
             $response = Fast2sms::checkBalance();
 
-            $this->handleBalance($response->balance, $threshold);
-
-            return self::SUCCESS;
+            return $this->handleBalance($response->balance, $threshold, (bool) $this->option('json'));
 
         } catch (Fast2smsException $e) {
-            $this->error("Failed to check SMS balance: {$e->getMessage()}");
+            if ($this->option('json')) {
+                $this->line(json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR));
+            } else {
+                $this->components->error("Failed to check SMS balance: {$e->getMessage()}");
+            }
 
             return self::FAILURE;
         }
     }
 
-    public function handleBalance(?float $balance, float $threshold): void
+    /**
+     * @throws JsonException
+     */
+    public function handleBalance(?float $balance, float $threshold, bool $jsonMode = false): int
     {
-        $this->info("Current SMS balance: ₹$balance");
+        $belowThreshold = $balance !== null && $balance <= $threshold;
 
-        if ($balance <= $threshold) {
-            event(new LowBalanceDetected($balance, $threshold));
-            $this->warn("Balance (₹$balance) is below threshold (₹$threshold)");
+        if ($jsonMode) {
+            $this->line(json_encode([
+                'balance' => $balance,
+                'threshold' => $threshold,
+                'below_threshold' => $belowThreshold,
+            ], JSON_THROW_ON_ERROR));
+        } else {
+            $balanceFormatted = number_format((float) $balance, 2);
+            $thresholdFormatted = number_format($threshold, 2);
+
+            if ($this->components !== null) {
+                $this->components->info("Wallet balance: ₹$balanceFormatted");
+
+                if ($belowThreshold) {
+                    $this->components->warn("Balance is below threshold of ₹$thresholdFormatted");
+                }
+            } else {
+                $this->line("Wallet balance: ₹$balanceFormatted");
+
+                if ($belowThreshold) {
+                    $this->line("Balance is below threshold of ₹$thresholdFormatted");
+                }
+            }
         }
+
+        if ($belowThreshold) {
+            if (config('fast2sms.events.enabled', true)) {
+                event(new LowBalanceDetected($balance, $threshold));
+            }
+
+            return self::FAILURE;
+        }
+
+        return self::SUCCESS;
     }
 
     /**

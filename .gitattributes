@@ -63,3 +63,13 @@
 /pint.json.dist            export-ignore
 
 /composer.lock         export-ignore
+
+/plans                 export-ignore
+/build                 export-ignore
+/.claude               export-ignore
+/.junie                export-ignore
+/UPGRADING.md          export-ignore
+/CODE_OF_CONDUCT.md    export-ignore
+/CHANGELOG.md          export-ignore
+/CONTRIBUTING.md       export-ignore
+/SECURITY.md           export-ignore

@@ -11,7 +11,7 @@ use Shakil\Fast2sms\Responses\WhatsAppResponse;
 /**
  * Defines the contract for the WhatsApp service.
  */
-interface WhatsAppInterface
+interface WhatsAppInterface extends WhatsAppAccountInterface, WhatsAppTemplateInterface
 {
     /**
      * Send a simplified session message.
@@ -31,33 +31,6 @@ interface WhatsAppInterface
      * @param string|null          $version       Optional API version.
      */
     public function sendMetaMessage(string $to, array $payload, ?string $phoneNumberId = null, ?string $version = null): WhatsAppResponse;
-
-    /**
-     * Send a simplified template message.
-     *
-     * @param string|array<int, string> $numbers       Recipient number(s).
-     * @param string|int                $templateId    Fast2SMS template ID.
-     * @param array<int, string>|null   $variables     Optional template variables.
-     * @param string|null               $mediaUrl      Optional media URL.
-     * @param string|null               $phoneNumberId Optional phone number ID.
-     */
-    public function sendTemplateMessage(string|array $numbers, string|int $templateId, ?array $variables = null, ?string $mediaUrl = null, ?string $phoneNumberId = null): WhatsAppResponse;
-
-    /**
-     * Manage templates (Create, Get, Delete).
-     *
-     * @param string               $method HTTP method.
-     * @param string|null          $path   Additional path.
-     * @param array<string, mixed> $data   Request data.
-     */
-    public function manageTemplates(string $method, ?string $path = null, array $data = []): WhatsAppResponse;
-
-    /**
-     * Get WABA and Template details.
-     *
-     * @param string $type 'number' or 'template'.
-     */
-    public function getWabaDetails(string $type): WhatsAppResponse;
 
     /**
      * Set the recipient mobile number.
@@ -117,6 +90,28 @@ interface WhatsAppInterface
      * Set the document filename for template messages.
      */
     public function documentFilename(string $filename): self;
+
+    /**
+     * Set the message ID (used for reactions).
+     */
+    public function messageId(string $id): self;
+
+    /**
+     * Set the emoji (used for reactions).
+     */
+    public function emoji(string $emoji): self;
+
+    /**
+     * Set the location for location messages.
+     */
+    public function location(float $latitude, float $longitude, ?string $name = null, ?string $address = null): self;
+
+    /**
+     * Set the interactive payload for interactive messages.
+     *
+     * @param array<string, mixed> $interactive
+     */
+    public function interactive(array $interactive): self;
 
     /**
      * Send the configured template message.
@@ -182,39 +177,42 @@ interface WhatsAppInterface
     public function getSummary(string $from, string $to): WhatsAppResponse;
 
     /**
-     * Get WhatsApp business profile.
-     */
-    public function getBusinessProfile(): WhatsAppResponse;
-
-    /**
-     * Update WhatsApp business profile.
-     *
-     * @param array<string, mixed> $profile
-     */
-    public function updateBusinessProfile(array $profile): WhatsAppResponse;
-
-    /**
-     * Get WhatsApp phone numbers.
-     */
-    public function getPhoneNumbers(): WhatsAppResponse;
-
-    /**
-     * Get single phone number details.
-     */
-    public function getPhoneNumberDetails(?string $phoneNumberId = null): WhatsAppResponse;
-
-    /**
-     * Get WABA health status.
-     */
-    public function getWabaHealthStatus(?string $wabaId = null): WhatsAppResponse;
-
-    /**
      * Upload media to WhatsApp.
      *
      * @param string $filePath Path to the file.
      * @param string $type     MIME type.
      */
     public function uploadMedia(string $filePath, string $type): WhatsAppResponse;
+
+    public function getTo(): ?string;
+
+    public function getFromPhoneNumberId(): ?string;
+
+    public function getType(): ?WhatsAppType;
+
+    public function getBody(): ?string;
+
+    public function getTemplateId(): ?string;
+
+    /** @return array<int, string>|null */
+    public function getVariables(): ?array;
+
+    public function getMediaUrl(): ?string;
+
+    public function getDocumentFilename(): ?string;
+
+    public function getMessageId(): ?string;
+
+    public function getEmoji(): ?string;
+
+    /** @return array<string, mixed>|null */
+    public function getLocation(): ?array;
+
+    /** @return array<string, mixed>|null */
+    public function getInteractive(): ?array;
+
+    /** @return array<int, mixed>|null */
+    public function getComponents(): ?array;
 
     /**
      * Queue the WhatsApp message.

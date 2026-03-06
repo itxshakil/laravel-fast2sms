@@ -12,6 +12,7 @@ use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/src',
+        __DIR__ . '/tests',
     ])
     ->withImportNames(removeUnusedImports: true)
     ->withComposerBased(laravel: true)

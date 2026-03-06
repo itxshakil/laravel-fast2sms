@@ -4,60 +4,46 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms;
 
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Shakil\Fast2sms\Contracts\ClientInterface;
+use Shakil\Fast2sms\Contracts\ResponseInterface;
+use Shakil\Fast2sms\DataTransferObjects\Fast2smsConfig;
+use Shakil\Fast2sms\Events\LowBalanceDetected;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
-use Shakil\Fast2sms\Exceptions\Fast2smsException;
-use Shakil\Fast2sms\Responses\DltManagerResponse;
-use Shakil\Fast2sms\Responses\Fast2smsResponse;
-use Shakil\Fast2sms\Responses\SmsResponse;
-use Shakil\Fast2sms\Responses\WalletBalanceResponse;
-use Shakil\Fast2sms\Responses\ResponseFactory;
+use Shakil\Fast2sms\Events\WhatsAppFailed;
+use Shakil\Fast2sms\Events\WhatsAppSent;
 use Shakil\Fast2sms\Traits\HandlesFaking;
-use Throwable;
 
 /**
- * Base class for Fast2sms service, handling HTTP client setup and API execution.
+ * Base class for Fast2sms service, handling core functionality.
  */
 abstract class BaseFast2smsService
 {
     use HandlesFaking;
-    /**
-     * The API key for Fast2sms.
-     */
-    protected string $apiKey;
 
     /**
-     * The driver to use for sending SMS.
+     * @param ClientInterface $client The API client.
+     * @param Fast2smsConfig  $config The typed package configuration.
      */
-    protected string $driver;
+    public function __construct(
+        protected ClientInterface $client,
+        protected Fast2smsConfig $config,
+    ) {}
 
     /**
-     * @throws Fast2smsException
+     * Return a map of all package events to their descriptions.
+     *
+     * @return array<class-string, string>
      */
-    public function __construct()
+    public static function events(): array
     {
-        $apiKey = config('fast2sms.api_key');
-
-        if (($apiKey === null || $apiKey === '') && config('fast2sms.driver') !== 'log') {
-            throw new Fast2smsException('Fast2sms API Key is not configured. Please set FAST2SMS_API_KEY in your .env file.');
-        }
-
-        $this->apiKey = $apiKey ?? '';
-        $this->driver = config('fast2sms.driver', 'api');
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    public function handleSuccessResponse(array $payload, PromiseInterface|Response $response): Fast2smsResponse
-    {
-        return ResponseFactory::make($payload, $response->json());
+        return [
+            SmsSent::class => 'Fired after a successful SMS send.',
+            SmsFailed::class => 'Fired when an SMS send fails.',
+            WhatsAppSent::class => 'Fired after a successful WhatsApp send.',
+            WhatsAppFailed::class => 'Fired when a WhatsApp send fails.',
+            LowBalanceDetected::class => 'Fired when wallet balance drops below the configured threshold.',
+        ];
     }
 
     /**
@@ -65,103 +51,14 @@ abstract class BaseFast2smsService
      *
      * @param array<string, mixed> $payload The request payload.
      * @param string               $path    The API endpoint path (default: /bulkV2).
-     *
-     * @throws Fast2smsException
      */
-    protected function executeApiCall(array $payload = [], string $path = '/bulkV2'): Fast2smsResponse
+    protected function executeApiCall(array $payload = [], string $path = '/bulkV2'): ResponseInterface
     {
-        if ($this->driver === 'log') {
-            return $this->executeLogCall($payload, $path);
-        }
-
-        $response = null;
-        $multipart = collect($payload)
-            ->map(fn ($v, $k): array => ['name' => $k, 'contents' => $v])
-            ->values()
-            ->toArray();
-
-        try {
-            $response = $this->http()->post($path, $multipart);
-
-            if ($response->successful()) {
-                return $this->handleSuccessResponse($payload, $response);
-            }
-
-            $error = $response->json('message', 'Unknown Fast2sms API error.');
-            $exception = new Fast2smsException("Fast2sms API Error: $error", $response->status());
-
-            Event::dispatch(new SmsFailed($payload, $exception, $response->json()));
-            throw $exception;
-        } catch (Throwable $e) {
-            if (! isset($exception)) {
-                $exception = new Fast2smsException(
-                    "Fast2sms API call failed: {$e->getMessage()}",
-                    $e->getCode(),
-                    $e,
-                );
-                Event::dispatch(new SmsFailed($payload, $exception, $response?->json()));
-            }
-            throw $exception;
-        } finally {
-            $this->afterApiCall();
-        }
-    }
-
-    /**
-     * Execute a log call instead of an API call.
-     *
-     * @param array<string, mixed> $payload
-     */
-    protected function executeLogCall(array $payload, string $path): Fast2smsResponse
-    {
-        Log::info("Fast2sms SMS Log [Path: {$path}]:", $payload);
-
-        $mockData = [
-            'return' => true,
-            'request_id' => 'log-' . uniqid('', true),
-            'message' => ['SMS sent successfully (logged)'],
-        ];
-
-        if ($path === '/wallet') {
-            $mockData = [
-                'return' => true,
-                'wallet' => 1000,
-            ];
-        }
-
-        if ($path === '/dlt_manager') {
-            $mockData = [
-                'success' => true,
-                'data' => [],
-            ];
-        }
-
-        try {
-            return ResponseFactory::make($payload, $mockData);
-        } finally {
-            $this->afterApiCall();
-        }
-    }
-
-    /**
-     * Make an HTTP client for Fast2sms.
-     */
-    protected function http(): PendingRequest
-    {
-        return Http::retry(3, 100)->baseUrl(config('fast2sms.base_url'))
-            ->timeout(config('fast2sms.timeout'))
-            ->withHeaders(['Authorization' => $this->apiKey])
-            ->asMultipart();
+        return $this->client->post($path, $payload);
     }
 
     /**
      * Hook method executed after every API call.
-     *
-     * Child classes can override this to reset state or perform
-     * post-request cleanup.
      */
-    protected function afterApiCall(): void
-    {
-        // Default: no action. Override in subclasses.
-    }
+    protected function afterApiCall(): void {}
 }

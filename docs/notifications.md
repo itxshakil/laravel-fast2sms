@@ -1,12 +1,40 @@
 # Laravel Notifications
 
-The package provides dedicated notification channels for both SMS and WhatsApp, allowing you to easily integrate messaging into your Laravel application's notification system.
+Laravel Fast2SMS provides two notification channels out of the box: `fast2sms` for SMS and `whatsapp` for WhatsApp.
+
+---
 
 ## SMS Notifications
 
-### Model Setup
+### 1. Add the Channel
 
-Add the `routeNotificationForSms` method to your notifiable model:
+Return `'fast2sms'` from your notification's `via()` method:
+
+```php
+use Illuminate\Notifications\Notification;
+use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Notifications\Messages\SmsMessage;
+
+class OrderShipped extends Notification
+{
+    public function __construct(private readonly Order $order) {}
+
+    public function via(object $notifiable): array
+    {
+        return ['fast2sms'];
+    }
+
+    public function toSms(object $notifiable): SmsMessage
+    {
+        return SmsMessage::create("Your order #{$this->order->id} has shipped!")
+            ->withRoute(SmsRoute::QUICK);
+    }
+}
+```
+
+### 2. Add Routing to Your Model
+
+Add `routeNotificationForFast2sms()` to your notifiable model:
 
 ```php
 use Illuminate\Notifications\Notifiable;
@@ -15,116 +43,112 @@ class User extends Model
 {
     use Notifiable;
 
-    public function routeNotificationForSms()
+    public function routeNotificationForFast2sms(): string
     {
-        return $this->phone;
+        return $this->phone_number;
     }
 }
 ```
 
-### Creating SMS Notifications
-
-You can return a simple string or use the `SmsMessage` builder for more control.
+### 3. Send the Notification
 
 ```php
-use Illuminate\Notifications\Notification;
-use Shakil\Fast2sms\Notifications\Messages\SmsMessage;
-use Shakil\Fast2sms\Enums\SmsRoute;
+$user->notify(new OrderShipped($order));
 
-class OrderShipped extends Notification
-{
-    public function via($notifiable)
-    {
-        return ['fast2sms'];
-    }
-
-    public function toSms($notifiable)
-    {
-        // Simple string
-        // return "Your order #{$notifiable->order_id} has been shipped!";
-
-        // Fluent builder
-        return (new SmsMessage)
-            ->route(SmsRoute::DLT)
-            ->template('ORDER_SHIPPED_01', [$notifiable->order_id])
-            ->from('FSTSMS');
-    }
-}
+// Or via the Notification facade
+Notification::send($users, new OrderShipped($order));
 ```
+
+---
+
+## SmsMessage Builder
+
+```php
+SmsMessage::create('Your message here')
+    ->withRoute(SmsRoute::QUICK)       // Set SMS route
+    ->withNumbers(['9876543210'])      // Override recipient numbers
+    ->from('MYAPP');                   // Override sender ID
+```
+
+### Deprecated Methods (v1 → v2)
+
+| Old (deprecated) | New |
+|-----------------|-----|
+| `content('...')` | `withContent('...')` |
+| `route(...)` | `withRoute(...)` |
+| `to('...')` | `withNumbers('...')` |
 
 ---
 
 ## WhatsApp Notifications
 
-### Model Setup
-
-Add the `routeNotificationForWhatsApp` method to your notifiable model:
-
-```php
-use Illuminate\Notifications\Notifiable;
-
-class User extends Model
-{
-    use Notifiable;
-
-    public function routeNotificationForWhatsApp()
-    {
-        return $this->phone; // Should include country code, e.g., 919876543210
-    }
-}
-```
-
-### Creating WhatsApp Notifications
-
-Use the `WhatsAppMessage` builder to send session or template messages.
+### 1. Add the Channel
 
 ```php
 use Illuminate\Notifications\Notification;
 use Shakil\Fast2sms\Notifications\Messages\WhatsAppMessage;
-use Shakil\Fast2sms\Enums\WhatsAppType;
 
-class WelcomeNotification extends Notification
+class OrderShipped extends Notification
 {
-    public function via($notifiable)
+    public function via(object $notifiable): array
     {
         return ['whatsapp'];
     }
 
-    public function toWhatsApp($notifiable)
+    public function toWhatsApp(object $notifiable): WhatsAppMessage
     {
-        // Simple string (Session Message)
-        // return "Welcome to our platform, {$notifiable->name}!";
-
-        // Template Message
-        return (new WhatsAppMessage)
-            ->template('WELCOME_USER_01', [$notifiable->name]);
-            
-        // Advanced: Interactive Message
-        /*
-        return (new WhatsAppMessage)
-            ->interactive([
-                'type' => 'button',
-                'body' => ['text' => 'Are you interested?'],
-                'action' => [
-                    'buttons' => [
-                        ['type' => 'reply', 'reply' => ['id' => 'yes', 'title' => 'Yes']],
-                        ['type' => 'reply', 'reply' => ['id' => 'no', 'title' => 'No']],
-                    ]
-                ]
-            ]);
-        */
+        return WhatsAppMessage::text("Your order #{$this->order->id} has shipped!");
     }
 }
 ```
 
-## Sending Notifications
+### 2. Add Routing to Your Model
 
 ```php
-$user->notify(new WelcomeNotification());
-
-// Or using the Notification facade
-use Illuminate\Support\Facades\Notification;
-
-Notification::route('whatsapp', '919876543210')
-    ->notify(new WelcomeNotification());
+public function routeNotificationForWhatsapp(): string
+{
+    return $this->phone_number;
+}
 ```
+
+---
+
+## WhatsAppMessage Builder
+
+```php
+// Text
+WhatsAppMessage::text('Hello!');
+
+// Image
+WhatsAppMessage::image('https://example.com/image.jpg');
+
+// Document
+WhatsAppMessage::document('https://example.com/file.pdf');
+
+// Location
+WhatsAppMessage::forLocation(lat: 28.6139, lng: 77.2090);
+
+// Interactive
+WhatsAppMessage::forInteractive([/* ... */]);
+```
+
+---
+
+## Sending to Multiple Channels
+
+```php
+public function via(object $notifiable): array
+{
+    return ['fast2sms', 'whatsapp', 'mail'];
+}
+```
+
+---
+
+## See Also
+
+- [Cost-Saving Features](cost-saving-features.md)
+- [Queuing](queuing.md)
+- [SMS Guide](sms-guide.md)
+- [WhatsApp Guide](whatsapp.md)
+- [Testing](testing.md)

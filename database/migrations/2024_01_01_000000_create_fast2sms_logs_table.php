@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fast2sms_logs', function (Blueprint $table) {
+        Schema::create('fast2sms_logs', static function (Blueprint $table) {
             $table->id();
             $table->string('request_id')->nullable()->index();
             $table->json('payload')->nullable();

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Traits;
 
 use Illuminate\Support\Collection;
+
+use function is_array;
+
 use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Jobs\SendWhatsAppJob;
 
-/**
- * Trait to manage WhatsApp parameters and queueing for Fast2sms.
- */
 trait ManagesWhatsAppParameters
 {
     use HasQueueing;
@@ -35,6 +35,20 @@ trait ManagesWhatsAppParameters
 
     protected ?string $documentFilename = null;
 
+    protected ?string $messageId = null;
+
+    protected ?string $emoji = null;
+
+    /**
+     * @var array<string, mixed>|null
+     */
+    protected ?array $location = null;
+
+    /**
+     * @var array<string, mixed>|null
+     */
+    protected ?array $interactive = null;
+
     /**
      * @var array<int, array<string, mixed>>|null
      */
@@ -56,9 +70,6 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set the sender phone number ID.
-     */
     public function from(string $phoneNumberId): self
     {
         $this->fromPhoneNumberId = $phoneNumberId;
@@ -66,9 +77,6 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set the message type.
-     */
     public function type(WhatsAppType $type): self
     {
         $this->type = $type;
@@ -76,9 +84,6 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set the message body text.
-     */
     public function body(string $text): self
     {
         $this->body = $text;
@@ -86,9 +91,6 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set the template ID for template messages.
-     */
     public function template(string|int $templateId): self
     {
         $this->templateId = (string) $templateId;
@@ -108,9 +110,6 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set media URL for template messages.
-     */
     public function media(string $url): self
     {
         $this->mediaUrl = $url;
@@ -118,12 +117,50 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Set the document filename for template messages.
-     */
     public function documentFilename(string $filename): self
     {
         $this->documentFilename = $filename;
+
+        return $this;
+    }
+
+    public function messageId(string $id): self
+    {
+        $this->messageId = $id;
+
+        return $this;
+    }
+
+    public function emoji(string $emoji): self
+    {
+        $this->emoji = $emoji;
+
+        return $this;
+    }
+
+    /**
+     * Set the location for location messages.
+     */
+    public function location(float $latitude, float $longitude, ?string $name = null, ?string $address = null): self
+    {
+        $this->location = [
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'name' => $name,
+            'address' => $address,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Set the interactive payload for interactive messages.
+     *
+     * @param array<string, mixed> $interactive
+     */
+    public function interactive(array $interactive): self
+    {
+        $this->interactive = $interactive;
 
         return $this;
     }
@@ -140,41 +177,26 @@ trait ManagesWhatsAppParameters
         return $this;
     }
 
-    /**
-     * Get the recipient mobile number.
-     */
     public function getTo(): ?string
     {
         return $this->to;
     }
 
-    /**
-     * Get the sender phone number ID.
-     */
     public function getFromPhoneNumberId(): ?string
     {
         return $this->fromPhoneNumberId;
     }
 
-    /**
-     * Get the message type.
-     */
     public function getType(): ?WhatsAppType
     {
         return $this->type;
     }
 
-    /**
-     * Get the message body text.
-     */
     public function getBody(): ?string
     {
         return $this->body;
     }
 
-    /**
-     * Get the template ID.
-     */
     public function getTemplateId(): ?string
     {
         return $this->templateId;
@@ -190,20 +212,40 @@ trait ManagesWhatsAppParameters
         return $this->variables;
     }
 
-    /**
-     * Get the media URL.
-     */
     public function getMediaUrl(): ?string
     {
         return $this->mediaUrl;
     }
 
-    /**
-     * Get the document filename.
-     */
     public function getDocumentFilename(): ?string
     {
         return $this->documentFilename;
+    }
+
+    public function getMessageId(): ?string
+    {
+        return $this->messageId;
+    }
+
+    public function getEmoji(): ?string
+    {
+        return $this->emoji;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getLocation(): ?array
+    {
+        return $this->location;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getInteractive(): ?array
+    {
+        return $this->interactive;
     }
 
     /**
@@ -216,9 +258,6 @@ trait ManagesWhatsAppParameters
         return $this->components;
     }
 
-    /**
-     * Queue the WhatsApp message.
-     */
     public function queue(): void
     {
         $parameters = WhatsAppParameters::fromWhatsApp($this);
@@ -242,9 +281,6 @@ trait ManagesWhatsAppParameters
         $this->afterApiCall();
     }
 
-    /**
-     * Reset the fluent state for the next request.
-     */
     protected function resetWhatsAppParameters(): void
     {
         $this->to = null;
@@ -255,6 +291,10 @@ trait ManagesWhatsAppParameters
         $this->variables = null;
         $this->mediaUrl = null;
         $this->documentFilename = null;
+        $this->messageId = null;
+        $this->emoji = null;
+        $this->location = null;
+        $this->interactive = null;
         $this->components = null;
 
         $this->resetQueueConfig();

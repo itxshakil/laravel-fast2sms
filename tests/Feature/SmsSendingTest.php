@@ -42,13 +42,11 @@ class SmsSendingTest extends TestCase
         $this->assertNotNull($response->getRequestId());
 
         Http::assertSent(function ($request) {
-            $data = collect($request->data())->mapWithKeys(function ($item) {
-                return [$item['name'] => $item['contents']];
-            })->all();
+            $data = $request->data();
 
-            return $data['route'] === SmsRoute::QUICK->value
-                && $data['numbers'] === $this->testNumber
-                && $data['message'] === 'Test Quick SMS';
+            return ($data['route'] ?? null) === SmsRoute::QUICK->value
+                && ($data['numbers'] ?? null) === $this->testNumber
+                && ($data['message'] ?? null) === 'Test Quick SMS';
         });
     }
 
@@ -62,13 +60,11 @@ class SmsSendingTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
-            $data = collect($request->data())->mapWithKeys(function ($item) {
-                return [$item['name'] => $item['contents']];
-            })->all();
+            $data = $request->data();
 
-            return $data['route'] === SmsRoute::QUICK->value
-                && $data['numbers'] === $this->testNumber
-                && $data['message'] === 'Test Quick SMS';
+            return ($data['route'] ?? null) === SmsRoute::QUICK->value
+                && ($data['numbers'] ?? null) === $this->testNumber
+                && ($data['message'] ?? null) === 'Test Quick SMS';
         });
     }
 
@@ -89,14 +85,12 @@ class SmsSendingTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
-            $data = collect($request->data())->mapWithKeys(function ($item) {
-                return [$item['name'] => $item['contents']];
-            })->all();
+            $data = $request->data();
 
-            return $data['route'] === SmsRoute::DLT->value
-                && $data['template_id'] === $this->testTemplateId
-                && $data['variables_values'] === 'Hello|World'
-                && $data['sender_id'] === $this->testSenderId;
+            return ($data['route'] ?? null) === SmsRoute::DLT->value
+                && ($data['template_id'] ?? null) === $this->testTemplateId
+                && ($data['variables_values'] ?? null) === 'Hello|World'
+                && ($data['sender_id'] ?? null) === $this->testSenderId;
         });
     }
 
@@ -115,14 +109,12 @@ class SmsSendingTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
-            $data = collect($request->data())->mapWithKeys(function ($item) {
-                return [$item['name'] => $item['contents']];
-            })->all();
+            $data = $request->data();
 
-            return $data['route'] === SmsRoute::DLT->value
-                && $data['template_id'] === $this->testTemplateId
-                && $data['variables_values'] === 'Hello|World'
-                && $data['sender_id'] === $this->testSenderId;
+            return ($data['route'] ?? null) === SmsRoute::DLT->value
+                && ($data['template_id'] ?? null) === $this->testTemplateId
+                && ($data['variables_values'] ?? null) === 'Hello|World'
+                && ($data['sender_id'] ?? null) === $this->testSenderId;
         });
     }
 
@@ -138,13 +130,11 @@ class SmsSendingTest extends TestCase
         $this->assertTrue($response->isSuccess());
 
         Http::assertSent(function ($request) {
-            $data = collect($request->data())->mapWithKeys(function ($item) {
-                return [$item['name'] => $item['contents']];
-            })->all();
+            $data = $request->data();
 
-            return $data['route'] === SmsRoute::OTP->value
-                && $data['numbers'] === $this->testNumber
-                && $data['variables_values'] === '123456';
+            return ($data['route'] ?? null) === SmsRoute::OTP->value
+                && ($data['numbers'] ?? null) === $this->testNumber
+                && ($data['variables_values'] ?? null) === '123456';
         });
     }
 

@@ -43,17 +43,21 @@ class WhatsAppChannel
         $message = $notification->toWhatsApp($notifiable);
 
         if (is_string($message)) {
-            Fast2sms::viaWhatsApp($to)->sendText($message);
+            Fast2sms::viaWhatsApp($to)->type(WhatsAppType::TEXT)->body($message)->send();
 
             return;
         }
 
         $service = Fast2sms::viaWhatsApp($message->to ?? $to);
 
+        if ($message->fromPhoneNumberId) {
+            $service->from($message->fromPhoneNumberId);
+        }
+
         $type = $message->type ?? WhatsAppType::TEXT;
         $service->type($type);
 
-        if ($message->templateId) {
+        if ($message->templateId !== null) {
             $service->template($message->templateId);
         }
 
@@ -78,18 +82,24 @@ class WhatsAppChannel
         }
 
         if ($message->interactive) {
-            $service->sendInteractive($message->interactive);
+            $service->interactive($message->interactive)->send();
 
             return;
         }
 
         if ($message->location) {
-            $service->sendLocation(
+            $service->location(
                 $message->location['latitude'],
                 $message->location['longitude'],
                 $message->location['name'] ?? null,
                 $message->location['address'] ?? null,
-            );
+            )->send();
+
+            return;
+        }
+
+        if ($type === WhatsAppType::REACTION) {
+            $service->messageId($message->messageId ?? '')->emoji($message->emoji ?? '')->send();
 
             return;
         }

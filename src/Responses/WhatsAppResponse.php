@@ -7,16 +7,14 @@ namespace Shakil\Fast2sms\Responses;
 use InvalidArgumentException;
 
 use function is_bool;
+use function is_string;
 
-/**
- * A class to handle responses from the Fast2sms WhatsApp API.
- */
 class WhatsAppResponse extends Fast2smsResponse
 {
     /**
-     * @param array<string, mixed> $data The raw response data from the API.
+     * @param array<string, mixed> $data
      *
-     * @throws InvalidArgumentException if the response data is invalid or malformed.
+     * @throws InvalidArgumentException
      */
     public function __construct(protected array $data)
     {
@@ -24,7 +22,6 @@ class WhatsAppResponse extends Fast2smsResponse
             throw new InvalidArgumentException('Response data cannot be empty.');
         }
 
-        // WhatsApp APIs might use 'success' or 'status' or 'return'
         $this->success = $this->data['success'] ?? $this->data['status'] ?? $this->data['return'] ?? false;
 
         if (! is_bool($this->success)) {
@@ -34,9 +31,6 @@ class WhatsAppResponse extends Fast2smsResponse
         $this->message = $this->extractWhatsAppMessage();
     }
 
-    /**
-     * Extracts a human-readable message from the response data.
-     */
     private function extractWhatsAppMessage(): string
     {
         if (isset($this->data['message']) && is_string($this->data['message'])) {
