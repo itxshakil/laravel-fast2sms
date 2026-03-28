@@ -37,7 +37,7 @@ jobs:
               run: composer install --no-interaction --prefer-dist --no-dev
 
             - name: Generate Release Notes (Draft)
-              uses: release-drafter/release-drafter@v6
+              uses: release-drafter/release-drafter@v7
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
