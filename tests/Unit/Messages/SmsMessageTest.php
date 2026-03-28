@@ -26,7 +26,7 @@ class SmsMessageTest extends TestCase
     public function it_can_set_content()
     {
         $message = new SmsMessage;
-        $message->content('Test message');
+        $message->withContent('Test message');
 
         $this->assertEquals('Test message', $message->content);
     }
@@ -62,7 +62,7 @@ class SmsMessageTest extends TestCase
     public function it_can_set_route()
     {
         $message = new SmsMessage;
-        $message->route(SmsRoute::QUICK);
+        $message->withRoute(SmsRoute::QUICK);
 
         $this->assertEquals(SmsRoute::QUICK, $message->route);
     }
@@ -80,9 +80,9 @@ class SmsMessageTest extends TestCase
     public function it_can_chain_methods()
     {
         $message = (new SmsMessage)
-            ->content('Test message')
+            ->withContent('Test message')
             ->from('TESTID')
-            ->route(SmsRoute::QUICK)
+            ->withRoute(SmsRoute::QUICK)
             ->language(SmsLanguage::UNICODE);
 
         $this->assertEquals('Test message', $message->content);
@@ -95,7 +95,7 @@ class SmsMessageTest extends TestCase
     public function it_can_create_dlt_message()
     {
         $message = (new SmsMessage)
-            ->route(SmsRoute::DLT)
+            ->withRoute(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');
 

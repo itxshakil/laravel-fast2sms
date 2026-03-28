@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shakil\Fast2sms\Tests\Unit\Channels;
 
+use BadMethodCallException;
 use Illuminate\Notifications\Notification;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -149,6 +150,80 @@ class SmsChannelTest extends TestCase
             return $parameters['sender_id'] === 'DEFAULT';
         });
     }
+
+    /**
+     * Test that BadMethodCallException is thrown when toSms() is missing.
+     */
+    #[Test]
+    public function it_throws_when_to_sms_method_is_missing(): void
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/toSms/');
+
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestSmsNotificationWithoutMethod;
+
+        $channel->send($notifiable, $notification);
+    }
+
+    /**
+     * Test that flash flag is forwarded correctly.
+     *
+     * @throws Fast2smsException
+     */
+    #[Test]
+    public function it_forwards_flash_flag(): void
+    {
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestFlashNotification;
+
+        $channel->send($notifiable, $notification);
+
+        Fast2sms::assertSent(function ($parameters) {
+            return isset($parameters['flash']) && (int) $parameters['flash'] === 1;
+        });
+    }
+
+    /**
+     * Test that scheduleTime is forwarded correctly.
+     *
+     * @throws Fast2smsException
+     */
+    #[Test]
+    public function it_forwards_schedule_time(): void
+    {
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestScheduleNotification;
+
+        $channel->send($notifiable, $notification);
+
+        Fast2sms::assertSent(function ($parameters) {
+            return ($parameters['schedule_time'] ?? null) === '2025-12-31-10-00';
+        });
+    }
+
+    /**
+     * Test that entityId is forwarded correctly.
+     *
+     * @throws Fast2smsException
+     */
+    #[Test]
+    public function it_forwards_entity_id(): void
+    {
+        $channel = new SmsChannel;
+        $notifiable = new TestNotifiable;
+        $notification = new TestEntityIdNotification;
+
+        $channel->send($notifiable, $notification);
+
+        Fast2sms::assertSent(function ($parameters) {
+            return ($parameters['entity_id'] ?? null) === 'ENTITY123' &&
+                ($parameters['route'] ?? null) === SmsRoute::DLT->value;
+        });
+    }
 }
 
 /**
@@ -192,7 +267,7 @@ class TestDltNotification extends Notification
     public function toSms(mixed $notifiable): SmsMessage
     {
         return (new SmsMessage)
-            ->route(SmsRoute::DLT)
+            ->withRoute(SmsRoute::DLT)
             ->template('template123', ['var1', 'var2'])
             ->from('TESTID');
     }
@@ -206,8 +281,8 @@ class TestLanguageNotification extends Notification
     public function toSms(mixed $notifiable): SmsMessage
     {
         return (new SmsMessage)
-            ->content('Test unicode message')
-            ->route(SmsRoute::QUICK)
+            ->withContent('Test unicode message')
+            ->withRoute(SmsRoute::QUICK)
             ->language(SmsLanguage::UNICODE);
     }
 }
@@ -220,7 +295,7 @@ class TestDefaultRouteNotification extends Notification
     public function toSms(mixed $notifiable): SmsMessage
     {
         return (new SmsMessage)
-            ->content('Test message');
+            ->withContent('Test message');
     }
 }
 
@@ -232,8 +307,54 @@ class TestDefaultSenderNotification extends Notification
     public function toSms(mixed $notifiable): SmsMessage
     {
         return (new SmsMessage)
-            ->content('Test message')
-            ->route(SmsRoute::DLT)
+            ->withContent('Test message')
+            ->withRoute(SmsRoute::DLT)
             ->template('template123', ['var1']);
+    }
+}
+
+/**
+ * Notification missing the toSms() method.
+ */
+class TestSmsNotificationWithoutMethod extends Notification {}
+
+/**
+ * Test notification class for flash messages.
+ */
+class TestFlashNotification extends Notification
+{
+    public function toSms(mixed $notifiable): SmsMessage
+    {
+        return (new SmsMessage)
+            ->withContent('Flash message')
+            ->flash(true);
+    }
+}
+
+/**
+ * Test notification class for scheduled messages.
+ */
+class TestScheduleNotification extends Notification
+{
+    public function toSms(mixed $notifiable): SmsMessage
+    {
+        return (new SmsMessage)
+            ->withContent('Scheduled message')
+            ->schedule('2025-12-31-10-00');
+    }
+}
+
+/**
+ * Test notification class for messages with entity ID.
+ */
+class TestEntityIdNotification extends Notification
+{
+    public function toSms(mixed $notifiable): SmsMessage
+    {
+        return (new SmsMessage)
+            ->withRoute(SmsRoute::DLT)
+            ->template('tmpl_001', ['var1'])
+            ->from('SENDER')
+            ->entityId('ENTITY123');
     }
 }

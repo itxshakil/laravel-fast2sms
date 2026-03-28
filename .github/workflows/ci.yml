@@ -27,7 +27,8 @@ jobs:
             - uses: actions/cache@v4
               with:
                   path: ~/.composer/cache
-                  key: pint-${{ hashFiles('composer.lock') }}
+                  key: pint-${{ hashFiles('composer.json') }}
+                  restore-keys: pint-
 
             - run: composer install --no-interaction --prefer-dist
             - run: vendor/bin/pint --test
@@ -49,7 +50,8 @@ jobs:
             - uses: actions/cache@v4
               with:
                   path: ~/.composer/cache
-                  key: phpstan-${{ hashFiles('composer.lock') }}
+                  key: phpstan-${{ hashFiles('composer.json') }}
+                  restore-keys: phpstan-
 
             - run: composer install --no-interaction --prefer-dist
             - run: php -d memory_limit=1G vendor/bin/phpstan analyse
@@ -60,11 +62,17 @@ jobs:
         needs: analyse
 
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest, windows-latest]
-                php: [8.3, 8.4]
+                php: [8.3, 8.4, 8.5]
                 deps: [prefer-lowest, prefer-stable]
+            include:
+                - php: 8.5
+                  experimental: true
+            exclude: []
+
+        continue-on-error: ${{ matrix.experimental == true }}
 
         steps:
             - uses: actions/checkout@v4
@@ -75,6 +83,14 @@ jobs:
                   extensions: dom, mbstring, zip, fileinfo
                   tools: composer
                   coverage: none
+
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: test-${{ matrix.php }}-${{ matrix.os }}-${{ matrix.deps }}-${{ hashFiles('composer.json') }}
+                  restore-keys: |
+                      test-${{ matrix.php }}-${{ matrix.os }}-${{ matrix.deps }}-
+                      test-${{ matrix.php }}-${{ matrix.os }}-
 
             - run: composer update --${{ matrix.deps }} --no-interaction --prefer-dist
             - run: vendor/bin/phpunit
@@ -91,6 +107,13 @@ jobs:
               with:
                   php-version: 8.3
                   tools: composer
+                  coverage: none
+
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.composer/cache
+                  key: packagist-${{ hashFiles('composer.json') }}
+                  restore-keys: packagist-
 
             - run: composer validate --strict
             - run: composer dump-autoload --dry-run --optimize

@@ -6,165 +6,240 @@ namespace Shakil\Fast2sms\Traits;
 
 use Closure;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
-
-use function is_array;
-
-use PHPUnit\Framework\Assert;
-
+use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
+use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
+use Shakil\Fast2sms\Enums\SmsRoute;
+use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
+use Shakil\Fast2sms\Testing\Fast2smsFake;
+use Shakil\Fast2sms\Testing\RecordedSmsSend;
+use Shakil\Fast2sms\Testing\RecordedWhatsAppSend;
 
 /**
- * Trait to handle faking and assertion for Fast2sms during testing.
+ * Handles faking and assertion for Fast2sms during testing.
  */
 trait HandlesFaking
 {
-    /**
-     * Indicates if the Fast2sms service is faking SMS sends.
-     */
-    protected static bool $faking = false;
+    protected static ?Fast2smsFake $fake = null;
 
-    /**
-     * The collection of "sent" messages when faking.
-     *
-     * @var Collection<int, array<string, mixed>>
-     */
-    protected static Collection $sentMessages;
-
-    /**
-     * Enable faking for Fast2sms.
-     * This will prevent actual HTTP calls and store messages in memory.
-     */
-    public static function fake(): void
+    public static function fake(): Fast2smsFake
     {
-        self::$faking = true;
-        self::$sentMessages = collect();
+        self::$fake = new Fast2smsFake();
+        self::$fake->activate();
 
-        Http::fake([
-            config('fast2sms.base_url') . '*' => function ($request) {
-                // Convert multipart request into array
-                $payload = [];
-                foreach ($request->data() as $part) {
-                    $payload[$part['name']] = $part['contents'];
-                }
-
-                self::$sentMessages->push($payload);
-
-                return Http::response([
-                    'return' => true,
-                    'message' => 'SMS sent successfully (faked).',
-                ]);
-            },
-        ]);
+        return self::$fake;
     }
 
     /**
-     * Assert that an SMS was sent.
+     * Stop faking and reset the shared fake instance.
      *
+     * Call this in your test's tearDown() to prevent fake state from leaking
+     * into subsequent test cases.
+     */
+    public static function stopFaking(): void
+    {
+        self::$fake = null;
+    }
+
+    /**
      * @param array<string, mixed>|Closure|null $callback
      *
      * @throws Fast2smsException
      */
     public static function assertSent(array|Closure|null $callback = null): void
     {
-        if (! self::$faking) {
-            throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
-        }
-
-        if ($callback === null) {
-            Assert::assertGreaterThan(
-                0,
-                self::$sentMessages->count(),
-                'No SMS was sent.',
-            );
-
-            return;
-        }
-
-        Assert::assertTrue(
-            self::$sentMessages->contains(function (array $message) use ($callback) {
-                if (is_array($callback)) {
-                    foreach ($callback as $key => $value) {
-                        if (! isset($message[$key]) || $message[$key] !== $value) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
-                return $callback($message);
-            }),
-            'An SMS with the given criteria was not sent.',
-        );
+        self::ensureFaking();
+        self::$fake->assertSent($callback);
     }
 
     /**
-     * Assert that an SMS was not sent.
-     *
      * @param array<string, mixed>|Closure|null $callback
      *
      * @throws Fast2smsException
      */
     public static function assertNotSent(array|Closure|null $callback = null): void
     {
-        if (! self::$faking) {
-            throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
-        }
-
-        if ($callback === null) {
-            Assert::assertEquals(
-                0,
-                self::$sentMessages->count(),
-                'SMS was sent when it should not have been.',
-            );
-
-            return;
-        }
-
-        Assert::assertFalse(
-            self::$sentMessages->contains(function (array $message) use ($callback) {
-                if (is_array($callback)) {
-                    foreach ($callback as $key => $value) {
-                        if (! isset($message[$key]) || $message[$key] !== $value) {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
-                return $callback($message);
-            }),
-            'An SMS with the given criteria was sent when it should not have been.',
-        );
+        self::ensureFaking();
+        self::$fake->assertNotSent($callback);
     }
 
     /**
-     * Assert that a specific number of SMS messages were sent.
-     *
      * @throws Fast2smsException
      */
     public static function assertSentTimes(int $count): void
     {
-        if (! self::$faking) {
-            throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
-        }
-
-        Assert::assertEquals(
-            $count,
-            self::$sentMessages->count(),
-            "Expected $count SMS messages to be sent, but " . self::$sentMessages->count() . ' were sent.',
-        );
+        self::ensureFaking();
+        self::$fake->assertSentTimes($count);
     }
 
     /**
-     * Get all "sent" messages when faking.
-     *
      * @return Collection<int, array<string, mixed>>
+     *
+     * @throws Fast2smsException
      */
     public static function sentMessages(): Collection
     {
-        return self::$sentMessages;
+        self::ensureFaking();
+
+        return self::$fake->sentMessages();
+    }
+
+    /**
+     * @return list<RecordedSmsSend>
+     *
+     * @throws Fast2smsException
+     */
+    public static function sentSms(): array
+    {
+        self::ensureFaking();
+
+        return self::$fake->sentSms();
+    }
+
+    /**
+     * @return list<RecordedWhatsAppSend>
+     *
+     * @throws Fast2smsException
+     */
+    public static function sentWhatsApp(): array
+    {
+        self::ensureFaking();
+
+        return self::$fake->sentWhatsApp();
+    }
+
+    /**
+     * @param (Closure(SmsParameters): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertSmsSent(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsSent($callback);
+    }
+
+    /**
+     * @param (Closure(SmsParameters): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertSmsNotSent(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsNotSent($callback);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertSmsSentCount(int $count): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsSentCount($count);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertSmsSentTo(string $number): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsSentTo($number);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertSmsSentWithMessage(string $message): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsSentWithMessage($message);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertSmsSentWithRoute(SmsRoute $route): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSmsSentWithRoute($route);
+    }
+
+    /**
+     * @param (Closure(WhatsAppParameters): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertWhatsAppSent(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWhatsAppSent($callback);
+    }
+
+    /**
+     * @param (Closure(WhatsAppParameters): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertWhatsAppNotSent(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWhatsAppNotSent($callback);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertWhatsAppSentCount(int $count): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWhatsAppSentCount($count);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertWhatsAppSentTo(string $number): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWhatsAppSentTo($number);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertWhatsAppSentWithType(WhatsAppType $type): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWhatsAppSentWithType($type);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertNothingSent(): void
+    {
+        self::ensureFaking();
+        self::$fake->assertNothingSent();
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertSentCount(int $expected): void
+    {
+        self::ensureFaking();
+        self::$fake->assertSentCount($expected);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    private static function ensureFaking(): void
+    {
+        if (! self::$fake instanceof Fast2smsFake) {
+            throw new Fast2smsException('Fast2sms is not in faking mode. Call Fast2sms::fake() first.');
+        }
     }
 }

@@ -7,3 +7,7 @@ tests/temp
 .php-cs-fixer.cache
 .phpstan
 .junie
+.claude
+.env
+plans/
+build/

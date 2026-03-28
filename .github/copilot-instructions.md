@@ -23,7 +23,7 @@ Purpose: Provide concise, actionable knowledge for an AI to be immediately produ
   - Run tests: `composer test` (runs `phpunit` per `composer.json`). For targeted tests: `vendor/bin/phpunit tests/Feature/SmsSendingTest.php`.
   - Lint/format: `composer lint` (runs `laravel/pint`).
   - Publish config when testing integration in a real app: `php artisan vendor:publish --tag=fast2sms-config`.
-  - Artisan command: `php artisan sms:monitor` — registered by `Fast2smsServiceProvider` (see `Console/Commands`).
+  - Artisan command: `php artisan fast2sms:balance` — registered by `Fast2smsServiceProvider` (see `Console/Commands`).
 
 - **Testing & fakes**
   - Tests use `orchestra/testbench`. `tests/TestCase.php` sets `fast2sms` config values (including `api_key` = `test_api_key`) via `defineEnvironment()`.
@@ -38,7 +38,7 @@ Purpose: Provide concise, actionable knowledge for an AI to be immediately produ
 - **Common patterns and repo conventions**
   - Fluent setter pattern: most public methods on `Fast2sms` return `$this`, enabling chains like `Fast2sms::to(...)->route(...)->templateId(...)->send()`.
   - DTO usage: `DataTransferObjects/SmsParameters.php` is used to serialize job payloads (see `SendSmsJob`).
-  - Events: package dispatches `Events\n+    - `SmsSent` on success, `SmsFailed` on failure, and `LowBalanceDetected` for balance checks. Use these hooks when adding integrations.
+  - Events: package dispatches `SmsSent` on success, `SmsFailed` on failure, and `LowBalanceDetected` for balance checks. Use these hooks when adding integrations.
   - Exceptions: `Shakil\\Fast2sms\\Exceptions\\Fast2smsException` is the package-level exception class — thrown liberally for config/validation/API errors.
 
 - **When editing code, watch for**

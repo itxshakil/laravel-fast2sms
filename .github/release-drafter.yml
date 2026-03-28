@@ -4,6 +4,7 @@ tag-template: "v$NEXT_PATCH_VERSION"
 categories:
     - title: "🚀 New Features"
       labels:
+          - feature
           - core
           - http
           - notifications

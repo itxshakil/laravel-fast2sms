@@ -27,6 +27,7 @@ class QueueTest extends TestCase
         parent::setUp();
         Queue::fake();
 
+        $this->app['config']->set('fast2sms.queue.enabled', true);
         $this->fast2sms = $this->app->make('fast2sms');
     }
 

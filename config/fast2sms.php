@@ -84,26 +84,133 @@ return [
     */
     'database_logging' => env('FAST2SMS_DATABASE_LOGGING', false),
 
-    /**
-     * ---------------------------------------------------------------------------
-     * Fast2sms Balance Threshold
-     * ---------------------------------------------------------------------------.
-     *
-     * This is the minimum balance threshold for triggering a low balance events.
-     */
-    'balance_threshold' => env('FAST2SMS_BALANCE_THRESHOLD', 1000),
-
     /*
     |--------------------------------------------------------------------------
     | Queue Settings
     |--------------------------------------------------------------------------
     |
-    | Configure the default queue settings for SMS jobs
+    | Configure queued sending for SMS and WhatsApp jobs.
+    |
+    | enabled — Set to true to dispatch sending as queued jobs instead of
+    | sending synchronously. Requires a queue worker to be running.
+    | Example: FAST2SMS_QUEUE_ENABLED=true
+    |
+    | connection — The queue connection to use (e.g. 'redis', 'database').
+    | Defaults to the application's default queue connection.
+    | Example: FAST2SMS_QUEUE_CONNECTION=redis
+    |
+    | name — The queue name to push jobs onto.
+    | Example: FAST2SMS_QUEUE_NAME=sms
+    |
+    | tries — Maximum number of attempts before a job is marked as failed.
+    | Example: FAST2SMS_QUEUE_TRIES=3
     |
     */
     'queue' => [
-        'connection' => env('FAST2SMS_QUEUE_CONNECTION', 'default'),
-        'name' => env('FAST2SMS_QUEUE_NAME', 'fast2sms'),
+        'enabled' => env('FAST2SMS_QUEUE_ENABLED', false),
+        'connection' => env('FAST2SMS_QUEUE_CONNECTION'),
+        'name' => env('FAST2SMS_QUEUE_NAME', 'default'),
+        'tries' => env('FAST2SMS_QUEUE_TRIES', 3),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Event Settings
+    |--------------------------------------------------------------------------
+    |
+    | Control whether the package dispatches Laravel events (SmsSent, SmsFailed,
+    | WhatsAppSent, WhatsAppFailed, LowBalanceDetected).
+    |
+    | Set FAST2SMS_EVENTS_ENABLED=false to disable all event dispatching,
+    | for example, in high-throughput environments where listeners are not needed.
+    |
+    */
+    'events' => [
+        'enabled' => env('FAST2SMS_EVENTS_ENABLED', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cost-Saving Features
+    |--------------------------------------------------------------------------
+    |
+    | These opt-in features reduce wasted API credits. All are disabled by
+    | default and can be enabled via environment variables.
+    |
+    */
+
+    /*
+     * Deduplication / Idempotency Guard
+     *
+     * When enabled, a hash of (recipients + message + route) is stored in the
+     * cache for `ttl` seconds. A second identical call within that window throws
+     * DuplicateSendException instead of hitting the API again.
+     */
+    'deduplication' => [
+        'enabled' => env('FAST2SMS_DEDUP_ENABLED', false),
+        'ttl' => env('FAST2SMS_DEDUP_TTL', 60),
+        'store' => env('FAST2SMS_DEDUP_STORE', null),
+    ],
+
+    /*
+     * Pre-send Recipient Validation
+     *
+     * When enabled, each recipient is validated against the Fast2smsPhone rule
+     * before the API call. Invalid numbers are stripped and a warning is logged.
+     * If all numbers are invalid, ValidationException::allRecipientsInvalid() is thrown.
+     */
+    'validation' => [
+        'strip_invalid_recipients' => env('FAST2SMS_STRIP_INVALID', false),
+    ],
+
+    /*
+     * Recipient List Deduplication & Batch Splitting
+     *
+     * `deduplicate` removes duplicate numbers from the recipient list before sending.
+     * `batch_size` splits large lists into chunks of that size (0 = no splitting).
+     */
+    'recipients' => [
+        'deduplicate' => env('FAST2SMS_DEDUP_RECIPIENTS', true),
+        'batch_size' => env('FAST2SMS_BATCH_SIZE', 0),
+    ],
+
+    /*
+     * Balance Gate
+     *
+     * When enabled, the wallet balance is checked before every send. If the balance
+     * is below `threshold`, a LowBalanceDetected event is fired. When `abort` is
+     * true, InsufficientBalanceException is also thrown to prevent the API call.
+     */
+    'balance_gate' => [
+        'enabled' => env('FAST2SMS_BALANCE_GATE', false),
+        'threshold' => env('FAST2SMS_BALANCE_THRESHOLD', 10.0),
+        'abort' => env('FAST2SMS_BALANCE_ABORT', true),
+    ],
+
+    /*
+     * Send-Rate Throttle
+     *
+     * When enabled, a per-minute sliding-window counter is maintained in the cache.
+     * If the counter reaches `max_per_minute`, ThrottleExceededException is thrown.
+     */
+    'throttle' => [
+        'enabled' => env('FAST2SMS_THROTTLE_ENABLED', false),
+        'max_per_minute' => env('FAST2SMS_THROTTLE_MAX', 60),
+        'store' => env('FAST2SMS_THROTTLE_STORE', null),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | WhatsApp Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configure the WhatsApp settings for sending WhatsApp messages.
+    |
+    */
+    'whatsapp' => [
+        'default_phone_number_id' => env('FAST2SMS_WHATSAPP_PHONE_NUMBER_ID', ''),
+        'default_waba_id' => env('FAST2SMS_WHATSAPP_WABA_ID', ''),
+        'version' => env('FAST2SMS_WHATSAPP_VERSION', 'v24.0'),
     ],
 
 ];

@@ -32,17 +32,16 @@ If you have a suggestion for the project:
 1. Fork the repository
 2. Create a branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
-4. Run tests: `composer test`
-5. Ensure code style: `composer lint`
-6. Commit changes: `git commit -m 'Add amazing feature'`
-7. Push branch: `git push origin feature/amazing-feature`
-8. Open a Pull Request
+4. Run the full QA pipeline: `composer qa`
+5. Commit changes: `git commit -m 'Add amazing feature'`
+6. Push branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
 #### Development Prerequisites
 
-* PHP 8.3 or higher
+* PHP 8.3 / 8.4 / 8.5
 * Composer
-* Laravel 12.x or higher
+* Laravel 11.x or higher (^11.0 | ^12.0 | ^13.0)
 
 #### Coding Standards
 
@@ -57,14 +56,25 @@ If you have a suggestion for the project:
 ```bash
 git clone https://github.com/itxshakil/laravel-fast2sms.git
 composer install
-composer test
 ```
+
+Available composer scripts:
+
+| Command                  | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| `composer test`          | Run the full PHPUnit test suite                  |
+| `composer test:coverage` | Run tests with HTML + Clover coverage output     |
+| `composer analyse`       | Run PHPStan static analysis                      |
+| `composer lint`          | Check code style with Pint (no changes)          |
+| `composer lint:fix`      | Auto-fix code style with Rector + Pint           |
+| `composer rector`        | Run Rector standalone (modernise/refactor code)  |
+| `composer qa`            | Full QA pipeline: lint + analyse + tests         |
 
 ## Pull Request Guidelines
 
 * Update `README.md` if the interface changes
 * Update `CHANGELOG.md` via PR notes (labels are automatically mapped to changelog categories)
-* The PR must work for PHP 8.3+
+* The PR must work for PHP 8.3 / 8.4 / 8.5
 * Include tests for new features
 * Follow existing coding style
 * Use clear, descriptive commit messages

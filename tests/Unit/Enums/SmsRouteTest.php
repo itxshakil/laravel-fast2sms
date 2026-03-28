@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shakil\Fast2sms\Tests\Unit;
+namespace Shakil\Fast2sms\Tests\Unit\Enums;
 
 use PHPUnit\Framework\Attributes\Test;
 use Shakil\Fast2sms\Enums\SmsRoute;
