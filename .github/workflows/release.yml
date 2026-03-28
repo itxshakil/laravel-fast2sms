@@ -24,7 +24,7 @@ jobs:
                   coverage: none
 
             - name: Cache Composer packages
-              uses: actions/cache@v4
+              uses: actions/cache@v5
               with:
                   path: ~/.composer/cache
                   key: release-${{ hashFiles('composer.json') }}
