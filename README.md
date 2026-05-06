@@ -21,6 +21,11 @@
 
 **Laravel Fast2SMS** is a first-class Laravel package for sending SMS and WhatsApp messages via the [Fast2SMS](https://www.fast2sms.com) API. It provides a fluent, type-safe API, Laravel Notifications support, queue integration, a powerful fake for testing, and a rich exception hierarchy — so you can build reliable messaging features with confidence.
 
+The most complete Fast2SMS integration for Laravel:
+- SMS + OTP + DLT + WhatsApp
+- Queue + Notifications
+- Cost optimization built-in
+
 ---
 
 ## Table of Contents
