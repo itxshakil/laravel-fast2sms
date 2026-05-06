@@ -24,7 +24,7 @@
 The most complete Fast2SMS integration for Laravel:
 - SMS + OTP + DLT + WhatsApp
 - Queue + Notifications
-- Cost optimization built-in
+- Prevents wasting SMS money in production
 
 ---
 
