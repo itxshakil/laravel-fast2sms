@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-09-23
+
+Maintenance release: discoverability and release tooling. No runtime changes.
+
+### Changed
+
+- `composer.json` keywords now match the GitHub topics (`otp`, `dlt`, `sms-gateway`, `whatsapp-business-api`, `webhooks`, `india`, `php`, `laravel-notifications`) so the package surfaces in Packagist search for those terms.
+- CI jobs run in parallel and dependencies are cached per OS/PHP via `ramsey/composer-install`; macOS and Windows run on PHP 8.3 and 8.5 with highest dependencies while Linux keeps the full matrix. A run now takes about 2 minutes instead of 5.
+- Release notes are drafted continuously on every push to `main` by a dedicated `release-drafter.yml` workflow, with the next version resolved from PR labels. `release.yml` only validates the tagged commit.
+- `docs/maintainer-guide.md` describes the actual manual tag-based release process.
+
 ## [2.1.0] - 2026-09-23
 
 Adds an opt-in **delivery-status webhook receiver** so "accepted" can become "delivered" or "failed" inside your app, and repairs the CI pipeline that had been silently failing since the v2.0.0 merge.
@@ -206,7 +217,8 @@ Initial public release of the `laravel-fast2sms` package.
 - Input validation and sanitization
 - Rate limiting support
 
-[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.2.0...v1.3.0
