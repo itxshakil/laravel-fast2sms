@@ -16,9 +16,11 @@ use Shakil\Fast2sms\Console\Commands\ListEvents;
 use Shakil\Fast2sms\Console\Commands\MonitorSmsBalance;
 use Shakil\Fast2sms\Console\Commands\WhatsAppWabaDetails;
 use Shakil\Fast2sms\Contracts\ClientInterface;
+use Shakil\Fast2sms\Contracts\WebhookHandlerInterface;
 use Shakil\Fast2sms\DataTransferObjects\Fast2smsConfig;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
 use Shakil\Fast2sms\Support\ConfigValidator;
+use Shakil\Fast2sms\Webhooks\WebhookHandler;
 
 /**
  * Fast2sms Service Provider for Laravel.
@@ -62,6 +64,8 @@ class Fast2smsServiceProvider extends ServiceProvider
             Fast2smsConfig::fromArray($app['config']['fast2sms']),
         ));
 
+        $this->app->singleton(WebhookHandlerInterface::class, WebhookHandler::class);
+
         $this->app->extend(ChannelManager::class, function ($service, $app) {
             $service->extend('fast2sms', fn ($app) => $app->make(SmsChannel::class));
             $service->extend('whatsapp', fn ($app) => $app->make(WhatsAppChannel::class));
@@ -97,6 +101,8 @@ class Fast2smsServiceProvider extends ServiceProvider
             $this->loadMigrations();
         }
 
+        $this->registerWebhookRoute();
+
         $this->publishes([
             __DIR__ . '/../config/fast2sms.php' => config_path('fast2sms.php'),
         ], 'fast2sms-config');
@@ -114,7 +120,21 @@ class Fast2smsServiceProvider extends ServiceProvider
     #[Override]
     public function provides(): array
     {
-        return ['fast2sms', 'fast2sms.whatsapp'];
+        return ['fast2sms', 'fast2sms.whatsapp', WebhookHandlerInterface::class];
+    }
+
+    /**
+     * Mount the delivery-status webhook route when the receiver is opted in.
+     */
+    protected function registerWebhookRoute(): void
+    {
+        $config = $this->app['config']['fast2sms']['webhook'] ?? [];
+
+        if (! ($config['enabled'] ?? false) || ! ($config['auto_route'] ?? true)) {
+            return;
+        }
+
+        $this->loadRoutesFrom(__DIR__ . '/../routes/webhooks.php');
     }
 
     /**

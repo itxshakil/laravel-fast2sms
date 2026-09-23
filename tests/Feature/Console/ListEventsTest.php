@@ -50,7 +50,7 @@ class ListEventsTest extends TestCase
             ->assertExitCode(0);
 
         // Run again capturing output
-        $result = Artisan::call('fast2sms:events', ['--json' => true]);
+        Artisan::call('fast2sms:events', ['--json' => true]);
         $json = Artisan::output();
 
         $decoded = json_decode($json, true);
@@ -64,14 +64,14 @@ class ListEventsTest extends TestCase
      * @throws JsonException
      */
     #[Test]
-    public function it_lists_five_events(): void
+    public function it_lists_seven_events(): void
     {
         Artisan::call('fast2sms:events', ['--json' => true]);
         $json = Artisan::output();
 
         $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertCount(5, $decoded);
+        $this->assertCount(7, $decoded);
     }
 
     /**

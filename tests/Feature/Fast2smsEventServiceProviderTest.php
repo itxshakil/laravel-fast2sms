@@ -13,10 +13,13 @@ use function is_string;
 
 use ReflectionException;
 use ReflectionFunction;
+use Shakil\Fast2sms\Events\MessageDelivered;
+use Shakil\Fast2sms\Events\MessageFailed;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Events\WhatsAppFailed;
 use Shakil\Fast2sms\Events\WhatsAppSent;
+use Shakil\Fast2sms\Listeners\LogDeliveryStatus;
 use Shakil\Fast2sms\Listeners\LogSmsFailed;
 use Shakil\Fast2sms\Listeners\LogSmsSent;
 use Shakil\Fast2sms\Listeners\LogWhatsAppFailed;
@@ -65,11 +68,27 @@ class Fast2smsEventServiceProviderTest extends TestCase
         $this->assertContains(LogWhatsAppFailed::class, $listenerClasses);
     }
 
-    public function test_all_four_events_have_exactly_one_listener_each(): void
+    public function test_message_delivered_event_is_wired_to_log_delivery_status_listener(): void
+    {
+        $dispatcher = $this->app->make(Dispatcher::class);
+        $listeners = $dispatcher->getListeners(MessageDelivered::class);
+
+        $this->assertContains(LogDeliveryStatus::class, $this->extractListenerClasses($listeners));
+    }
+
+    public function test_message_failed_event_is_wired_to_log_delivery_status_listener(): void
+    {
+        $dispatcher = $this->app->make(Dispatcher::class);
+        $listeners = $dispatcher->getListeners(MessageFailed::class);
+
+        $this->assertContains(LogDeliveryStatus::class, $this->extractListenerClasses($listeners));
+    }
+
+    public function test_all_six_events_have_exactly_one_listener_each(): void
     {
         $dispatcher = $this->app->make(Dispatcher::class);
 
-        foreach ([SmsSent::class, SmsFailed::class, WhatsAppSent::class, WhatsAppFailed::class] as $event) {
+        foreach ([SmsSent::class, SmsFailed::class, WhatsAppSent::class, WhatsAppFailed::class, MessageDelivered::class, MessageFailed::class] as $event) {
             $listeners = $dispatcher->getListeners($event);
             $this->assertCount(1, $listeners, "Expected exactly 1 listener for {$event}.");
         }

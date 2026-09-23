@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Shakil\Fast2sms\Events\MessageDelivered;
+use Shakil\Fast2sms\Events\MessageFailed;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Events\WhatsAppFailed;
 use Shakil\Fast2sms\Events\WhatsAppSent;
+use Shakil\Fast2sms\Listeners\LogDeliveryStatus;
 use Shakil\Fast2sms\Listeners\LogSmsFailed;
 use Shakil\Fast2sms\Listeners\LogSmsSent;
 use Shakil\Fast2sms\Listeners\LogWhatsAppFailed;
@@ -32,5 +35,7 @@ class Fast2smsEventServiceProvider extends EventServiceProvider
         SmsFailed::class => [LogSmsFailed::class],
         WhatsAppSent::class => [LogWhatsAppSent::class],
         WhatsAppFailed::class => [LogWhatsAppFailed::class],
+        MessageDelivered::class => [LogDeliveryStatus::class],
+        MessageFailed::class => [LogDeliveryStatus::class],
     ];
 }

@@ -16,6 +16,7 @@ use Shakil\Fast2sms\Exceptions\ThrottleExceededException;
 use Shakil\Fast2sms\Exceptions\ValidationException;
 use Shakil\Fast2sms\Traits\ManagesAccount;
 use Shakil\Fast2sms\Traits\ManagesSms;
+use Shakil\Fast2sms\Traits\ManagesWebhooks;
 use Throwable;
 
 /**
@@ -29,6 +30,7 @@ class Fast2sms extends BaseFast2smsService implements Fast2smsInterface
 {
     use ManagesAccount;
     use ManagesSms;
+    use ManagesWebhooks;
 
     /**
      * Send an SMS using the currently configured parameters.
