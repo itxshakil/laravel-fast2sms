@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/packagist/dt/itxshakil/laravel-fast2sms" alt="Total Downloads">
   </a>
   <a href="https://github.com/itxshakil/laravel-fast2sms/actions">
-    <img src="https://github.com/itxshakil/laravel-fast2sms/actions/workflows/ci.yml/badge.svg" alt="Tests">
+    <img src="https://github.com/itxshakil/laravel-fast2sms/actions/workflows/ci.yml/badge.svg?branch=main" alt="Tests">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">

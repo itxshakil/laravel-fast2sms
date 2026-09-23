@@ -2,7 +2,7 @@ name: CI
 
 on:
     push:
-        branches-ignore: ["main"]
+        branches: ["main"]
     pull_request:
         branches: ["main"]
 
@@ -32,6 +32,9 @@ jobs:
 
             - run: composer install --no-interaction --prefer-dist
             - run: vendor/bin/pint --test
+
+            - name: Lint GitHub Actions workflows
+              uses: raven-actions/actionlint@v2
 
     analyse:
         name: Static Analysis (PHPStan)
@@ -67,12 +70,6 @@ jobs:
                 os: [ubuntu-latest, macos-latest, windows-latest]
                 php: [8.3, 8.4, 8.5]
                 deps: [prefer-lowest, prefer-stable]
-            include:
-                - php: 8.5
-                  experimental: true
-            exclude: []
-
-        continue-on-error: ${{ matrix.experimental == true }}
 
         steps:
             - uses: actions/checkout@v4
