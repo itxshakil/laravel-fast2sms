@@ -4,12 +4,18 @@
     "keywords": [
         "laravel",
         "laravel-package",
+        "laravel-notifications",
+        "php",
         "fast2sms",
         "sms",
+        "sms-gateway",
+        "otp",
+        "dlt",
         "whatsapp",
+        "whatsapp-business-api",
         "notifications",
-        "package",
-        "fluent-api"
+        "webhooks",
+        "india"
     ],
     "license": "MIT",
     "authors": [
