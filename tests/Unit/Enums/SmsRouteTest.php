@@ -31,9 +31,16 @@ class SmsRouteTest extends TestCase
     }
 
     #[Test]
+    public function invalid_sms_route_string_returns_null_from_try_from(): void
+    {
+        $this->assertNull(SmsRoute::tryFrom('invalid_route'));
+    }
+
+    #[Test]
     public function invalid_sms_route_string_throws_error(): void
     {
-        $this->expectException(ValueError::class); // Enum::from() throws ValueError for invalid cases
-        SmsRoute::from('invalid_route');
+        $this->expectException(ValueError::class);
+
+        $this->assertInstanceOf(SmsRoute::class, SmsRoute::from('invalid_route'));
     }
 }

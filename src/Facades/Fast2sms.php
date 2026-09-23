@@ -9,6 +9,7 @@ use DateTimeInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Shakil\Fast2sms\Contracts\ResponseInterface;
+use Shakil\Fast2sms\Contracts\WebhookHandlerInterface;
 use Shakil\Fast2sms\Contracts\WhatsAppInterface;
 use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
@@ -36,6 +37,7 @@ use Shakil\Fast2sms\Testing\RecordedWhatsAppSend;
  * @method static ResponseInterface                     dltManager(string $type)
  * @method static WhatsAppInterface                     whatsapp()
  * @method static WhatsAppInterface                     viaWhatsApp(string|array<int, string>|null $to = null)
+ * @method static WebhookHandlerInterface               webhook()
  * @method static void                                  queue()
  * @method static \Shakil\Fast2sms\Fast2sms             onConnection(string $connection)
  * @method static \Shakil\Fast2sms\Fast2sms             onQueue(string $queue)

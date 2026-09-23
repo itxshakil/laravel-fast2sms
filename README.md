@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/packagist/dt/itxshakil/laravel-fast2sms" alt="Total Downloads">
   </a>
   <a href="https://github.com/itxshakil/laravel-fast2sms/actions">
-    <img src="https://github.com/itxshakil/laravel-fast2sms/actions/workflows/ci.yml/badge.svg" alt="Tests">
+    <img src="https://github.com/itxshakil/laravel-fast2sms/actions/workflows/ci.yml/badge.svg?branch=main" alt="Tests">
   </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
@@ -41,6 +41,7 @@ The most complete Fast2SMS integration for Laravel:
 - [Laravel Notifications](#laravel-notifications)
 - [Queuing](#queuing)
 - [Events & Listeners](#events--listeners)
+- [Delivery-Status Webhooks](#delivery-status-webhooks)
 - [Testing](#testing)
 - [Artisan Commands](#artisan-commands)
 - [Phone Validation](#phone-validation)
@@ -56,6 +57,7 @@ The most complete Fast2SMS integration for Laravel:
 - 📱 **SMS** — Quick, OTP, and DLT routes with flash and bulk support
 - 💬 **WhatsApp** — Text, image, document, location, and interactive messages
 - 🔔 **Laravel Notifications** — `SmsChannel` and `WhatsAppChannel` out of the box
+- 📬 **Delivery-status webhooks** — Opt-in receiver that turns Fast2SMS delivery reports into `MessageDelivered` / `MessageFailed` events and reconciles your logs
 - ⚡ **Queue support** — Dispatch sends as background jobs with per-send overrides
 - 🧪 **Fake & assert** — `Fast2sms::fake()` with 16 rich assertion helpers
 - 🚨 **Typed exceptions** — `AuthenticationException`, `RateLimitException`, `ApiException`, and more
@@ -151,6 +153,12 @@ After publishing, edit `config/fast2sms.php`. All keys can be set via environmen
 | `queue.connection` | `FAST2SMS_QUEUE_CONNECTION` | `null` | Queue connection name |
 | `queue.name` | `FAST2SMS_QUEUE_NAME` | `default` | Queue name |
 | `queue.tries` | `FAST2SMS_QUEUE_TRIES` | `3` | Max job attempts |
+| `webhook.enabled` | `FAST2SMS_WEBHOOK_ENABLED` | `false` | Enable the delivery-status webhook receiver |
+| `webhook.auto_route` | `FAST2SMS_WEBHOOK_AUTO_ROUTE` | `true` | Register the package route (`POST {path}/{secret}`) |
+| `webhook.path` | `FAST2SMS_WEBHOOK_PATH` | `fast2sms/webhook` | URI prefix of the auto-registered route |
+| `webhook.secret` | `FAST2SMS_WEBHOOK_SECRET` | `null` | Shared secret in the webhook URL (required; requests are rejected until set) |
+| `webhook.allowed_ips` | `FAST2SMS_WEBHOOK_ALLOWED_IPS` | `[]` | Optional comma-separated source IP allow-list |
+| `webhook.update_logs` | `FAST2SMS_WEBHOOK_UPDATE_LOGS` | `true` | Reconcile `fast2sms_logs` rows from delivery reports |
 
 Use `FAST2SMS_DRIVER=log` in local/testing environments to log messages instead of making real API calls.
 
@@ -452,6 +460,8 @@ The package dispatches the following events:
 | `WhatsAppSent` | After a successful WhatsApp send |
 | `WhatsAppFailed` | When a WhatsApp send fails |
 | `LowBalanceDetected` | When wallet balance drops below threshold |
+| `MessageDelivered` | When a delivery-status webhook reports a delivered message |
+| `MessageFailed` | When a delivery-status webhook reports a failed message |
 
 ### Listening to Events
 
@@ -474,6 +484,42 @@ php artisan fast2sms:events
 ```
 
 > **Full events guide:** [docs/events.md](docs/events.md)
+
+---
+
+## Delivery-Status Webhooks
+
+"Accepted" is not "delivered". Fast2SMS can POST a delivery report (DLR) for every message, and the package ships an opt-in receiver that verifies the request, dispatches `MessageDelivered` / `MessageFailed`, and updates the matching `fast2sms_logs` row.
+
+```env
+FAST2SMS_WEBHOOK_ENABLED=true
+FAST2SMS_WEBHOOK_SECRET=a-long-random-string
+FAST2SMS_DATABASE_LOGGING=true
+```
+
+Then point the Fast2SMS dashboard (**Create Webhook**, Standard format) at:
+
+```
+https://your-app.com/fast2sms/webhook/a-long-random-string
+```
+
+```php
+use Shakil\Fast2sms\Events\MessageFailed;
+
+class AlertOnDeliveryFailure
+{
+    public function handle(MessageFailed $event): void
+    {
+        $status = $event->response; // DeliveryStatusResponse
+
+        report("SMS {$status->requestId} to {$status->mobile} failed: {$status->getMessage()}");
+    }
+}
+```
+
+Fast2SMS does not sign webhooks, so the secret in the URL is the authenticity check. Treat it like a credential. Prefer your own route? Set `FAST2SMS_WEBHOOK_AUTO_ROUTE=false` and call `Fast2sms::webhook()->handle($request)` yourself.
+
+> **Full webhooks guide:** [docs/webhooks.md](docs/webhooks.md)
 
 ---
 

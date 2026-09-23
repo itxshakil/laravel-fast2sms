@@ -213,4 +213,41 @@ return [
         'version' => env('FAST2SMS_WHATSAPP_VERSION', 'v24.0'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Delivery-Status Webhooks
+    |--------------------------------------------------------------------------
+    |
+    | Fast2sms can POST real-time delivery reports (DLR) back to your app.
+    | The receiver is opt-in and nothing is mounted until `enabled` is true.
+    |
+    | enabled     — Turn the receiver on. Example: FAST2SMS_WEBHOOK_ENABLED=true
+    | auto_route  — Register the package route at POST {path}/{secret}. Set to
+    |               false to call Fast2sms::webhook()->handle($request) from
+    |               your own route instead.
+    | path        — URI prefix for the auto-registered route.
+    | secret      — Shared secret placed in the webhook URL you configure in
+    |               the Fast2sms dashboard. Fast2sms does not sign requests, so
+    |               treat this like a credential. Requests are rejected until
+    |               it is set. Example: FAST2SMS_WEBHOOK_SECRET=<random string>
+    | middleware  — Middleware groups applied to the route. The `api` group is
+    |               exempt from CSRF verification.
+    | allowed_ips — Optional comma-separated source IP allow-list.
+    | update_logs — Reconcile the matching `fast2sms_logs` row (requires
+    |               `database_logging`).
+    |
+    */
+    'webhook' => [
+        'enabled' => env('FAST2SMS_WEBHOOK_ENABLED', false),
+        'auto_route' => env('FAST2SMS_WEBHOOK_AUTO_ROUTE', true),
+        'path' => env('FAST2SMS_WEBHOOK_PATH', 'fast2sms/webhook'),
+        'secret' => env('FAST2SMS_WEBHOOK_SECRET'),
+        'middleware' => ['api'],
+        'allowed_ips' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('FAST2SMS_WEBHOOK_ALLOWED_IPS', '')),
+        ))),
+        'update_logs' => env('FAST2SMS_WEBHOOK_UPDATE_LOGS', true),
+    ],
+
 ];

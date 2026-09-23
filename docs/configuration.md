@@ -102,6 +102,22 @@ Set to `false` to disable all event dispatching (useful in high-throughput scena
 
 ---
 
+### `webhook.*`
+
+Opt-in receiver for Fast2SMS delivery-status (DLR) webhooks. See [webhooks.md](./webhooks.md).
+
+| Key | Env Variable | Default | Description |
+|-----|-------------|---------|-------------|
+| `webhook.enabled` | `FAST2SMS_WEBHOOK_ENABLED` | `false` | Enable the receiver. Nothing is mounted until this is `true` |
+| `webhook.auto_route` | `FAST2SMS_WEBHOOK_AUTO_ROUTE` | `true` | Register `POST {path}/{secret}`. Set `false` to use your own route with `Fast2sms::webhook()->handle($request)` |
+| `webhook.path` | `FAST2SMS_WEBHOOK_PATH` | `fast2sms/webhook` | URI prefix of the auto-registered route |
+| `webhook.secret` | `FAST2SMS_WEBHOOK_SECRET` | `null` | Shared secret embedded in the webhook URL. Requests are rejected until it is set |
+| `webhook.middleware` | — | `['api']` | Middleware groups applied to the route (`api` is CSRF-exempt) |
+| `webhook.allowed_ips` | `FAST2SMS_WEBHOOK_ALLOWED_IPS` | `[]` | Comma-separated source IP allow-list |
+| `webhook.update_logs` | `FAST2SMS_WEBHOOK_UPDATE_LOGS` | `true` | Reconcile `fast2sms_logs` rows (requires `database_logging`) |
+
+---
+
 ### Cost-Saving Features
 
 All cost-saving features are **opt-in** and disabled by default. See [Cost-Saving Features](cost-saving-features.md) for full documentation.

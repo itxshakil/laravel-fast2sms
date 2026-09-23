@@ -7,4 +7,4 @@ namespace Shakil\Fast2sms\Contracts;
 /**
  * Defines the contract for the Fast2sms service.
  */
-interface Fast2smsInterface extends AccountManagerInterface, SmsSenderInterface {}
+interface Fast2smsInterface extends AccountManagerInterface, SmsSenderInterface, WebhookManagerInterface {}

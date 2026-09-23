@@ -13,6 +13,8 @@ Laravel Fast2SMS dispatches events at key points in the SMS and WhatsApp send li
 | `WhatsAppSent` | `Shakil\Fast2sms\Events\WhatsAppSent` | After a successful WhatsApp send |
 | `WhatsAppFailed` | `Shakil\Fast2sms\Events\WhatsAppFailed` | When a WhatsApp send throws an exception |
 | `LowBalanceDetected` | `Shakil\Fast2sms\Events\LowBalanceDetected` | When wallet balance drops below threshold |
+| `MessageDelivered` | `Shakil\Fast2sms\Events\MessageDelivered` | When a delivery-status webhook reports a delivered message (see [webhooks.md](./webhooks.md)) |
+| `MessageFailed` | `Shakil\Fast2sms\Events\MessageFailed` | When a delivery-status webhook reports a failed message (see [webhooks.md](./webhooks.md)) |
 
 ---
 
@@ -151,6 +153,7 @@ The package ships with built-in listeners that log to the database when `databas
 | `LogSmsFailed` | `SmsFailed` | Writes failure record to DB |
 | `LogWhatsAppSent` | `WhatsAppSent` | Writes send record to DB |
 | `LogWhatsAppFailed` | `WhatsAppFailed` | Writes failure record to DB |
+| `LogDeliveryStatus` | `MessageDelivered`, `MessageFailed` | Reconciles the matching `fast2sms_logs` row by `request_id` |
 
 ---
 

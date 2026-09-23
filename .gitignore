@@ -11,3 +11,4 @@ tests/temp
 .env
 plans/
 build/
+.DS_Store

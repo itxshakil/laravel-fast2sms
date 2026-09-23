@@ -8,6 +8,8 @@ use Shakil\Fast2sms\Contracts\ClientInterface;
 use Shakil\Fast2sms\Contracts\ResponseInterface;
 use Shakil\Fast2sms\DataTransferObjects\Fast2smsConfig;
 use Shakil\Fast2sms\Events\LowBalanceDetected;
+use Shakil\Fast2sms\Events\MessageDelivered;
+use Shakil\Fast2sms\Events\MessageFailed;
 use Shakil\Fast2sms\Events\SmsFailed;
 use Shakil\Fast2sms\Events\SmsSent;
 use Shakil\Fast2sms\Events\WhatsAppFailed;
@@ -43,6 +45,8 @@ abstract class BaseFast2smsService
             WhatsAppSent::class => 'Fired after a successful WhatsApp send.',
             WhatsAppFailed::class => 'Fired when a WhatsApp send fails.',
             LowBalanceDetected::class => 'Fired when wallet balance drops below the configured threshold.',
+            MessageDelivered::class => 'Fired when a delivery-status webhook reports a delivered message.',
+            MessageFailed::class => 'Fired when a delivery-status webhook reports a failed message.',
         ];
     }
 
