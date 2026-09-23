@@ -159,31 +159,31 @@ All scripts are defined in `composer.json` under `"scripts"`. The `qa` script ru
 
 The CI pipeline is defined in `.github/workflows/ci.yml` and runs on every push and pull request to `main`.
 
-### Jobs (in order)
+### Jobs (all run in parallel)
 
 | Job | Tool | What it checks |
 |-----|------|---------------|
-| `lint` | Laravel Pint | Code style (no modifications, exits non-zero on violations) |
+| `lint` | Laravel Pint + actionlint | Code style and GitHub Actions workflow syntax |
 | `analyse` | PHPStan level 6 | Static type correctness |
-| `test` | PHPUnit 12 | Functional correctness across the full matrix |
+| `packagist` | Composer | `composer.json` validity and optimised autoload |
+| `test` | PHPUnit 12 | Functional correctness across the matrix |
+
+No job waits on another, so a run takes as long as its slowest job (the macOS test runners).
+Dependency installs are cached per OS, PHP version and dependency strategy by `ramsey/composer-install`.
 
 ### Test Matrix
 
-The `test` job runs across:
+The `test` job runs:
 
-- **OS**: `ubuntu-latest`, `macos-latest`, `windows-latest`
-- **PHP**: `8.3`, `8.4`, `8.5`
-- **Dependencies**: `prefer-lowest` (minimum supported versions), `prefer-stable` (latest stable)
+- **Linux** (`ubuntu-latest`): PHP `8.3`, `8.4`, `8.5` with both `lowest` and `highest` dependency versions (6 jobs).
+- **macOS** and **Windows**: PHP `8.3` and `8.5` with `highest` dependencies only (4 jobs).
 
-This gives 18 combinations per run, ensuring the package works across all supported environments.
+Windows runners need `pdo_sqlite` listed explicitly in `setup-php` extensions; Linux and macOS enable it by default.
 
-### Release Workflow
+### Release Workflows
 
-Defined in `.github/workflows/release.yml`. Triggered on pushes to `main` that match a version tag (`v*.*.*`). It:
-
-1. Validates `composer.json`.
-2. Runs `composer install --no-dev`.
-3. Calls the release-drafter to generate/update the GitHub Release draft.
+- `.github/workflows/release-drafter.yml` runs on every push to `main` and maintains a draft GitHub Release from merged PR titles and labels, with the version resolved from labels.
+- `.github/workflows/release.yml` runs when a `v*.*.*` tag is pushed and validates `composer.json` plus a `--no-dev` install of the tagged commit.
 
 ---
 
@@ -191,38 +191,37 @@ Defined in `.github/workflows/release.yml`. Triggered on pushes to `main` that m
 
 ### How Versioning Works
 
-This project uses **semantic-release** (configured in `.releaserc.json`). When a commit is merged to `main`:
+Releases are cut manually with an annotated git tag.
+There is no semantic-release; the version number is chosen by the maintainer following [Semantic Versioning](https://semver.org/).
+`CHANGELOG.md` is maintained by hand in [Keep a Changelog](https://keepachangelog.com/) format.
 
-1. `@semantic-release/commit-analyzer` reads commit messages and determines the next version (`patch` / `minor` / `major`).
-2. `@semantic-release/changelog` updates `CHANGELOG.md`.
-3. `@semantic-release/git` commits the updated `CHANGELOG.md` and `composer.json` back to `main`.
-4. `@semantic-release/github` creates a GitHub Release with the generated release notes.
+Two workflows support the process:
+
+- `release-drafter.yml` runs on every push to `main` and keeps a draft GitHub Release up to date from merged PR titles and labels.
+  The proposed version is resolved from labels: `breaking-change` bumps major, feature labels bump minor, everything else bumps patch.
+- `release.yml` runs when a `v*.*.*` tag is pushed and validates that the tagged commit passes `composer validate --strict` and installs without dev dependencies.
 
 ### How to Cut a Release
 
-**Automated path (recommended):**
-
-1. Merge your feature/fix PRs to `main` using conventional commit messages.
-2. Semantic-release runs automatically on the CI and creates the release.
-
-**Manual path (if needed):**
-
 ```bash
-# 1. Ensure main is up to date and all tests pass
+# 1. Ensure main is up to date and CI is green
 git checkout main && git pull
 composer qa
 
-# 2. Update CHANGELOG.md — move [Unreleased] items to a new [x.y.z] section
-# 3. Commit with a conventional message
+# 2. Move the [Unreleased] items in CHANGELOG.md into a new [x.y.z] - YYYY-MM-DD section
+#    and update the compare links at the bottom of the file.
 git add CHANGELOG.md
-git commit -m "chore(release): prepare v2.1.0"
+git commit -m "chore(release): prepare vx.y.z"
 
-# 4. Tag the release
-git tag v2.1.0
+# 3. Tag and push
+git tag -a vx.y.z -m "vx.y.z - short summary"
 git push origin main --tags
+
+# 4. Publish the GitHub Release once release.yml passes, using the changelog section as notes
+gh release create vx.y.z --verify-tag --title "vx.y.z - short summary" --notes-file <(sed -n '/^## \[x.y.z\]/,/^## \[/p' CHANGELOG.md | sed '$d') --latest
 ```
 
-The `release.yml` workflow fires on the tag push and creates the GitHub Release.
+Packagist is linked to the GitHub repository and picks up the new tag automatically within a few minutes.
 
 ### Release Drafter
 
