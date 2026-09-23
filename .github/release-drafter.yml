@@ -1,5 +1,33 @@
-name-template: "v$NEXT_PATCH_VERSION"
-tag-template: "v$NEXT_PATCH_VERSION"
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+# Resolve the next version from PR labels instead of always proposing a patch.
+version-resolver:
+    major:
+        labels:
+            - breaking-change
+    minor:
+        labels:
+            - feature
+            - core
+            - http
+            - notifications
+            - queue
+            - config
+            - events
+            - service-provider
+    patch:
+        labels:
+            - bug
+            - fix
+            - dependencies
+            - docs
+            - documentation
+            - ci
+            - tooling
+            - tests
+            - meta
+    default: patch
 
 categories:
     - title: "🚀 New Features"

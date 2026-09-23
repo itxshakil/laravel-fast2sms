@@ -1,47 +1,29 @@
 name: Release
 
+# Validates that a tagged commit installs cleanly as a Composer package.
+# Release notes are drafted continuously by release-drafter.yml; publish the
+# draft (or `gh release create`) after this workflow passes.
 on:
     push:
         tags:
-            - "v*.*.*" # triggers only on version tags
+            - "v*.*.*"
 
 jobs:
     release:
-        name: Release Validation & Draft
+        name: Release Validation
         runs-on: ubuntu-latest
-        permissions:
-            contents: write
 
         steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
+            - uses: shivammathur/setup-php@v2
               with:
                   php-version: 8.3
                   tools: composer
                   coverage: none
-
-            - name: Cache Composer packages
-              uses: actions/cache@v4
-              with:
-                  path: ~/.composer/cache
-                  key: release-${{ hashFiles('composer.json') }}
-                  restore-keys: release-
 
             - name: Validate composer.json
               run: composer validate --strict
 
             - name: Ensure package installs without dev dependencies
               run: composer install --no-interaction --prefer-dist --no-dev
-
-            - name: Generate Release Notes (Draft)
-              uses: release-drafter/release-drafter@v6
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  config-name: release-drafter.yml
-
-            - name: Show Draft Release Notes
-              run: cat .github/release-drafter-draft.md || echo "No release notes generated"

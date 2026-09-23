@@ -10,13 +10,15 @@ concurrency:
     group: ci-${{ github.ref }}
     cancel-in-progress: true
 
+# All jobs run in parallel; nothing waits on lint or static analysis.
+# Dependency installs are cached per OS/PHP/strategy by ramsey/composer-install.
 jobs:
     lint:
         name: Lint (Pint)
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -24,13 +26,8 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.composer/cache
-                  key: pint-${{ hashFiles('composer.json') }}
-                  restore-keys: pint-
+            - uses: ramsey/composer-install@v3
 
-            - run: composer install --no-interaction --prefer-dist
             - run: vendor/bin/pint --test
 
             - name: Lint GitHub Actions workflows
@@ -39,10 +36,9 @@ jobs:
     analyse:
         name: Static Analysis (PHPStan)
         runs-on: ubuntu-latest
-        needs: lint
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -50,29 +46,47 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.composer/cache
-                  key: phpstan-${{ hashFiles('composer.json') }}
-                  restore-keys: phpstan-
+            - uses: ramsey/composer-install@v3
 
-            - run: composer install --no-interaction --prefer-dist
             - run: php -d memory_limit=1G vendor/bin/phpstan analyse
+
+    packagist:
+        name: Composer / Packagist Validation
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v7
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.3
+                  tools: composer
+                  coverage: none
+
+            - run: composer validate --strict
+            - run: composer dump-autoload --dry-run --optimize
 
     test:
         name: Tests (PHP ${{ matrix.php }} | ${{ matrix.os }} | ${{ matrix.deps }})
         runs-on: ${{ matrix.os }}
-        needs: analyse
 
+        # Full PHP x dependency matrix on Linux; macOS and Windows only on the
+        # oldest and newest PHP with stable dependencies. Keeps macOS jobs under
+        # the free-plan concurrency limit so none of them queue.
         strategy:
             fail-fast: false
             matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
+                os: [ubuntu-latest]
                 php: [8.3, 8.4, 8.5]
-                deps: [prefer-lowest, prefer-stable]
+                deps: [lowest, highest]
+                include:
+                    - { os: macos-latest, php: 8.3, deps: highest }
+                    - { os: macos-latest, php: 8.5, deps: highest }
+                    - { os: windows-latest, php: 8.3, deps: highest }
+                    - { os: windows-latest, php: 8.5, deps: highest }
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
 
             - uses: shivammathur/setup-php@v2
               with:
@@ -81,36 +95,8 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: actions/cache@v4
+            - uses: ramsey/composer-install@v3
               with:
-                  path: ~/.composer/cache
-                  key: test-${{ matrix.php }}-${{ matrix.os }}-${{ matrix.deps }}-${{ hashFiles('composer.json') }}
-                  restore-keys: |
-                      test-${{ matrix.php }}-${{ matrix.os }}-${{ matrix.deps }}-
-                      test-${{ matrix.php }}-${{ matrix.os }}-
+                  dependency-versions: ${{ matrix.deps }}
 
-            - run: composer update --${{ matrix.deps }} --no-interaction --prefer-dist
             - run: vendor/bin/phpunit
-
-    packagist:
-        name: Composer / Packagist Validation
-        runs-on: ubuntu-latest
-        needs: lint
-
-        steps:
-            - uses: actions/checkout@v4
-
-            - uses: shivammathur/setup-php@v2
-              with:
-                  php-version: 8.3
-                  tools: composer
-                  coverage: none
-
-            - uses: actions/cache@v4
-              with:
-                  path: ~/.composer/cache
-                  key: packagist-${{ hashFiles('composer.json') }}
-                  restore-keys: packagist-
-
-            - run: composer validate --strict
-            - run: composer dump-autoload --dry-run --optimize

@@ -1,0 +1,26 @@
+name: Release Drafter
+
+# Keeps a draft GitHub Release up to date as PRs merge into main. The draft's
+# version is resolved from PR labels (see .github/release-drafter.yml), so the
+# proposed tag is right before anything is tagged.
+on:
+    push:
+        branches: ["main"]
+
+permissions:
+    contents: read
+
+jobs:
+    update_release_draft:
+        name: Update draft release notes
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: read
+
+        steps:
+            - uses: release-drafter/release-drafter@v7
+              with:
+                  config-name: release-drafter.yml
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
