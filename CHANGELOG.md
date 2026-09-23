@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-09-23
+
+Adds an opt-in **delivery-status webhook receiver** so "accepted" can become "delivered" or "failed" inside your app, and repairs the CI pipeline that had been silently failing since the v2.0.0 merge.
+
+### Added
+
+- **Delivery-status webhooks** (see [docs/webhooks.md](./docs/webhooks.md), design in [docs/adr/0001-delivery-status-webhook-receiver.md](./docs/adr/0001-delivery-status-webhook-receiver.md)):
+    - `webhook.*` config block (`enabled`, `auto_route`, `path`, `secret`, `middleware`, `allowed_ips`, `update_logs`) with safe defaults; nothing is mounted until `FAST2SMS_WEBHOOK_ENABLED=true`.
+    - Auto-registered `POST {path}/{secret}` route guarded by the `VerifyFast2smsWebhook` middleware (constant-time secret check, optional source-IP allow-list). Requests are rejected until a secret is configured.
+    - `Fast2sms::webhook()->handle($request)` via the new `ManagesWebhooks` trait and `WebhookHandlerInterface` / `WebhookManagerInterface` contracts, for apps that prefer their own route.
+    - `DeliveryStatus` enum (`Delivered`, `Failed`, `Pending`) and `DeliveryStatusResponse` value object; the CleverTap `statuses[]` webhook format is flattened onto the Standard shape automatically.
+    - `MessageDelivered` and `MessageFailed` events, listed by `fast2sms:events`.
+    - `LogDeliveryStatus` listener that reconciles the matching `fast2sms_logs` row by `request_id`, ignoring stale or duplicate retries.
+    - Migration adding `status`, `failure_reason`, `amount_debited`, `delivery_timestamp` and `post_attempt` columns to `fast2sms_logs`. If you use database logging, re-publish and run migrations: `php artisan vendor:publish --tag=fast2sms-migrations && php artisan migrate`.
+    - README section, `docs/configuration.md` and `docs/events.md` entries, and `.env.example` keys for the feature.
+
+### Fixed
+
+- **CI workflow** had invalid `strategy` keys since the v2.0.0 merge, so every run failed before starting and the README badge read "failing". The matrix is repaired, CI now runs on pushes to `main`, `actionlint` guards the workflow files, and `pdo_sqlite` is enabled on Windows runners. All 18 OS/PHP/dependency combinations pass.
+- `SmsRouteTest` no longer discards the `SmsRoute::from()` result, which newer PHPStan flags.
+
+### Changed
+
+- PHP 8.5 is treated as a fully supported target in CI rather than an experimental one.
+- `.DS_Store` files are ignored by git.
+
+## [2.0.0] - 2026-03-28
+
 This release is a **major version** focused on long-term maintainability, a richer exception hierarchy, improved Developer Experience, and PHP 8.3+ modern patterns.
 
 **Highlights:**
@@ -178,8 +206,8 @@ Initial public release of the `laravel-fast2sms` package.
 - Input validation and sanitization
 - Rate limiting support
 
-[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.1...HEAD
-[2.0.1]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.0...v2.0.1
+[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.1.2...v1.2.0
