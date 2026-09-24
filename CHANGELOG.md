@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-09-24
+
 ### Fixed
 
 - **`Fast2sms::fake()` recorded SMS parameters** now carry every field of the payload. Previously `sentSms()[n]->parameters` only had `numbers`, `message` and `route`, so OTP and DLT sends showed a blank message and `null` for `variablesValues`, `senderId`, `entityId`, `templateId`, `language`, `flash` and `scheduleTime`. Tests can now read the OTP code via `->parameters->variablesValues` and assert on DLT fields.
@@ -229,7 +231,8 @@ Initial public release of the `laravel-fast2sms` package.
 - Input validation and sanitization
 - Rate limiting support
 
-[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.0...v2.1.0
