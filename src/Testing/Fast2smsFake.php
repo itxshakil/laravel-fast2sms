@@ -17,11 +17,14 @@ use function in_array;
 use function is_array;
 
 use PHPUnit\Framework\Assert;
+use Shakil\Fast2sms\Contracts\WebhookHandlerInterface;
 use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
 use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
 use Shakil\Fast2sms\Enums\SmsRoute;
 
 use Shakil\Fast2sms\Enums\WhatsAppType;
+use Shakil\Fast2sms\Responses\DeliveryStatusResponse;
+use Shakil\Fast2sms\Webhooks\WebhookHandler;
 
 /**
  * Fake implementation for Fast2sms, analogous to Laravel's MailFake.
@@ -51,6 +54,13 @@ class Fast2smsFake
      */
     private array $recordedWhatsApp = [];
 
+    /**
+     * Inbound delivery-status webhooks handled while faking.
+     *
+     * @var list<RecordedWebhook>
+     */
+    private array $recordedWebhooks = [];
+
     public function __construct()
     {
         $this->sentMessages = collect();
@@ -62,6 +72,11 @@ class Fast2smsFake
     public function activate(): void
     {
         $fake = $this;
+
+        app()->instance(
+            WebhookHandlerInterface::class,
+            new RecordingWebhookHandler(app()->make(WebhookHandler::class), $this),
+        );
 
         Http::fake([
             config('fast2sms.base_url') . '*' => function ($request) use ($fake) {
@@ -159,6 +174,7 @@ class Fast2smsFake
         $this->sentMessages->forget($this->sentMessages->keys()->all());
         $this->recordedSms = [];
         $this->recordedWhatsApp = [];
+        $this->recordedWebhooks = [];
     }
 
     /** @return list<RecordedSmsSend> */
@@ -367,6 +383,111 @@ class Fast2smsFake
     }
 
     /**
+     * Record an inbound delivery-status webhook (called by RecordingWebhookHandler).
+     */
+    public function recordWebhook(DeliveryStatusResponse $response): void
+    {
+        $this->recordedWebhooks[] = new RecordedWebhook(
+            response: $response,
+            receivedAt: new DateTimeImmutable(),
+        );
+    }
+
+    /** @return list<RecordedWebhook> */
+    public function handledWebhooks(): array
+    {
+        return $this->recordedWebhooks;
+    }
+
+    /**
+     * Assert that at least one delivery-status webhook was handled, optionally matching a closure.
+     *
+     * @param (Closure(DeliveryStatusResponse): bool)|null $callback
+     */
+    public function assertWebhookHandled(?Closure $callback = null): void
+    {
+        if (! $callback instanceof Closure) {
+            Assert::assertNotEmpty(
+                $this->recordedWebhooks,
+                'No delivery-status webhook was handled.',
+            );
+
+            return;
+        }
+
+        Assert::assertNotEmpty(
+            $this->filterWebhooks($callback),
+            'No delivery-status webhook matching the given criteria was handled.',
+        );
+    }
+
+    /**
+     * Assert that no delivery-status webhook was handled, optionally matching a closure.
+     *
+     * @param (Closure(DeliveryStatusResponse): bool)|null $callback
+     */
+    public function assertWebhookNotHandled(?Closure $callback = null): void
+    {
+        if (! $callback instanceof Closure) {
+            Assert::assertEmpty(
+                $this->recordedWebhooks,
+                'A delivery-status webhook was handled when none was expected.',
+            );
+
+            return;
+        }
+
+        Assert::assertEmpty(
+            $this->filterWebhooks($callback),
+            'A delivery-status webhook matching the given criteria was handled when none was expected.',
+        );
+    }
+
+    /**
+     * Assert that exactly $count delivery-status webhooks were handled.
+     */
+    public function assertWebhookHandledCount(int $count): void
+    {
+        Assert::assertCount(
+            $count,
+            $this->recordedWebhooks,
+            "Expected $count delivery-status webhook(s) to be handled, but " . count($this->recordedWebhooks) . ' were handled.',
+        );
+    }
+
+    /**
+     * Assert that a webhook reported a delivered message, optionally for a specific request ID.
+     */
+    public function assertMessageDelivered(?string $requestId = null): void
+    {
+        Assert::assertNotEmpty(
+            $this->filterWebhooks(
+                static fn (DeliveryStatusResponse $r): bool => $r->status->isDelivered()
+                    && ($requestId === null || $r->requestId === $requestId),
+            ),
+            $requestId === null
+                ? 'No webhook reported a delivered message.'
+                : "No webhook reported message [$requestId] as delivered.",
+        );
+    }
+
+    /**
+     * Assert that a webhook reported a failed message, optionally for a specific request ID.
+     */
+    public function assertMessageFailed(?string $requestId = null): void
+    {
+        Assert::assertNotEmpty(
+            $this->filterWebhooks(
+                static fn (DeliveryStatusResponse $r): bool => $r->status->isFailed()
+                    && ($requestId === null || $r->requestId === $requestId),
+            ),
+            $requestId === null
+                ? 'No webhook reported a failed message.'
+                : "No webhook reported message [$requestId] as failed.",
+        );
+    }
+
+    /**
      * Assert that nothing was sent (neither SMS nor WhatsApp).
      */
     public function assertNothingSent(): void
@@ -486,6 +607,18 @@ class Fast2smsFake
     public function sentMessages(): Collection
     {
         return $this->sentMessages;
+    }
+
+    /**
+     * @param  Closure(DeliveryStatusResponse): bool $callback
+     * @return list<RecordedWebhook>
+     */
+    private function filterWebhooks(Closure $callback): array
+    {
+        return array_values(array_filter(
+            $this->recordedWebhooks,
+            static fn (RecordedWebhook $w): bool => $callback($w->response),
+        ));
     }
 
     private function isWhatsAppPath(string $path): bool

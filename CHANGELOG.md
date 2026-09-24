@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Webhook fake assertions** — `Fast2sms::fake()` now records every handled delivery-status webhook. New helpers: `assertWebhookHandled()`, `assertWebhookNotHandled()`, `assertWebhookHandledCount()`, `assertMessageDelivered(?string $requestId)`, `assertMessageFailed(?string $requestId)` and the `handledWebhooks()` accessor returning `RecordedWebhook` objects. Recording wraps the real handler, so events and log reconciliation still run. Closes ADR-0001 action item 7.
+
 ## [2.1.1] - 2026-09-23
 
 Maintenance release: discoverability and release tooling. No runtime changes.

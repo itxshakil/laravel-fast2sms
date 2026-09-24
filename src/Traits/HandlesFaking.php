@@ -11,8 +11,10 @@ use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
 use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Exceptions\Fast2smsException;
+use Shakil\Fast2sms\Responses\DeliveryStatusResponse;
 use Shakil\Fast2sms\Testing\Fast2smsFake;
 use Shakil\Fast2sms\Testing\RecordedSmsSend;
+use Shakil\Fast2sms\Testing\RecordedWebhook;
 use Shakil\Fast2sms\Testing\RecordedWhatsAppSend;
 
 /**
@@ -231,6 +233,67 @@ trait HandlesFaking
     {
         self::ensureFaking();
         self::$fake->assertSentCount($expected);
+    }
+
+    /**
+     * @return list<RecordedWebhook>
+     *
+     * @throws Fast2smsException
+     */
+    public static function handledWebhooks(): array
+    {
+        self::ensureFaking();
+
+        return self::$fake->handledWebhooks();
+    }
+
+    /**
+     * @param (Closure(DeliveryStatusResponse): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertWebhookHandled(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWebhookHandled($callback);
+    }
+
+    /**
+     * @param (Closure(DeliveryStatusResponse): bool)|null $callback
+     *
+     * @throws Fast2smsException
+     */
+    public static function assertWebhookNotHandled(?Closure $callback = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWebhookNotHandled($callback);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertWebhookHandledCount(int $count): void
+    {
+        self::ensureFaking();
+        self::$fake->assertWebhookHandledCount($count);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertMessageDelivered(?string $requestId = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertMessageDelivered($requestId);
+    }
+
+    /**
+     * @throws Fast2smsException
+     */
+    public static function assertMessageFailed(?string $requestId = null): void
+    {
+        self::ensureFaking();
+        self::$fake->assertMessageFailed($requestId);
     }
 
     /**

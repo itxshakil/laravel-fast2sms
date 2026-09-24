@@ -59,7 +59,7 @@ The most complete Fast2SMS integration for Laravel:
 - 🔔 **Laravel Notifications** — `SmsChannel` and `WhatsAppChannel` out of the box
 - 📬 **Delivery-status webhooks** — Opt-in receiver that turns Fast2SMS delivery reports into `MessageDelivered` / `MessageFailed` events and reconciles your logs
 - ⚡ **Queue support** — Dispatch sends as background jobs with per-send overrides
-- 🧪 **Fake & assert** — `Fast2sms::fake()` with 16 rich assertion helpers
+- 🧪 **Fake & assert** — `Fast2sms::fake()` with 21 rich assertion helpers for SMS, WhatsApp and delivery webhooks
 - 🚨 **Typed exceptions** — `AuthenticationException`, `RateLimitException`, `ApiException`, and more
 - 💰 **Cost-saving features** — Recipient deduplication (on by default), dedup guard, throttle, balance gate, batch splitting, invalid-recipient stripping
 - 🔍 **PHPStan level 6** — Fully typed, zero suppressions
@@ -591,6 +591,38 @@ Fast2sms::assertSent(fn (array $message) => $message['numbers'] === ['9876543210
 
 // Assert no message matching criteria was sent
 Fast2sms::assertNotSent(fn (array $message) => $message['numbers'] === ['9876543210']);
+```
+
+### Webhook Assertions
+
+When the fake is active, every delivery-status webhook that reaches the package route (or `Fast2sms::webhook()->handle()`) is recorded. Events and log reconciliation still run as normal.
+
+```php
+use Shakil\Fast2sms\Responses\DeliveryStatusResponse;
+
+Fast2sms::fake();
+
+// Simulate Fast2SMS calling your webhook
+$this->postJson('/fast2sms/webhook/' . config('fast2sms.webhook.secret'), [
+    'request_id' => 'req_123',
+    'status' => 'delivered',
+    'mobile' => '9876543210',
+]);
+
+Fast2sms::assertWebhookHandled();
+Fast2sms::assertWebhookHandledCount(1);
+Fast2sms::assertMessageDelivered('req_123');
+Fast2sms::assertMessageFailed('req_456');   // fails: nothing failed
+Fast2sms::assertWebhookNotHandled(fn (DeliveryStatusResponse $r) => $r->mobile === '9000000000');
+
+// Closure-based assertion
+Fast2sms::assertWebhookHandled(fn (DeliveryStatusResponse $r) => $r->amountDebited !== null);
+
+// Inspect what was recorded
+foreach (Fast2sms::handledWebhooks() as $webhook) {
+    $webhook->response;   // DeliveryStatusResponse
+    $webhook->receivedAt; // DateTimeImmutable
+}
 ```
 
 ### Stopping the Fake

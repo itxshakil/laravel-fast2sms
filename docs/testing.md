@@ -122,6 +122,50 @@ Fast2sms::assertNotSent(fn (array $message) => $message['numbers'] === ['9876543
 
 ---
 
+## Webhook Assertions
+
+`Fast2sms::fake()` also records every inbound delivery-status webhook handled by the package, whether it arrived on the auto-registered route or through `Fast2sms::webhook()->handle($request)`.
+Recording is a decorator around the real handler, so `MessageDelivered` / `MessageFailed` are still dispatched and `fast2sms_logs` is still reconciled; combine with `Event::fake()` if you want to silence listeners.
+
+| Method | Asserts |
+|--------|---------|
+| `assertWebhookHandled(?Closure $cb = null)` | At least one webhook was handled, optionally matching the closure |
+| `assertWebhookNotHandled(?Closure $cb = null)` | No webhook was handled, optionally matching the closure |
+| `assertWebhookHandledCount(int $count)` | Exactly `$count` webhooks were handled |
+| `assertMessageDelivered(?string $requestId = null)` | A webhook reported a delivered message, optionally for `$requestId` |
+| `assertMessageFailed(?string $requestId = null)` | A webhook reported a failed message, optionally for `$requestId` |
+| `handledWebhooks()` | Returns `list<RecordedWebhook>` (`->response`, `->receivedAt`) |
+
+Closures receive the parsed `DeliveryStatusResponse`.
+
+```php
+use Illuminate\Http\Request;
+use Shakil\Fast2sms\Facades\Fast2sms;
+use Shakil\Fast2sms\Responses\DeliveryStatusResponse;
+
+Fast2sms::fake();
+
+// Through the package route
+$this->postJson('/fast2sms/webhook/' . config('fast2sms.webhook.secret'), [
+    'request_id' => 'req_123',
+    'status' => 'failed',
+    'failure_reason' => 'DND number',
+]);
+
+// Or directly, when you own the route
+Fast2sms::webhook()->handle(Request::create('/hooks/sms', 'POST', [
+    'request_id' => 'req_456',
+    'status' => 'delivered',
+]));
+
+Fast2sms::assertWebhookHandledCount(2);
+Fast2sms::assertMessageFailed('req_123');
+Fast2sms::assertMessageDelivered('req_456');
+Fast2sms::assertWebhookHandled(
+    fn (DeliveryStatusResponse $r): bool => $r->getMessage() === 'DND number',
+);
+```
+
 ## Resetting the Fake
 
 Between tests, the fake resets automatically. To reset manually within a test:
