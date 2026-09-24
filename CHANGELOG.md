@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-09-24
+
+Adds delivery-status webhook assertions to `Fast2sms::fake()`.
+
 ### Added
 
 - **Webhook fake assertions** — `Fast2sms::fake()` now records every handled delivery-status webhook. New helpers: `assertWebhookHandled()`, `assertWebhookNotHandled()`, `assertWebhookHandledCount()`, `assertMessageDelivered(?string $requestId)`, `assertMessageFailed(?string $requestId)` and the `handledWebhooks()` accessor returning `RecordedWebhook` objects. Recording wraps the real handler, so events and log reconciliation still run. Closes ADR-0001 action item 7.
@@ -221,7 +225,8 @@ Initial public release of the `laravel-fast2sms` package.
 - Input validation and sanitization
 - Rate limiting support
 
-[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/itxshakil/laravel-fast2sms/compare/v1.3.0...v2.0.0
