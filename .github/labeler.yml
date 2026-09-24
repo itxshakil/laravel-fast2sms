@@ -84,7 +84,5 @@ meta:
                 - .gitignore
                 - .gitattributes
 
-breaking-change:
-    - changed-files:
-          - any-glob-to-any-file:
-                - src/**
+# `breaking-change` is intentionally not path-based. Apply it by hand on PRs
+# that change public behaviour; release-drafter resolves it to a major bump.
