@@ -6,6 +6,8 @@ namespace Shakil\Fast2sms\Tests\Unit\Testing;
 
 use PHPUnit\Framework\AssertionFailedError;
 use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
+use Shakil\Fast2sms\Enums\SmsLanguage;
+use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Testing\Fast2smsFake;
 use Shakil\Fast2sms\Tests\TestCase;
@@ -118,6 +120,45 @@ class Fast2smsFakeTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $messages);
         $this->assertSame('9999999999', $messages->first()['numbers']);
+    }
+
+    public function test_it_records_the_otp_code_from_an_otp_payload(): void
+    {
+        $this->fake->recordMessage(['route' => 'otp', 'numbers' => '9876543210', 'variables_values' => '482913', 'flash' => 0]);
+
+        $params = $this->fake->sentSms()[0]->parameters;
+
+        $this->assertSame(SmsRoute::OTP, $params->route);
+        $this->assertSame('482913', $params->variablesValues);
+        $this->assertFalse($params->flash);
+    }
+
+    public function test_it_records_every_dlt_field_from_a_dlt_payload(): void
+    {
+        $this->fake->recordMessage([
+            'route' => 'dlt',
+            'numbers' => '9876543210',
+            'sender_id' => 'MYSHOP',
+            'message' => '123456',
+            'entity_id' => 'ENT1',
+            'template_id' => 'TPL1',
+            'variables_values' => 'Order #1|shipped',
+            'language' => 'unicode',
+            'flash' => 1,
+            'schedule_time' => '2026-10-01 10:00',
+        ]);
+
+        $params = $this->fake->sentSms()[0]->parameters;
+
+        $this->assertSame(SmsRoute::DLT, $params->route);
+        $this->assertSame('MYSHOP', $params->senderId);
+        $this->assertSame('123456', $params->message);
+        $this->assertSame('ENT1', $params->entityId);
+        $this->assertSame('TPL1', $params->templateId);
+        $this->assertSame('Order #1|shipped', $params->variablesValues);
+        $this->assertSame(SmsLanguage::UNICODE, $params->language);
+        $this->assertTrue($params->flash);
+        $this->assertSame('2026-10-01 10:00', $params->scheduleTime);
     }
 
     public function test_sent_whatsapp_returns_empty_array_initially(): void

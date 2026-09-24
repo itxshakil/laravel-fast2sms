@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Fast2sms::fake()` recorded SMS parameters** now carry every field of the payload. Previously `sentSms()[n]->parameters` only had `numbers`, `message` and `route`, so OTP and DLT sends showed a blank message and `null` for `variablesValues`, `senderId`, `entityId`, `templateId`, `language`, `flash` and `scheduleTime`. Tests can now read the OTP code via `->parameters->variablesValues` and assert on DLT fields.
+
 ## [2.2.0] - 2026-09-24
 
 Adds delivery-status webhook assertions to `Fast2sms::fake()`.

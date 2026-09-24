@@ -20,6 +20,7 @@ use PHPUnit\Framework\Assert;
 use Shakil\Fast2sms\Contracts\WebhookHandlerInterface;
 use Shakil\Fast2sms\DataTransferObjects\SmsParameters;
 use Shakil\Fast2sms\DataTransferObjects\WhatsAppParameters;
+use Shakil\Fast2sms\Enums\SmsLanguage;
 use Shakil\Fast2sms\Enums\SmsRoute;
 
 use Shakil\Fast2sms\Enums\WhatsAppType;
@@ -160,6 +161,13 @@ class Fast2smsFake
                     numbers: is_array($numbers) ? $numbers : [$numbers],
                     message: $payload['message'] ?? '',
                     route: SmsRoute::tryFrom($payload['route'] ?? '') ?? SmsRoute::QUICK,
+                    language: isset($payload['language']) ? SmsLanguage::tryFrom((string) $payload['language']) : null,
+                    senderId: isset($payload['sender_id']) ? (string) $payload['sender_id'] : null,
+                    entityId: isset($payload['entity_id']) ? (string) $payload['entity_id'] : null,
+                    templateId: isset($payload['template_id']) ? (string) $payload['template_id'] : null,
+                    variablesValues: $payload['variables_values'] ?? null,
+                    flash: (bool) ($payload['flash'] ?? false),
+                    scheduleTime: isset($payload['schedule_time']) ? (string) $payload['schedule_time'] : null,
                 ),
                 sentAt: $now,
             );
