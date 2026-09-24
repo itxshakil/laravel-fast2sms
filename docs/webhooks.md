@@ -103,6 +103,24 @@ Route::post('/hooks/sms', function (Request $request) {
 });
 ```
 
+## Testing
+
+With `Fast2sms::fake()` active, handled webhooks are recorded and can be asserted on:
+
+```php
+Fast2sms::fake();
+
+$this->postJson('/fast2sms/webhook/' . config('fast2sms.webhook.secret'), [
+    'request_id' => 'req_123',
+    'status' => 'delivered',
+]);
+
+Fast2sms::assertMessageDelivered('req_123');
+Fast2sms::assertWebhookHandledCount(1);
+```
+
+See [testing.md](./testing.md#webhook-assertions) for the full list of webhook assertions.
+
 ## CleverTap format
 
 If you configure the **CleverTap (SMS)** webhook template in the dashboard, its `statuses[]` envelope is flattened automatically onto the standard shape, so events and reconciliation work unchanged.

@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Shakil\Fast2sms\Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Override;
 use Shakil\Fast2sms\Events\MessageDelivered;
 use Shakil\Fast2sms\Events\MessageFailed;
+use Shakil\Fast2sms\Facades\Fast2sms;
 use Shakil\Fast2sms\Models\Fast2smsLog;
+use Shakil\Fast2sms\Responses\DeliveryStatusResponse;
 use Shakil\Fast2sms\Tests\TestCase;
 
 final class WebhookTest extends TestCase
@@ -97,6 +100,45 @@ final class WebhookTest extends TestCase
         $log = Fast2smsLog::query()->where('request_id', 'req_123')->firstOrFail();
         $this->assertSame('delivered', $log->getAttribute('status'));
         $this->assertTrue((bool) $log->getAttribute('is_success'));
+    }
+
+    public function test_fake_records_webhooks_received_on_the_package_route(): void
+    {
+        Fast2sms::fake();
+
+        Fast2sms::assertWebhookNotHandled();
+
+        $this->postJson(self::URL, $this->deliveredPayload())->assertOk();
+        $this->postJson(self::URL, $this->deliveredPayload(['request_id' => 'req_456', 'status' => 'failed']))->assertOk();
+
+        Fast2sms::assertWebhookHandled();
+        Fast2sms::assertWebhookHandledCount(2);
+        Fast2sms::assertMessageDelivered('req_123');
+        Fast2sms::assertMessageFailed('req_456');
+        Fast2sms::assertWebhookHandled(fn (DeliveryStatusResponse $r): bool => $r->mobile === '9999999999');
+    }
+
+    public function test_fake_records_webhooks_handled_from_a_custom_route(): void
+    {
+        Fast2sms::fake();
+
+        $request = Request::create('/hooks/sms', 'POST', $this->deliveredPayload());
+
+        Fast2sms::webhook()->handle($request);
+
+        Fast2sms::assertMessageDelivered('req_123');
+        Fast2sms::assertWebhookHandledCount(1);
+    }
+
+    public function test_fake_still_dispatches_events_and_reconciles_logs(): void
+    {
+        Fast2sms::fake();
+        Event::fake([MessageDelivered::class]);
+
+        $this->postJson(self::URL, $this->deliveredPayload())->assertOk();
+
+        Event::assertDispatched(MessageDelivered::class);
+        Fast2sms::assertMessageDelivered('req_123');
     }
 
     #[Override]

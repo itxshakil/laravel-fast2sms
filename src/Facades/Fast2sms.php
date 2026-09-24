@@ -16,6 +16,7 @@ use Shakil\Fast2sms\Enums\SmsRoute;
 use Shakil\Fast2sms\Enums\WhatsAppType;
 use Shakil\Fast2sms\Testing\Fast2smsFake;
 use Shakil\Fast2sms\Testing\RecordedSmsSend;
+use Shakil\Fast2sms\Testing\RecordedWebhook;
 use Shakil\Fast2sms\Testing\RecordedWhatsAppSend;
 
 /**
@@ -60,6 +61,12 @@ use Shakil\Fast2sms\Testing\RecordedWhatsAppSend;
  * @method static void                                  assertWhatsAppSentWithType(WhatsAppType $type)
  * @method static void                                  assertNothingSent()
  * @method static void                                  assertSentCount(int $expected)
+ * @method static list<RecordedWebhook>                 handledWebhooks()
+ * @method static void                                  assertWebhookHandled(Closure|null $callback = null)
+ * @method static void                                  assertWebhookNotHandled(Closure|null $callback = null)
+ * @method static void                                  assertWebhookHandledCount(int $count)
+ * @method static void                                  assertMessageDelivered(?string $requestId = null)
+ * @method static void                                  assertMessageFailed(?string $requestId = null)
  * @method static Collection<int, array<string, mixed>> sentMessages()
  * @method static list<RecordedSmsSend>                 sentSms()
  * @method static list<RecordedWhatsAppSend>            sentWhatsApp()

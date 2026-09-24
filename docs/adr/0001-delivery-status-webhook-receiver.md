@@ -1,6 +1,6 @@
 # ADR-0001: Inbound Delivery-Status Webhook Receiver
 
-**Status:** Proposed
+**Status:** Accepted. Items 1-6 and 8-10 shipped in v2.1.0 (2026-09-23); item 7 shipped in the following release.
 **Date:** 2026-07-09
 **Deciders:** Shakil Alam (maintainer), package contributors
 
@@ -94,13 +94,13 @@ Security is handled pragmatically given Fast2SMS provides no signing: a high-ent
 
 ## Action Items
 
-1. [ ] Add `WebhookHandlerInterface` to `src/Contracts/` (parse + handle + CRUD registration).
-2. [ ] Add `DeliveryStatus` enum and `DeliveryStatusResponse` value object; wire construction through `ResponseFactory`.
-3. [ ] Implement `ManagesWebhooks` trait; mix into `BaseFast2smsService`; expose via `Fast2sms` facade + regenerate IDE helper.
-4. [ ] Add `webhook` config block (`enabled`, `path`, `secret`, `auto_route`, `update_logs`, `allowed_ips`) with safe defaults (disabled, null secret).
-5. [ ] Add `VerifyFast2smsWebhook` middleware (secret compare via `hash_equals`, optional IP allow-list) and conditional route registration in `Fast2smsServiceProvider`; exempt from CSRF.
-6. [ ] Dispatch `MessageDelivered` / `MessageFailed`; add matching log-writing listeners; implement idempotent `Fast2smsLog` reconciliation by `request_id` guarded on `post_attempt`/`delivery_timestamp`.
-7. [ ] Extend `Fast2smsFake` with webhook assertions (`assertDeliveryHandled`, `assertMessageDelivered`, etc.).
-8. [ ] Tests: Unit (payload → `DeliveryStatusResponse` mapping, enum, idempotency guard) and Feature (route registration, secret rejection, CSRF exemption, log reconciliation) — no real HTTP.
-9. [ ] Docs: `docs/webhooks.md` (setup, secret-in-URL security model, dashboard config) + README section; note the pull-based fallback.
-10. [ ] Run `composer qa` (lint + PHPStan level 6 + tests) before merge.
+1. [x] Add `WebhookHandlerInterface` to `src/Contracts/` (parse + handle + CRUD registration).
+2. [x] Add `DeliveryStatus` enum and `DeliveryStatusResponse` value object; wire construction through `ResponseFactory`.
+3. [x] Implement `ManagesWebhooks` trait; mix into `BaseFast2smsService`; expose via `Fast2sms` facade + regenerate IDE helper.
+4. [x] Add `webhook` config block (`enabled`, `path`, `secret`, `auto_route`, `update_logs`, `allowed_ips`) with safe defaults (disabled, null secret).
+5. [x] Add `VerifyFast2smsWebhook` middleware (secret compare via `hash_equals`, optional IP allow-list) and conditional route registration in `Fast2smsServiceProvider`; exempt from CSRF.
+6. [x] Dispatch `MessageDelivered` / `MessageFailed`; add matching log-writing listeners; implement idempotent `Fast2smsLog` reconciliation by `request_id` guarded on `post_attempt`/`delivery_timestamp`.
+7. [x] Extend `Fast2smsFake` with webhook assertions (`assertWebhookHandled`, `assertWebhookNotHandled`, `assertWebhookHandledCount`, `assertMessageDelivered`, `assertMessageFailed`, `handledWebhooks`).
+8. [x] Tests: Unit (payload → `DeliveryStatusResponse` mapping, enum, idempotency guard) and Feature (route registration, secret rejection, CSRF exemption, log reconciliation) — no real HTTP.
+9. [x] Docs: `docs/webhooks.md` (setup, secret-in-URL security model, dashboard config) + README section; note the pull-based fallback.
+10. [x] Run `composer qa` (lint + PHPStan level 6 + tests) before merge.
