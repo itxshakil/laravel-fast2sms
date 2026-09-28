@@ -26,7 +26,7 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: ramsey/composer-install@v3
+            - uses: ramsey/composer-install@v4
 
             - run: vendor/bin/pint --test
 
@@ -46,7 +46,7 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: ramsey/composer-install@v3
+            - uses: ramsey/composer-install@v4
 
             - run: php -d memory_limit=1G vendor/bin/phpstan analyse
 
@@ -95,7 +95,7 @@ jobs:
                   tools: composer
                   coverage: none
 
-            - uses: ramsey/composer-install@v3
+            - uses: ramsey/composer-install@v4
               with:
                   dependency-versions: ${{ matrix.deps }}
 
