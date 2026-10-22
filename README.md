@@ -48,6 +48,7 @@ The most complete Fast2SMS integration for Laravel:
 - [Error Handling](#error-handling)
 - [Upgrade Guide](#upgrade-guide)
 - [Contributing](#contributing)
+- [More Packages](#more-packages)
 - [License](#license)
 
 ---
@@ -768,6 +769,19 @@ composer lint:fix
 # Full QA pipeline
 composer qa
 ```
+
+---
+
+## More Packages
+
+Other packages by the same author:
+
+| Package | What it does |
+| --- | --- |
+| [itxshakil/laravel-aadhaar-offline](https://github.com/itxshakil/laravel-aadhaar-offline) | Read and verify Aadhaar Offline e-KYC and Secure QR codes locally in Laravel |
+| [itxshakil/aadhaar-offline](https://github.com/itxshakil/aadhaar-offline) | The same Aadhaar Offline verification for any PHP app |
+| [itxshakil/laravel-form-shield](https://github.com/itxshakil/laravel-form-shield) | CAPTCHA-free spam scoring for Laravel forms |
+| [itxshakil/cpanel-whm](https://github.com/itxshakil/cpanel-whm) | Typed, fakeable cPanel WHM API client for Laravel |
 
 ---
 
