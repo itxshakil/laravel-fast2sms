@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-03
+
 ### Removed
 
 - Laravel 11 support. Every Laravel 11 release now has an unpatched security advisory, and Composer refuses to install it by default. Stay on 2.2.x if you can't upgrade yet.
