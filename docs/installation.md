@@ -20,7 +20,7 @@ composer require itxshakil/laravel-fast2sms
 
 ## Step 2 — Auto-Discovery
 
-Laravel automatically discovers the service provider and facade. No manual registration is needed for Laravel 11+.
+Laravel automatically discovers the service provider and facade. No manual registration is needed.
 
 ### Manual Registration (optional)
 

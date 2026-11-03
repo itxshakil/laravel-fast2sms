@@ -74,7 +74,7 @@ The most complete Fast2SMS integration for Laravel:
 | Requirement | Version |
 |-------------|---------|
 | PHP | ^8.3 |
-| Laravel | ^11.0 \| ^12.0 \| ^13.0 |
+| Laravel | ^12.0 \| ^13.0 |
 | Fast2SMS account | [Sign up free](https://www.fast2sms.com) |
 
 ---

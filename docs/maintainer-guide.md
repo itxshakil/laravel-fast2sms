@@ -81,7 +81,7 @@ Facade (Fast2sms::quick(), Fast2sms::otp(), Fast2sms::dlt())
 
 - PHP 8.3 / 8.4 / 8.5
 - Composer
-- Laravel 11.x or higher (`^11.0 | ^12.0 | ^13.0`)
+- Laravel 12.x or higher (`^12.0 | ^13.0`)
 - A Fast2SMS account (for manual integration testing only)
 
 ### Branching Strategy
