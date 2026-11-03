@@ -3,6 +3,8 @@ version: 2
 updates:
   - package-ecosystem: composer
     directory: /
+    # Widen ranges instead of replacing them, or a major bump drops support for older PHP.
+    versioning-strategy: widen
     schedule:
       interval: weekly
       day: monday
